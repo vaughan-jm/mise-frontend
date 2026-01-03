@@ -79,6 +79,344 @@ export default function Mise() {
     { code: 'ar', label: 'عر', name: 'Arabic' },
   ];
   
+  // UI Translations
+  const t = {
+    en: {
+      justTheRecipe: 'just the recipe',
+      pasteUrl: 'Paste URL',
+      snapPhoto: 'Photo',
+      youtube: 'Video',
+      recipesLeft: 'left',
+      signIn: 'Sign In',
+      logout: 'Logout',
+      clean: 'Clean',
+      addPhotos: 'Add photos',
+      addMore: 'Add more',
+      worksWithAny: 'Works with any recipe website',
+      uploadOrSnap: 'Upload or snap cookbook pages',
+      pasteYoutube: 'Paste a YouTube cooking video URL',
+      youtubeHelper: 'Extract recipes from cooking videos',
+      prep: 'Prep',
+      cook: 'Cook',
+      servings: 'servings',
+      viewSource: 'View source',
+      save: 'Save',
+      saved: 'Saved',
+      saving: 'Saving...',
+      upgrade: 'Upgrade',
+      cookAgain: 'Cook Again',
+      youllNeed: "You'll need:",
+      tips: 'Tips',
+      suggestFeature: 'Suggest a feature',
+      savedRecipes: 'Saved Recipes',
+      close: 'Close',
+      noSavedRecipes: 'No saved recipes yet',
+      createAccount: 'Create Account',
+      welcomeBack: 'Welcome back',
+      email: 'Email',
+      password: 'Password',
+      needAccount: "Need an account?",
+      haveAccount: 'Have an account?',
+      free: 'Free',
+      recipes: 'recipes',
+      month: 'month',
+      unlimited: 'Unlimited',
+      current: 'Current',
+      choosePlan: 'Choose Plan',
+      rateExperience: 'How was your cooking experience?',
+      feedbackPlaceholder: "What feature would make mise better for you?",
+      sendFeedback: 'Send',
+      thanksFeedback: 'Thanks for your feedback!',
+    },
+    es: {
+      justTheRecipe: 'solo la receta',
+      pasteUrl: 'Pegar URL',
+      snapPhoto: 'Foto',
+      youtube: 'Video',
+      recipesLeft: 'restantes',
+      signIn: 'Iniciar',
+      logout: 'Salir',
+      clean: 'Limpiar',
+      addPhotos: 'Añadir fotos',
+      addMore: 'Añadir más',
+      worksWithAny: 'Funciona con cualquier sitio de recetas',
+      uploadOrSnap: 'Sube o fotografía páginas de cocina',
+      pasteYoutube: 'Pega una URL de video de cocina de YouTube',
+      youtubeHelper: 'Extrae recetas de videos de cocina',
+      prep: 'Prep',
+      cook: 'Cocinar',
+      servings: 'porciones',
+      viewSource: 'Ver fuente',
+      save: 'Guardar',
+      saved: 'Guardado',
+      saving: 'Guardando...',
+      upgrade: 'Mejorar',
+      cookAgain: 'Cocinar de nuevo',
+      youllNeed: 'Necesitarás:',
+      tips: 'Consejos',
+      suggestFeature: 'Sugerir función',
+      savedRecipes: 'Recetas guardadas',
+      close: 'Cerrar',
+      noSavedRecipes: 'Aún no hay recetas guardadas',
+      createAccount: 'Crear cuenta',
+      welcomeBack: 'Bienvenido de nuevo',
+      email: 'Correo',
+      password: 'Contraseña',
+      needAccount: '¿Necesitas una cuenta?',
+      haveAccount: '¿Tienes cuenta?',
+      free: 'Gratis',
+      recipes: 'recetas',
+      month: 'mes',
+      unlimited: 'Ilimitado',
+      current: 'Actual',
+      choosePlan: 'Elegir plan',
+      rateExperience: '¿Cómo fue tu experiencia cocinando?',
+      feedbackPlaceholder: '¿Qué función mejoraría mise para ti?',
+      sendFeedback: 'Enviar',
+      thanksFeedback: '¡Gracias por tu opinión!',
+    },
+    fr: {
+      justTheRecipe: 'juste la recette',
+      pasteUrl: 'Coller URL',
+      snapPhoto: 'Photo',
+      youtube: 'Vidéo',
+      recipesLeft: 'restantes',
+      signIn: 'Connexion',
+      logout: 'Déconnexion',
+      clean: 'Nettoyer',
+      addPhotos: 'Ajouter photos',
+      addMore: 'Ajouter plus',
+      worksWithAny: 'Fonctionne avec tous les sites de recettes',
+      uploadOrSnap: 'Téléchargez ou photographiez des pages de cuisine',
+      pasteYoutube: 'Collez une URL de vidéo de cuisine YouTube',
+      youtubeHelper: 'Extraire des recettes de vidéos de cuisine',
+      prep: 'Prép',
+      cook: 'Cuisson',
+      servings: 'portions',
+      viewSource: 'Voir source',
+      save: 'Sauver',
+      saved: 'Sauvé',
+      saving: 'Sauvegarde...',
+      upgrade: 'Améliorer',
+      cookAgain: 'Recuisiner',
+      youllNeed: 'Vous aurez besoin:',
+      tips: 'Conseils',
+      suggestFeature: 'Suggérer une fonction',
+      savedRecipes: 'Recettes sauvées',
+      close: 'Fermer',
+      noSavedRecipes: 'Pas encore de recettes sauvées',
+      createAccount: 'Créer un compte',
+      welcomeBack: 'Bienvenue',
+      email: 'Email',
+      password: 'Mot de passe',
+      needAccount: 'Besoin d\'un compte?',
+      haveAccount: 'Déjà un compte?',
+      free: 'Gratuit',
+      recipes: 'recettes',
+      month: 'mois',
+      unlimited: 'Illimité',
+      current: 'Actuel',
+      choosePlan: 'Choisir',
+      rateExperience: 'Comment était votre expérience?',
+      feedbackPlaceholder: 'Quelle fonction améliorerait mise?',
+      sendFeedback: 'Envoyer',
+      thanksFeedback: 'Merci pour votre avis!',
+    },
+    pt: {
+      justTheRecipe: 'só a receita',
+      pasteUrl: 'Colar URL',
+      snapPhoto: 'Foto',
+      youtube: 'Vídeo',
+      recipesLeft: 'restantes',
+      signIn: 'Entrar',
+      logout: 'Sair',
+      clean: 'Limpar',
+      addPhotos: 'Adicionar fotos',
+      addMore: 'Adicionar mais',
+      worksWithAny: 'Funciona com qualquer site de receitas',
+      uploadOrSnap: 'Envie ou fotografe páginas de receitas',
+      pasteYoutube: 'Cole uma URL de vídeo de culinária do YouTube',
+      youtubeHelper: 'Extraia receitas de vídeos de culinária',
+      prep: 'Prep',
+      cook: 'Cozinhar',
+      servings: 'porções',
+      viewSource: 'Ver fonte',
+      save: 'Salvar',
+      saved: 'Salvo',
+      saving: 'Salvando...',
+      upgrade: 'Melhorar',
+      cookAgain: 'Cozinhar novamente',
+      youllNeed: 'Você vai precisar:',
+      tips: 'Dicas',
+      suggestFeature: 'Sugerir função',
+      savedRecipes: 'Receitas salvas',
+      close: 'Fechar',
+      noSavedRecipes: 'Nenhuma receita salva ainda',
+      createAccount: 'Criar conta',
+      welcomeBack: 'Bem-vindo de volta',
+      email: 'Email',
+      password: 'Senha',
+      needAccount: 'Precisa de uma conta?',
+      haveAccount: 'Tem uma conta?',
+      free: 'Grátis',
+      recipes: 'receitas',
+      month: 'mês',
+      unlimited: 'Ilimitado',
+      current: 'Atual',
+      choosePlan: 'Escolher',
+      rateExperience: 'Como foi sua experiência?',
+      feedbackPlaceholder: 'Que função melhoraria o mise?',
+      sendFeedback: 'Enviar',
+      thanksFeedback: 'Obrigado pelo feedback!',
+    },
+    zh: {
+      justTheRecipe: '只要食谱',
+      pasteUrl: '粘贴链接',
+      snapPhoto: '照片',
+      youtube: '视频',
+      recipesLeft: '剩余',
+      signIn: '登录',
+      logout: '退出',
+      clean: '整理',
+      addPhotos: '添加照片',
+      addMore: '添加更多',
+      worksWithAny: '适用于任何食谱网站',
+      uploadOrSnap: '上传或拍摄食谱页面',
+      pasteYoutube: '粘贴YouTube烹饪视频链接',
+      youtubeHelper: '从烹饪视频中提取食谱',
+      prep: '准备',
+      cook: '烹饪',
+      servings: '份',
+      viewSource: '查看来源',
+      save: '保存',
+      saved: '已保存',
+      saving: '保存中...',
+      upgrade: '升级',
+      cookAgain: '再做一次',
+      youllNeed: '你需要:',
+      tips: '提示',
+      suggestFeature: '建议功能',
+      savedRecipes: '已保存的食谱',
+      close: '关闭',
+      noSavedRecipes: '还没有保存的食谱',
+      createAccount: '创建账户',
+      welcomeBack: '欢迎回来',
+      email: '邮箱',
+      password: '密码',
+      needAccount: '需要账户?',
+      haveAccount: '已有账户?',
+      free: '免费',
+      recipes: '食谱',
+      month: '月',
+      unlimited: '无限',
+      current: '当前',
+      choosePlan: '选择',
+      rateExperience: '烹饪体验如何?',
+      feedbackPlaceholder: '什么功能能让mise更好?',
+      sendFeedback: '发送',
+      thanksFeedback: '感谢您的反馈!',
+    },
+    hi: {
+      justTheRecipe: 'सिर्फ रेसिपी',
+      pasteUrl: 'URL पेस्ट करें',
+      snapPhoto: 'फोटो',
+      youtube: 'वीडियो',
+      recipesLeft: 'बाकी',
+      signIn: 'साइन इन',
+      logout: 'लॉगआउट',
+      clean: 'साफ करें',
+      addPhotos: 'फोटो जोड़ें',
+      addMore: 'और जोड़ें',
+      worksWithAny: 'किसी भी रेसिपी वेबसाइट के साथ काम करता है',
+      uploadOrSnap: 'कुकबुक पेज अपलोड या फोटो खींचें',
+      pasteYoutube: 'YouTube कुकिंग वीडियो URL पेस्ट करें',
+      youtubeHelper: 'कुकिंग वीडियो से रेसिपी निकालें',
+      prep: 'तैयारी',
+      cook: 'पकाना',
+      servings: 'सर्विंग्स',
+      viewSource: 'स्रोत देखें',
+      save: 'सेव करें',
+      saved: 'सेव हो गया',
+      saving: 'सेव हो रहा है...',
+      upgrade: 'अपग्रेड',
+      cookAgain: 'फिर से बनाएं',
+      youllNeed: 'आपको चाहिए:',
+      tips: 'सुझाव',
+      suggestFeature: 'सुझाव दें',
+      savedRecipes: 'सेव की गई रेसिपी',
+      close: 'बंद करें',
+      noSavedRecipes: 'अभी तक कोई रेसिपी सेव नहीं',
+      createAccount: 'खाता बनाएं',
+      welcomeBack: 'वापसी पर स्वागत है',
+      email: 'ईमेल',
+      password: 'पासवर्ड',
+      needAccount: 'खाता चाहिए?',
+      haveAccount: 'खाता है?',
+      free: 'मुफ्त',
+      recipes: 'रेसिपी',
+      month: 'महीना',
+      unlimited: 'अनलिमिटेड',
+      current: 'वर्तमान',
+      choosePlan: 'चुनें',
+      rateExperience: 'खाना बनाने का अनुभव कैसा था?',
+      feedbackPlaceholder: 'कौन सी सुविधा mise को बेहतर बनाएगी?',
+      sendFeedback: 'भेजें',
+      thanksFeedback: 'आपकी प्रतिक्रिया के लिए धन्यवाद!',
+    },
+    ar: {
+      justTheRecipe: 'فقط الوصفة',
+      pasteUrl: 'لصق الرابط',
+      snapPhoto: 'صورة',
+      youtube: 'فيديو',
+      recipesLeft: 'متبقي',
+      signIn: 'تسجيل الدخول',
+      logout: 'خروج',
+      clean: 'تنظيف',
+      addPhotos: 'إضافة صور',
+      addMore: 'إضافة المزيد',
+      worksWithAny: 'يعمل مع أي موقع وصفات',
+      uploadOrSnap: 'ارفع أو صوّر صفحات كتاب الطبخ',
+      pasteYoutube: 'الصق رابط فيديو طبخ من يوتيوب',
+      youtubeHelper: 'استخرج الوصفات من فيديوهات الطبخ',
+      prep: 'تحضير',
+      cook: 'طبخ',
+      servings: 'حصص',
+      viewSource: 'عرض المصدر',
+      save: 'حفظ',
+      saved: 'محفوظ',
+      saving: 'جاري الحفظ...',
+      upgrade: 'ترقية',
+      cookAgain: 'اطبخ مرة أخرى',
+      youllNeed: 'ستحتاج:',
+      tips: 'نصائح',
+      suggestFeature: 'اقتراح ميزة',
+      savedRecipes: 'الوصفات المحفوظة',
+      close: 'إغلاق',
+      noSavedRecipes: 'لا توجد وصفات محفوظة بعد',
+      createAccount: 'إنشاء حساب',
+      welcomeBack: 'مرحباً بعودتك',
+      email: 'البريد الإلكتروني',
+      password: 'كلمة المرور',
+      needAccount: 'تحتاج حساب؟',
+      haveAccount: 'لديك حساب؟',
+      free: 'مجاني',
+      recipes: 'وصفات',
+      month: 'شهر',
+      unlimited: 'غير محدود',
+      current: 'الحالي',
+      choosePlan: 'اختر',
+      rateExperience: 'كيف كانت تجربتك في الطبخ؟',
+      feedbackPlaceholder: 'ما الميزة التي ستحسن mise؟',
+      sendFeedback: 'إرسال',
+      thanksFeedback: 'شكراً على رأيك!',
+    },
+  };
+  
+  const txt = t[language] || t.en;
+  
+  // YouTube state
+  const [youtubeUrl, setYoutubeUrl] = useState('');
+  
   const changeLanguage = (code) => {
     setLanguage(code);
     localStorage.setItem('mise_language', code);
@@ -111,6 +449,15 @@ export default function Mise() {
     "Almost ready to cook...",
   ];
 
+  const youtubeLoadingMessages = [
+    "Watching the video for you...", "Skipping the 5-minute intro...", "Fast-forwarding through the sponsor...",
+    "Catching all the 'pinch of this'...", "Noting the secret techniques...", "Pausing on the good parts...",
+    "Translating hand gestures to measurements...", "Listening for hidden tips...", "Catching that mumbled ingredient...",
+    "Rewinding the tricky part...", "Converting 'eyeball it' to actual amounts...", "Decoding chef speak...",
+    "Noting the timing cues...", "Catching the off-camera tips...", "Extracting years of experience...",
+    "Translating 'until it looks right'...", "Almost got the whole recipe...",
+  ];
+
   useEffect(() => {
     const savedEmail = localStorage.getItem('mise_user_email');
     if (savedEmail) {
@@ -128,7 +475,7 @@ export default function Mise() {
 
   useEffect(() => {
     if (!loading) { setLoadingIndex(0); return; }
-    const messages = inputMode === 'url' ? urlLoadingMessages : photoLoadingMessages;
+    const messages = inputMode === 'url' ? urlLoadingMessages : inputMode === 'youtube' ? youtubeLoadingMessages : photoLoadingMessages;
     setLoadingMessage(messages[0]);
     const interval = setInterval(() => {
       setLoadingIndex(prev => { const next = prev + 1; if (next < messages.length) { setLoadingMessage(messages[next]); return next; } return prev; });
@@ -204,6 +551,15 @@ export default function Mise() {
     const data = await api.post('/api/recipe/clean-photo', { photos, language }, user?.email);
     if (data.error) { if (data.upgrade) setShowPricing(true); setError(data.message || data.error); }
     else { setRecipe(data.recipe); setServings(data.recipe.servings); setRecipesRemaining(data.recipesRemaining); setPhotos([]); }
+    setLoading(false);
+  };
+
+  const processYoutube = async () => {
+    if (!youtubeUrl.trim()) { setError('Please paste a YouTube URL'); return; }
+    setLoading(true); setError(''); setRecipe(null); resetCookingState();
+    const data = await api.post('/api/recipe/clean-youtube', { url: youtubeUrl, language }, user?.email);
+    if (data.error) { if (data.upgrade) setShowPricing(true); setError(data.message || data.error); }
+    else { setRecipe(data.recipe); setServings(data.recipe.servings); setRecipesRemaining(data.recipesRemaining); setYoutubeUrl(''); }
     setLoading(false);
   };
 
@@ -463,15 +819,15 @@ export default function Mise() {
             ))}
           </select>
           <span style={{ fontSize: '11px', color: c.muted, background: c.card, padding: '4px 8px', borderRadius: '4px' }}>
-            {recipesRemaining === Infinity ? '∞' : recipesRemaining} left
+            {recipesRemaining === Infinity ? '∞' : recipesRemaining} {txt.recipesLeft}
           </span>
           {user ? (
             <>
               <button onClick={() => setShowSaved(true)} style={{ background: c.card, border: `1px solid ${c.border}`, color: c.text, padding: '6px 10px', borderRadius: '6px', fontSize: '12px', cursor: 'pointer' }}>📚 {savedRecipes.length}</button>
-              <button onClick={handleLogout} style={{ background: 'none', border: 'none', color: c.muted, fontSize: '12px', cursor: 'pointer' }}>Logout</button>
+              <button onClick={handleLogout} style={{ background: 'none', border: 'none', color: c.muted, fontSize: '12px', cursor: 'pointer' }}>{txt.logout}</button>
             </>
           ) : (
-            <button onClick={() => setShowAuth(true)} style={{ background: c.accent, border: 'none', color: c.bg, padding: '6px 12px', borderRadius: '6px', fontSize: '12px', fontWeight: '500', cursor: 'pointer' }}>Sign In</button>
+            <button onClick={() => setShowAuth(true)} style={{ background: c.accent, border: 'none', color: c.bg, padding: '6px 12px', borderRadius: '6px', fontSize: '12px', fontWeight: '500', cursor: 'pointer' }}>{txt.signIn}</button>
           )}
         </div>
       </header>
@@ -480,17 +836,18 @@ export default function Mise() {
       {!recipe && !loading && (
         <div style={{ padding: '20px', maxWidth: '500px', margin: '0 auto' }}>
           <div style={{ display: 'flex', marginBottom: '16px', background: c.card, borderRadius: '10px', padding: '4px', border: `1px solid ${c.border}` }}>
-            <button onClick={() => setInputMode('url')} style={{ flex: 1, padding: '12px', fontSize: '13px', fontWeight: '500', background: inputMode === 'url' ? c.accent : 'transparent', color: inputMode === 'url' ? c.bg : c.muted, border: 'none', borderRadius: '8px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>🔗 Paste URL</button>
-            <button onClick={() => setInputMode('photo')} style={{ flex: 1, padding: '12px', fontSize: '13px', fontWeight: '500', background: inputMode === 'photo' ? c.accent : 'transparent', color: inputMode === 'photo' ? c.bg : c.muted, border: 'none', borderRadius: '8px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>📷 Snap Photo</button>
+            <button onClick={() => setInputMode('url')} style={{ flex: 1, padding: '10px 8px', fontSize: '12px', fontWeight: '500', background: inputMode === 'url' ? c.accent : 'transparent', color: inputMode === 'url' ? c.bg : c.muted, border: 'none', borderRadius: '8px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>🔗 {txt.pasteUrl}</button>
+            <button onClick={() => setInputMode('photo')} style={{ flex: 1, padding: '10px 8px', fontSize: '12px', fontWeight: '500', background: inputMode === 'photo' ? c.accent : 'transparent', color: inputMode === 'photo' ? c.bg : c.muted, border: 'none', borderRadius: '8px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>📷 {txt.snapPhoto}</button>
+            <button onClick={() => setInputMode('youtube')} style={{ flex: 1, padding: '10px 8px', fontSize: '12px', fontWeight: '500', background: inputMode === 'youtube' ? c.accent : 'transparent', color: inputMode === 'youtube' ? c.bg : c.muted, border: 'none', borderRadius: '8px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>▶️ {txt.youtube}</button>
           </div>
 
           {inputMode === 'url' && (
             <div>
               <div style={{ display: 'flex', gap: '8px' }}>
                 <input type="url" value={url} onChange={e => setUrl(e.target.value)} placeholder="Paste recipe URL..." onKeyDown={e => e.key === 'Enter' && fetchFromUrl()} style={{ flex: 1, padding: '14px 16px', fontSize: '15px', background: c.card, border: `1px solid ${c.border}`, borderRadius: '10px', color: c.text, outline: 'none' }} />
-                <button onClick={fetchFromUrl} style={{ padding: '14px 20px', fontSize: '14px', fontWeight: '500', background: c.accent, color: c.bg, border: 'none', borderRadius: '10px', cursor: 'pointer' }}>Clean</button>
+                <button onClick={fetchFromUrl} style={{ padding: '14px 20px', fontSize: '14px', fontWeight: '500', background: c.accent, color: c.bg, border: 'none', borderRadius: '10px', cursor: 'pointer' }}>{txt.clean}</button>
               </div>
-              <p style={{ fontSize: '12px', color: c.dim, textAlign: 'center', marginTop: '12px' }}>Works with any recipe website</p>
+              <p style={{ fontSize: '12px', color: c.dim, textAlign: 'center', marginTop: '12px' }}>{txt.worksWithAny}</p>
             </div>
           )}
 
@@ -509,13 +866,23 @@ export default function Mise() {
               )}
               <div style={{ display: 'flex', gap: '8px' }}>
                 <button onClick={() => fileInputRef.current?.click()} style={{ flex: 1, padding: '16px', fontSize: '14px', background: c.card, color: c.text, border: `2px dashed ${c.border}`, borderRadius: '10px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-                  <span style={{ fontSize: '20px' }}>📷</span> {photos.length === 0 ? 'Add photos' : 'Add more'}
+                  <span style={{ fontSize: '20px' }}>📷</span> {photos.length === 0 ? txt.addPhotos : txt.addMore}
                 </button>
                 {photos.length > 0 && (
-                  <button onClick={processPhotos} style={{ padding: '16px 24px', fontSize: '14px', fontWeight: '500', background: c.accent, color: c.bg, border: 'none', borderRadius: '10px', cursor: 'pointer' }}>Clean</button>
+                  <button onClick={processPhotos} style={{ padding: '16px 24px', fontSize: '14px', fontWeight: '500', background: c.accent, color: c.bg, border: 'none', borderRadius: '10px', cursor: 'pointer' }}>{txt.clean}</button>
                 )}
               </div>
-              <p style={{ fontSize: '12px', color: c.dim, textAlign: 'center', marginTop: '12px', lineHeight: 1.5 }}>No link? No problem.<br/>Upload or snap cookbook pages</p>
+              <p style={{ fontSize: '12px', color: c.dim, textAlign: 'center', marginTop: '12px', lineHeight: 1.5 }}>{txt.uploadOrSnap}</p>
+            </div>
+          )}
+
+          {inputMode === 'youtube' && (
+            <div>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <input type="url" value={youtubeUrl} onChange={e => setYoutubeUrl(e.target.value)} placeholder={txt.pasteYoutube} onKeyDown={e => e.key === 'Enter' && processYoutube()} style={{ flex: 1, padding: '14px 16px', fontSize: '15px', background: c.card, border: `1px solid ${c.border}`, borderRadius: '10px', color: c.text, outline: 'none' }} />
+                <button onClick={processYoutube} style={{ padding: '14px 20px', fontSize: '14px', fontWeight: '500', background: c.accent, color: c.bg, border: 'none', borderRadius: '10px', cursor: 'pointer' }}>{txt.clean}</button>
+              </div>
+              <p style={{ fontSize: '12px', color: c.dim, textAlign: 'center', marginTop: '12px' }}>{txt.youtubeHelper}</p>
             </div>
           )}
 
@@ -526,11 +893,11 @@ export default function Mise() {
       {/* Empty State Hero */}
       {!recipe && !loading && (
         <div style={{ padding: '30px 20px', textAlign: 'center' }}>
-          <h1 style={{ fontSize: '24px', fontWeight: '300', marginBottom: '8px', letterSpacing: '-0.5px' }}>just the recipe</h1>
-          <p style={{ fontSize: '14px', color: c.muted, maxWidth: '280px', margin: '0 auto', lineHeight: 1.6 }}>Strip the ads, stories, and clutter from any recipe. Online or from your cookbook.</p>
+          <h1 style={{ fontSize: '24px', fontWeight: '300', marginBottom: '8px', letterSpacing: '-0.5px' }}>{txt.justTheRecipe}</h1>
+          <p style={{ fontSize: '14px', color: c.muted, maxWidth: '280px', margin: '0 auto', lineHeight: 1.6 }}>{txt.worksWithAny}</p>
           <div style={{ marginTop: '24px', display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
-            {!user && <button onClick={() => setShowAuth(true)} style={{ background: c.card, border: `1px solid ${c.border}`, color: c.text, padding: '10px 18px', borderRadius: '8px', fontSize: '13px', cursor: 'pointer' }}>Sign up free</button>}
-            <button onClick={() => setShowPricing(true)} style={{ background: 'none', border: 'none', color: c.accent, fontSize: '13px', cursor: 'pointer' }}>View pricing →</button>
+            {!user && <button onClick={() => setShowAuth(true)} style={{ background: c.card, border: `1px solid ${c.border}`, color: c.text, padding: '10px 18px', borderRadius: '8px', fontSize: '13px', cursor: 'pointer' }}>{txt.signIn}</button>}
+            <button onClick={() => setShowPricing(true)} style={{ background: 'none', border: 'none', color: c.accent, fontSize: '13px', cursor: 'pointer' }}>{txt.upgrade} →</button>
           </div>
           
           {/* Discreet feedback link */}
