@@ -451,7 +451,7 @@ export default function Mise() {
 
           {inputMode === 'photo' && (
             <div>
-              <input ref={fileInputRef} type="file" accept="image/*" multiple capture="environment" onChange={handlePhotoSelect} style={{ display: 'none' }} />
+              <input ref={fileInputRef} type="file" accept="image/*" multiple onChange={handlePhotoSelect} style={{ display: 'none' }} />
               {photos.length > 0 && (
                 <div style={{ marginBottom: '12px', display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                   {photos.map((photo, i) => (
@@ -470,7 +470,7 @@ export default function Mise() {
                   <button onClick={processPhotos} style={{ padding: '16px 24px', fontSize: '14px', fontWeight: '500', background: c.accent, color: c.bg, border: 'none', borderRadius: '10px', cursor: 'pointer' }}>Clean</button>
                 )}
               </div>
-              <p style={{ fontSize: '12px', color: c.dim, textAlign: 'center', marginTop: '12px', lineHeight: 1.5 }}>No link? No problem.<br/>Snap your cookbook pages</p>
+              <p style={{ fontSize: '12px', color: c.dim, textAlign: 'center', marginTop: '12px', lineHeight: 1.5 }}>No link? No problem.<br/>Upload or snap cookbook pages</p>
             </div>
           )}
 
