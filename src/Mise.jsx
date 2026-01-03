@@ -144,7 +144,7 @@ export default function Mise() {
       youtubeHelper: 'Extract recipes from cooking videos',
       prep: 'Prep',
       cook: 'Cook',
-      servings: 'servings',
+      servings: 'Servings',
       viewSource: 'View source',
       save: 'Save',
       saved: 'Saved',
@@ -173,6 +173,23 @@ export default function Mise() {
       feedbackPlaceholder: "What feature would make mise better for you?",
       sendFeedback: 'Send',
       thanksFeedback: 'Thanks for your feedback!',
+      newRecipe: '← New recipe',
+      signInToSave: 'Sign in to save →',
+      scaled: 'scaled',
+      gathered: 'gathered',
+      of: 'of',
+      undo: 'Undo',
+      tapIngredient: '👆 Tap each ingredient as you set it out',
+      allGathered: '✓ All ingredients gathered!',
+      startCooking: 'Start Cooking →',
+      tapStep: '👆 Tap each step as you complete it',
+      allDone: '🎉 Done! Enjoy your meal!',
+      gotFeatureIdea: '💡 Got a feature idea?',
+      usuallySeconds: 'Usually 15-25 seconds',
+      usuallySecondsPhoto: 'Usually 20-30 seconds',
+      back: '← Back',
+      deleteRecipe: 'Delete',
+      cookRecipe: 'Cook',
     },
     es: {
       justTheRecipe: 'solo la receta',
@@ -191,7 +208,7 @@ export default function Mise() {
       youtubeHelper: 'Extrae recetas de videos de cocina',
       prep: 'Prep',
       cook: 'Cocinar',
-      servings: 'porciones',
+      servings: 'Porciones',
       viewSource: 'Ver fuente',
       save: 'Guardar',
       saved: 'Guardado',
@@ -220,6 +237,23 @@ export default function Mise() {
       feedbackPlaceholder: '¿Qué función mejoraría mise para ti?',
       sendFeedback: 'Enviar',
       thanksFeedback: '¡Gracias por tu opinión!',
+      newRecipe: '← Nueva receta',
+      signInToSave: 'Inicia sesión para guardar →',
+      scaled: 'escalado',
+      gathered: 'reunidos',
+      of: 'de',
+      undo: 'Deshacer',
+      tapIngredient: '👆 Toca cada ingrediente al prepararlo',
+      allGathered: '✓ ¡Todos los ingredientes listos!',
+      startCooking: 'Empezar a cocinar →',
+      tapStep: '👆 Toca cada paso al completarlo',
+      allDone: '🎉 ¡Listo! ¡Buen provecho!',
+      gotFeatureIdea: '💡 ¿Tienes una idea?',
+      usuallySeconds: 'Generalmente 15-25 segundos',
+      usuallySecondsPhoto: 'Generalmente 20-30 segundos',
+      back: '← Volver',
+      deleteRecipe: 'Eliminar',
+      cookRecipe: 'Cocinar',
     },
     fr: {
       justTheRecipe: 'juste la recette',
@@ -458,51 +492,164 @@ export default function Mise() {
     },
   };
   
-  const txt = t[language] || t.en;
+  const txt = { ...t.en, ...(t[language] || {}) }; // Merge with English fallbacks
   
   // YouTube state
   const [youtubeUrl, setYoutubeUrl] = useState('');
+  const [translateToast, setTranslateToast] = useState(null); // { show: true, language: 'es' }
+  const [translating, setTranslating] = useState(false);
+  const [recipeLanguage, setRecipeLanguage] = useState('en'); // Track what language the recipe is in
   
-  const changeLanguage = (code) => {
+  const translateRecipe = async (targetLang) => {
+    if (!recipe || translating) return;
+    setTranslating(true);
+    
+    const data = await api.post('/api/recipe/translate', { 
+      recipe, 
+      targetLanguage: targetLang 
+    });
+    
+    if (data.error) {
+      // If upgrade required, show the toast/pricing
+      if (data.error === 'upgrade_required') {
+        setTranslateToast({ show: true, language: targetLang });
+        setTimeout(() => setTranslateToast(null), 8000);
+      } else {
+        console.error('Translation error:', data.error);
+      }
+    } else if (data.recipe) {
+      setRecipe(data.recipe);
+      setRecipeLanguage(targetLang);
+    }
+    setTranslating(false);
+  };
+  
+  const changeLanguage = async (code) => {
+    const oldLang = language;
     setLanguage(code);
     localStorage.setItem('mise_language', code);
+    
+    // If recipe is on screen and language changed
+    if (recipe && code !== oldLang) {
+      // Always try to translate - server will check if paid
+      // This way if their subscription status changed, it still works
+      translateRecipe(code);
+    }
   };
 
   const topRef = useRef(null);
 
-  const urlLoadingMessages = [
-    "Scraping off the life story...", "Removing 47 pop-up ads...", "Skipping to the actual recipe...",
-    "Evicting sponsored content...", "Finding the recipe under 3000 words of backstory...",
-    "Deleting \"my grandmother once said...\"", "Bypassing the newsletter signup...",
-    "Ignoring the Pinterest buttons...", "Shooing away auto-play videos...",
-    "Translating food blogger to English...", "Rescuing recipe from SEO prison...",
-    "Dodging the \"rate this recipe\" popup...", "Skipping the influencer's trip to Tuscany...",
-    "Excavating the actual ingredients...", "Filtering out the Amazon affiliate links...",
-    "Muting the background music...", "Closing the cookie consent banner...",
-    "Scrolling past the kids' birthday party story...", "Ignoring \"jump to recipe\" (we got this)...",
-    "Clearing the sticky header forest...", "Defeating the print-friendly paywall...",
-    "Extracting signal from noise...", "Almost there, promise...",
-  ];
-
-  const photoLoadingMessages = [
-    "Reading your cookbook...", "Deciphering handwritten notes...", "Squinting at that smudged ingredient...",
-    "Converting grandma's pinch to grams...", "Digitizing deliciousness...", "Translating cookbook to app...",
-    "Making sense of \"season to taste\"...", "Interpreting splash-stained pages...", "Extracting the good stuff...",
-    "Decoding vintage measurements...", "Parsing that beautiful cursive...", "Figuring out what \"1 tin\" means today...",
-    "Adjusting for 1970s portion sizes...", "Reading between the sauce stains...", "Converting \"a knob of butter\" to tbsp...",
-    "Interpreting \"cook until done\"...", "Translating \"moderate oven\" to degrees...", "Decrypting family secrets...",
-    "Scanning for hidden tips in margins...", "Processing generations of wisdom...", "Making your cookbook immortal...",
-    "Almost ready to cook...",
-  ];
-
-  const youtubeLoadingMessages = [
-    "Watching the video for you...", "Skipping the 5-minute intro...", "Fast-forwarding through the sponsor...",
-    "Catching all the 'pinch of this'...", "Noting the secret techniques...", "Pausing on the good parts...",
-    "Translating hand gestures to measurements...", "Listening for hidden tips...", "Catching that mumbled ingredient...",
-    "Rewinding the tricky part...", "Converting 'eyeball it' to actual amounts...", "Decoding chef speak...",
-    "Noting the timing cues...", "Catching the off-camera tips...", "Extracting years of experience...",
-    "Translating 'until it looks right'...", "Almost got the whole recipe...",
-  ];
+  // Loading messages are now in the translations object (txt.loadingUrl, txt.loadingPhoto, txt.loadingYoutube)
+  const getLoadingMessages = () => {
+    const messages = {
+      en: {
+        url: [
+          "Scraping off the life story...", "Removing 47 pop-up ads...", "Skipping to the actual recipe...",
+          "Evicting sponsored content...", "Finding the recipe under 3000 words of backstory...",
+          "Deleting \"my grandmother once said...\"", "Bypassing the newsletter signup...",
+          "Ignoring the Pinterest buttons...", "Shooing away auto-play videos...",
+          "Translating food blogger to English...", "Rescuing recipe from SEO prison...",
+          "Dodging the \"rate this recipe\" popup...", "Skipping the influencer's trip to Tuscany...",
+          "Excavating the actual ingredients...", "Filtering out the Amazon affiliate links...",
+          "Almost there, promise...",
+        ],
+        photo: [
+          "Reading your cookbook...", "Deciphering handwritten notes...", "Squinting at that smudged ingredient...",
+          "Converting grandma's pinch to grams...", "Digitizing deliciousness...", "Translating cookbook to app...",
+          "Making sense of \"season to taste\"...", "Interpreting splash-stained pages...", "Extracting the good stuff...",
+          "Decoding vintage measurements...", "Parsing that beautiful cursive...", "Almost ready to cook...",
+        ],
+        youtube: [
+          "Watching the video for you...", "Skipping the 5-minute intro...", "Fast-forwarding through the sponsor...",
+          "Catching all the 'pinch of this'...", "Noting the secret techniques...", "Pausing on the good parts...",
+          "Translating hand gestures to measurements...", "Listening for hidden tips...", "Almost got the whole recipe...",
+        ],
+      },
+      es: {
+        url: [
+          "Quitando la historia de vida...", "Eliminando 47 anuncios...", "Saltando a la receta...",
+          "Sacando contenido patrocinado...", "Buscando la receta bajo 3000 palabras...",
+          "Borrando \"mi abuela decía...\"", "Evitando el registro al boletín...",
+          "Ignorando botones de Pinterest...", "Rescatando la receta...", "Casi listo, prometido...",
+        ],
+        photo: [
+          "Leyendo tu libro de cocina...", "Descifrando notas manuscritas...", "Mirando ese ingrediente borroso...",
+          "Convirtiendo el pellizco de la abuela a gramos...", "Digitalizando delicia...", "Casi listo para cocinar...",
+        ],
+        youtube: [
+          "Viendo el video por ti...", "Saltando la intro de 5 minutos...", "Avanzando el patrocinio...",
+          "Captando cada 'pizca de esto'...", "Notando las técnicas secretas...", "Casi tenemos la receta...",
+        ],
+      },
+      fr: {
+        url: [
+          "Suppression de l'histoire de vie...", "Suppression de 47 publicités...", "Passage à la recette...",
+          "Extraction du contenu sponsorisé...", "Recherche de la recette...", "Presque terminé...",
+        ],
+        photo: [
+          "Lecture de votre livre de cuisine...", "Déchiffrage des notes manuscrites...", "Numérisation...", "Presque prêt...",
+        ],
+        youtube: [
+          "Visionnage de la vidéo...", "Saut de l'intro de 5 minutes...", "Avance rapide du sponsor...", "Presque terminé...",
+        ],
+      },
+      pt: {
+        url: [
+          "Removendo a história de vida...", "Removendo 47 anúncios...", "Pulando para a receita...",
+          "Removendo conteúdo patrocinado...", "Encontrando a receita...", "Quase lá...",
+        ],
+        photo: [
+          "Lendo seu livro de receitas...", "Decifrando notas manuscritas...", "Digitalizando...", "Quase pronto...",
+        ],
+        youtube: [
+          "Assistindo o vídeo para você...", "Pulando a intro de 5 minutos...", "Avançando o patrocínio...", "Quase lá...",
+        ],
+      },
+      zh: {
+        url: [
+          "正在跳过生活故事...", "正在删除47个弹窗广告...", "正在跳转到食谱...",
+          "正在提取食谱...", "快好了...",
+        ],
+        photo: [
+          "正在阅读您的食谱书...", "正在解读手写笔记...", "正在数字化...", "快好了...",
+        ],
+        youtube: [
+          "正在为您观看视频...", "正在跳过5分钟的介绍...", "正在快进广告...", "快好了...",
+        ],
+      },
+      hi: {
+        url: [
+          "जीवन कहानी हटा रहे हैं...", "47 पॉप-अप विज्ञापन हटा रहे हैं...", "रेसिपी पर जा रहे हैं...",
+          "रेसिपी निकाल रहे हैं...", "लगभग हो गया...",
+        ],
+        photo: [
+          "आपकी रसोई की किताब पढ़ रहे हैं...", "हस्तलिखित नोट्स पढ़ रहे हैं...", "डिजिटाइज़ कर रहे हैं...", "लगभग तैयार...",
+        ],
+        youtube: [
+          "आपके लिए वीडियो देख रहे हैं...", "5 मिनट का इंट्रो छोड़ रहे हैं...", "विज्ञापन छोड़ रहे हैं...", "लगभग हो गया...",
+        ],
+      },
+      ar: {
+        url: [
+          "إزالة قصة الحياة...", "إزالة 47 إعلان...", "الانتقال إلى الوصفة...",
+          "استخراج الوصفة...", "تقريباً انتهينا...",
+        ],
+        photo: [
+          "قراءة كتاب الطبخ...", "فك الملاحظات المكتوبة بخط اليد...", "الرقمنة...", "تقريباً جاهز...",
+        ],
+        youtube: [
+          "مشاهدة الفيديو من أجلك...", "تخطي المقدمة...", "تخطي الإعلان...", "تقريباً انتهينا...",
+        ],
+      },
+    };
+    
+    const lang = messages[language] || messages.en;
+    return {
+      url: lang.url || messages.en.url,
+      photo: lang.photo || messages.en.photo,
+      youtube: lang.youtube || messages.en.youtube,
+    };
+  };
 
   useEffect(() => {
     // Check for existing session
@@ -539,13 +686,14 @@ export default function Mise() {
 
   useEffect(() => {
     if (!loading) { setLoadingIndex(0); return; }
-    const messages = inputMode === 'url' ? urlLoadingMessages : inputMode === 'youtube' ? youtubeLoadingMessages : photoLoadingMessages;
+    const loadingMessages = getLoadingMessages();
+    const messages = inputMode === 'url' ? loadingMessages.url : inputMode === 'youtube' ? loadingMessages.youtube : loadingMessages.photo;
     setLoadingMessage(messages[0]);
     const interval = setInterval(() => {
       setLoadingIndex(prev => { const next = prev + 1; if (next < messages.length) { setLoadingMessage(messages[next]); return next; } return prev; });
     }, 3000);
     return () => clearInterval(interval);
-  }, [loading, inputMode]);
+  }, [loading, inputMode, language]);
 
   const loadSavedRecipes = async () => {
     const data = await api.get('/api/recipes/saved');
@@ -1054,7 +1202,7 @@ export default function Mise() {
             onMouseEnter={e => e.target.style.opacity = 1}
             onMouseLeave={e => e.target.style.opacity = 0.7}
           >
-            💡 Got a feature idea?
+            {txt.gotFeatureIdea}
           </button>
         </div>
       )}
@@ -1064,16 +1212,97 @@ export default function Mise() {
         <div style={{ padding: '60px 20px', textAlign: 'center' }}>
           <div style={{ width: '36px', height: '36px', border: `2px solid ${c.border}`, borderTopColor: c.accent, borderRadius: '50%', margin: '0 auto 20px', animation: 'spin 0.7s linear infinite' }} />
           <p style={{ color: c.text, fontSize: '15px', marginBottom: '8px', minHeight: '24px' }}>{loadingMessage}</p>
-          <p style={{ color: c.muted, fontSize: '12px' }}>{inputMode === 'url' ? 'Usually 15-25 seconds' : 'Usually 20-30 seconds'} ☕</p>
+          <p style={{ color: c.muted, fontSize: '12px' }}>{inputMode === 'url' ? txt.usuallySeconds : txt.usuallySecondsPhoto} ☕</p>
           <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+        </div>
+      )}
+
+      {/* Translation Toast for Free Users */}
+      {translateToast?.show && (
+        <div style={{ 
+          position: 'fixed', 
+          bottom: '20px', 
+          left: '50%', 
+          transform: 'translateX(-50%)', 
+          background: c.card, 
+          border: `1px solid ${c.border}`,
+          borderRadius: '12px',
+          padding: '14px 18px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '12px',
+          boxShadow: '0 4px 20px rgba(0,0,0,0.3)',
+          zIndex: 1000,
+          maxWidth: '340px',
+          width: '90%',
+        }}>
+          <span style={{ fontSize: '24px' }}>🌍</span>
+          <div style={{ flex: 1 }}>
+            <p style={{ fontSize: '14px', color: c.text, fontWeight: '500', marginBottom: '2px' }}>
+              Translate to {languages.find(l => l.code === translateToast.language)?.name || translateToast.language}?
+            </p>
+            <p style={{ fontSize: '12px', color: c.muted }}>
+              Upgrade for instant recipe translation
+            </p>
+          </div>
+          <button 
+            onClick={() => { setTranslateToast(null); setShowPricing(true); }}
+            style={{ 
+              background: c.accent, 
+              color: c.bg, 
+              border: 'none', 
+              padding: '8px 14px', 
+              borderRadius: '8px', 
+              fontSize: '13px', 
+              fontWeight: '600',
+              cursor: 'pointer',
+              whiteSpace: 'nowrap'
+            }}
+          >
+            $1.99/mo
+          </button>
+          <button 
+            onClick={() => setTranslateToast(null)}
+            style={{ 
+              background: 'none', 
+              border: 'none', 
+              color: c.muted, 
+              fontSize: '18px', 
+              cursor: 'pointer',
+              padding: '0 4px'
+            }}
+          >
+            ✕
+          </button>
         </div>
       )}
 
       {/* Recipe Display */}
       {recipe && !loading && (
-        <div style={{ maxWidth: '500px', margin: '0 auto', padding: '16px' }}>
+        <div style={{ maxWidth: '500px', margin: '0 auto', padding: '16px', position: 'relative' }}>
+          {/* Translating overlay */}
+          {translating && (
+            <div style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              background: `${c.bg}dd`,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              zIndex: 10,
+              borderRadius: '12px',
+            }}>
+              <div style={{ textAlign: 'center' }}>
+                <div style={{ width: '32px', height: '32px', border: `2px solid ${c.border}`, borderTopColor: c.accent, borderRadius: '50%', margin: '0 auto 12px', animation: 'spin 0.7s linear infinite' }} />
+                <p style={{ color: c.text, fontSize: '14px' }}>Translating...</p>
+              </div>
+            </div>
+          )}
           <div ref={topRef} />
-          <button onClick={() => { setRecipe(null); setUrl(''); }} style={{ background: 'none', border: 'none', color: c.muted, fontSize: '13px', cursor: 'pointer', marginBottom: '12px', padding: 0 }}>← New recipe</button>
+          <button onClick={() => { setRecipe(null); setUrl(''); setRecipeLanguage('en'); }} style={{ background: 'none', border: 'none', color: c.muted, fontSize: '13px', cursor: 'pointer', marginBottom: '12px', padding: 0 }}>{txt.newRecipe}</button>
 
           {recipe.imageUrl && <div style={{ width: '100%', height: '140px', borderRadius: '12px', overflow: 'hidden', marginBottom: '16px', background: `url(${recipe.imageUrl}) center/cover` }} />}
 
@@ -1081,25 +1310,25 @@ export default function Mise() {
             <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '10px' }}>
               <h2 style={{ fontSize: '20px', fontWeight: '600', margin: 0, lineHeight: 1.3 }}>{recipe.title}</h2>
               {user && !isRecipeSaved() && (
-                <button onClick={saveCurrentRecipe} disabled={savingRecipe} style={{ background: c.card, border: `1px solid ${c.border}`, color: c.text, padding: '6px 10px', borderRadius: '6px', fontSize: '12px', cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0 }}>{savingRecipe ? '...' : '💾 Save'}</button>
+                <button onClick={saveCurrentRecipe} disabled={savingRecipe} style={{ background: c.card, border: `1px solid ${c.border}`, color: c.text, padding: '6px 10px', borderRadius: '6px', fontSize: '12px', cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0 }}>{savingRecipe ? txt.saving : `💾 ${txt.save}`}</button>
               )}
-              {user && isRecipeSaved() && <span style={{ background: c.accentDim, color: c.text, padding: '6px 10px', borderRadius: '6px', fontSize: '12px', flexShrink: 0 }}>✓ Saved</span>}
+              {user && isRecipeSaved() && <span style={{ background: c.accentDim, color: c.text, padding: '6px 10px', borderRadius: '6px', fontSize: '12px', flexShrink: 0 }}>✓ {txt.saved}</span>}
             </div>
             <div style={{ display: 'flex', gap: '12px', fontSize: '12px', color: c.muted, marginTop: '8px' }}>
               {recipe.prepTime && <span>⏱ {recipe.prepTime}</span>}
               {recipe.cookTime && <span>🔥 {recipe.cookTime}</span>}
             </div>
-            {!user && <button onClick={() => setShowAuth(true)} style={{ marginTop: '8px', background: 'none', border: 'none', color: c.accent, fontSize: '12px', cursor: 'pointer', padding: 0 }}>Sign in to save →</button>}
+            {!user && <button onClick={() => setShowAuth(true)} style={{ marginTop: '8px', background: 'none', border: 'none', color: c.accent, fontSize: '12px', cursor: 'pointer', padding: 0 }}>{txt.signInToSave}</button>}
           </div>
 
           <Attribution recipe={recipe} />
 
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '14px', padding: '12px', background: c.card, borderRadius: '10px', marginBottom: '20px', border: `1px solid ${c.border}` }}>
-            <span style={{ fontSize: '12px', color: c.muted }}>Servings</span>
+            <span style={{ fontSize: '12px', color: c.muted }}>{txt.servings}</span>
             <button onClick={() => adjustServings(servings - 1)} style={{ width: '28px', height: '28px', background: c.cardHover, border: `1px solid ${c.border}`, borderRadius: '6px', color: c.text, fontSize: '14px', cursor: 'pointer' }}>−</button>
             <span style={{ fontSize: '16px', fontWeight: '600', minWidth: '20px', textAlign: 'center' }}>{servings}</span>
             <button onClick={() => adjustServings(servings + 1)} style={{ width: '28px', height: '28px', background: c.cardHover, border: `1px solid ${c.border}`, borderRadius: '6px', color: c.text, fontSize: '14px', cursor: 'pointer' }}>+</button>
-            {servings !== recipe.servings && <span style={{ fontSize: '10px', color: c.accent }}>scaled</span>}
+            {servings !== recipe.servings && <span style={{ fontSize: '10px', color: c.accent }}>{txt.scaled}</span>}
           </div>
 
           <div style={{ display: 'flex', marginBottom: '16px', background: c.card, borderRadius: '10px', padding: '4px', border: `1px solid ${c.border}` }}>
@@ -1112,16 +1341,16 @@ export default function Mise() {
             <div>
               {ingredientsDone > 0 && (
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px', padding: '10px 14px', background: c.accentDim, borderRadius: '8px' }}>
-                  <span style={{ fontSize: '12px' }}>{ingredientsDone} of {recipe.ingredients?.length} gathered</span>
-                  <button onClick={undoLastIngredient} style={{ background: 'none', border: 'none', color: c.text, fontSize: '12px', cursor: 'pointer', opacity: 0.8 }}>Undo</button>
+                  <span style={{ fontSize: '12px' }}>{ingredientsDone} {txt.of} {recipe.ingredients?.length} {txt.gathered}</span>
+                  <button onClick={undoLastIngredient} style={{ background: 'none', border: 'none', color: c.text, fontSize: '12px', cursor: 'pointer', opacity: 0.8 }}>{txt.undo}</button>
                 </div>
               )}
-              {remainingIngredients.length > 0 && <p style={{ fontSize: '12px', color: c.muted, marginBottom: '12px', textAlign: 'center' }}>👆 Tap each ingredient as you set it out</p>}
+              {remainingIngredients.length > 0 && <p style={{ fontSize: '12px', color: c.muted, marginBottom: '12px', textAlign: 'center' }}>{txt.tapIngredient}</p>}
               {remainingIngredients.length === 0 ? (
                 <div style={{ textAlign: 'center', padding: '30px 20px', background: c.card, borderRadius: '12px', border: `1px solid ${c.border}` }}>
                   <span style={{ fontSize: '28px', display: 'block', marginBottom: '10px' }}>✅</span>
-                  <p style={{ fontSize: '15px', fontWeight: '500', marginBottom: '6px' }}>All ingredients ready!</p>
-                  <p style={{ fontSize: '13px', color: c.muted }}>Tap "Cook" to start</p>
+                  <p style={{ fontSize: '15px', fontWeight: '500', marginBottom: '6px' }}>{txt.allGathered}</p>
+                  <p style={{ fontSize: '13px', color: c.muted }}>{txt.startCooking}</p>
                 </div>
               ) : (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
@@ -1141,24 +1370,24 @@ export default function Mise() {
             <div>
               {stepsDone > 0 && (
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px', padding: '10px 14px', background: c.accentDim, borderRadius: '8px' }}>
-                  <span style={{ fontSize: '12px' }}>{stepsDone} of {recipe.steps?.length} done</span>
+                  <span style={{ fontSize: '12px' }}>{stepsDone} {txt.of} {recipe.steps?.length}</span>
                   <div style={{ display: 'flex', gap: '12px' }}>
-                    <button onClick={undoLastStep} style={{ background: 'none', border: 'none', color: c.text, fontSize: '12px', cursor: 'pointer', opacity: 0.8 }}>Undo</button>
+                    <button onClick={undoLastStep} style={{ background: 'none', border: 'none', color: c.text, fontSize: '12px', cursor: 'pointer', opacity: 0.8 }}>{txt.undo}</button>
                     <button onClick={resetAll} style={{ background: 'none', border: 'none', color: c.text, fontSize: '12px', cursor: 'pointer', opacity: 0.8 }}>Reset</button>
                   </div>
                 </div>
               )}
-              {remainingSteps.length > 0 && <p style={{ fontSize: '12px', color: c.muted, marginBottom: '12px', textAlign: 'center' }}>👆 Tap each step when complete</p>}
+              {remainingSteps.length > 0 && <p style={{ fontSize: '12px', color: c.muted, marginBottom: '12px', textAlign: 'center' }}>{txt.tapStep}</p>}
               {remainingSteps.length === 0 ? (
                 <div style={{ textAlign: 'center', padding: '30px 20px', background: c.card, borderRadius: '12px', border: `1px solid ${c.border}` }}>
                   <span style={{ fontSize: '28px', display: 'block', marginBottom: '10px' }}>🎉</span>
-                  <p style={{ fontSize: '15px', fontWeight: '500', marginBottom: '6px' }}>All done!</p>
-                  <p style={{ fontSize: '13px', color: c.muted, marginBottom: '12px' }}>Enjoy your meal</p>
+                  <p style={{ fontSize: '15px', fontWeight: '500', marginBottom: '6px' }}>{txt.allDone}</p>
+                  <p style={{ fontSize: '13px', color: c.muted, marginBottom: '12px' }}></p>
                   
                   {/* Quick rating - only show if not rated this session */}
                   {!hasRatedThisSession && (
                     <div style={{ marginBottom: '16px' }}>
-                      <p style={{ fontSize: '12px', color: c.dim, marginBottom: '4px' }}>How was mise?</p>
+                      <p style={{ fontSize: '12px', color: c.dim, marginBottom: '4px' }}>{txt.rateExperience}</p>
                       <QuickRating />
                     </div>
                   )}
