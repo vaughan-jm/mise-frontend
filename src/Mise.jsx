@@ -60,6 +60,29 @@ export default function Mise() {
   const [userRating, setUserRating] = useState(null);
   const [ratingsSummary, setRatingsSummary] = useState(null);
   const [hasRatedThisSession, setHasRatedThisSession] = useState(false);
+  
+  // Language state
+  const [language, setLanguage] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('mise_language') || 'en';
+    }
+    return 'en';
+  });
+  
+  const languages = [
+    { code: 'en', label: 'EN', name: 'English' },
+    { code: 'es', label: 'ES', name: 'Español' },
+    { code: 'fr', label: 'FR', name: 'Français' },
+    { code: 'pt', label: 'PT', name: 'Português' },
+    { code: 'zh', label: '中文', name: 'Chinese' },
+    { code: 'hi', label: 'हिं', name: 'Hindi' },
+    { code: 'ar', label: 'عر', name: 'Arabic' },
+  ];
+  
+  const changeLanguage = (code) => {
+    setLanguage(code);
+    localStorage.setItem('mise_language', code);
+  };
 
   const topRef = useRef(null);
 
@@ -169,7 +192,7 @@ export default function Mise() {
   const fetchFromUrl = async () => {
     if (!url.trim()) { setError('Please paste a recipe URL'); return; }
     setLoading(true); setError(''); setRecipe(null); resetCookingState();
-    const data = await api.post('/api/recipe/clean-url', { url }, user?.email);
+    const data = await api.post('/api/recipe/clean-url', { url, language }, user?.email);
     if (data.error) { if (data.upgrade) setShowPricing(true); setError(data.message || data.error); }
     else { setRecipe(data.recipe); setServings(data.recipe.servings); setRecipesRemaining(data.recipesRemaining); }
     setLoading(false);
@@ -178,7 +201,7 @@ export default function Mise() {
   const processPhotos = async () => {
     if (!photos.length) { setError('Please add at least one photo'); return; }
     setLoading(true); setError(''); setRecipe(null); resetCookingState();
-    const data = await api.post('/api/recipe/clean-photo', { photos }, user?.email);
+    const data = await api.post('/api/recipe/clean-photo', { photos, language }, user?.email);
     if (data.error) { if (data.upgrade) setShowPricing(true); setError(data.message || data.error); }
     else { setRecipe(data.recipe); setServings(data.recipe.servings); setRecipesRemaining(data.recipesRemaining); setPhotos([]); }
     setLoading(false);
@@ -417,6 +440,28 @@ export default function Mise() {
           )}
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          {/* Language selector - discreet */}
+          <select 
+            value={language} 
+            onChange={(e) => changeLanguage(e.target.value)}
+            style={{ 
+              background: c.card, 
+              border: `1px solid ${c.border}`, 
+              color: c.muted, 
+              padding: '4px 8px', 
+              borderRadius: '4px', 
+              fontSize: '11px', 
+              cursor: 'pointer',
+              appearance: 'none',
+              WebkitAppearance: 'none',
+              minWidth: '42px',
+              textAlign: 'center',
+            }}
+          >
+            {languages.map(lang => (
+              <option key={lang.code} value={lang.code}>{lang.label}</option>
+            ))}
+          </select>
           <span style={{ fontSize: '11px', color: c.muted, background: c.card, padding: '4px 8px', borderRadius: '4px' }}>
             {recipesRemaining === Infinity ? '∞' : recipesRemaining} left
           </span>
