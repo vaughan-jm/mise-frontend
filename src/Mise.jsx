@@ -87,7 +87,7 @@ export default function Mise() {
   const [loadingIndex, setLoadingIndex] = useState(0);
   const [error, setError] = useState('');
   const [servings, setServings] = useState(null);
-  const [recipesRemaining, setRecipesRemaining] = useState(3);
+  const [recipesRemaining, setRecipesRemaining] = useState(10); // 10 free for anonymous users
 
   const [phase, setPhase] = useState('prep');
   const [completedIngredients, setCompletedIngredients] = useState({});
