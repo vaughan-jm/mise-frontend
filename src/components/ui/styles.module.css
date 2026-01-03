@@ -1,0 +1,347 @@
+/* Base color palette as CSS variables */
+:root {
+  --color-bg: #0d1117;
+  --color-card: #161b22;
+  --color-card-hover: #1c2128;
+  --color-accent: #4ade80;
+  --color-accent-dim: #166534;
+  --color-warm: #fb923c;
+  --color-text: #e6edf3;
+  --color-muted: #7d8590;
+  --color-dim: #484f58;
+  --color-border: #30363d;
+  --color-error: #f85149;
+  --color-ingredient-bg: #1a2332;
+  --color-ingredient-border: #2d4a3e;
+
+  --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --border-radius: 10px;
+  --border-radius-lg: 12px;
+  --border-radius-sm: 6px;
+}
+
+/* Container */
+.container {
+  min-height: 100vh;
+  background: var(--color-bg);
+  font-family: var(--font-family);
+  color: var(--color-text);
+}
+
+/* Card */
+.card {
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius);
+  padding: 16px;
+  transition: all 0.2s ease;
+}
+
+.card:hover {
+  background: var(--color-card-hover);
+}
+
+.cardInteractive {
+  composes: card;
+  cursor: pointer;
+}
+
+.cardInteractive:hover {
+  border-color: var(--color-accent);
+}
+
+/* Header */
+.header {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  background: var(--color-bg);
+  z-index: 100;
+}
+
+/* Buttons */
+.button {
+  padding: 10px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  border: none;
+  border-radius: var(--border-radius-sm);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: var(--font-family);
+  outline: none;
+}
+
+.button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.buttonPrimary {
+  composes: button;
+  background: var(--color-accent);
+  color: var(--color-bg);
+}
+
+.buttonPrimary:hover:not(:disabled) {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.buttonPrimary:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.buttonSecondary {
+  composes: button;
+  background: var(--color-card);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+}
+
+.buttonSecondary:hover:not(:disabled) {
+  background: var(--color-card-hover);
+}
+
+.buttonGhost {
+  composes: button;
+  background: none;
+  color: var(--color-muted);
+  border: none;
+}
+
+.buttonGhost:hover:not(:disabled) {
+  color: var(--color-accent);
+}
+
+.buttonError {
+  composes: button;
+  background: var(--color-error);
+  color: white;
+}
+
+.buttonError:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+/* Inputs */
+.input {
+  width: 100%;
+  padding: 12px 14px;
+  font-size: 15px;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-sm);
+  color: var(--color-text);
+  outline: none;
+  font-family: var(--font-family);
+  box-sizing: border-box;
+  transition: border-color 0.2s ease;
+}
+
+.input:focus {
+  border-color: var(--color-accent);
+}
+
+.input::placeholder {
+  color: var(--color-muted);
+}
+
+.textarea {
+  composes: input;
+  resize: vertical;
+  min-height: 100px;
+}
+
+/* Modal */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.modal {
+  width: 100%;
+  max-width: 500px;
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-lg);
+  padding: 24px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  animation: slideUp 0.3s ease;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.modalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.modalTitle {
+  font-size: 20px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.modalClose {
+  background: none;
+  border: none;
+  color: var(--color-muted);
+  font-size: 24px;
+  cursor: pointer;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.modalClose:hover {
+  background: var(--color-card-hover);
+  color: var(--color-text);
+}
+
+.modalBody {
+  margin-bottom: 16px;
+}
+
+.modalFooter {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+/* Loading Spinner */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.spinner {
+  border: 2px solid var(--color-border);
+  border-top-color: var(--color-accent);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+.spinnerSmall {
+  composes: spinner;
+  width: 16px;
+  height: 16px;
+}
+
+.spinnerMedium {
+  composes: spinner;
+  width: 32px;
+  height: 32px;
+}
+
+.spinnerLarge {
+  composes: spinner;
+  width: 48px;
+  height: 48px;
+}
+
+/* Badge */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.badgePrimary {
+  composes: badge;
+  background: var(--color-accent);
+  color: var(--color-bg);
+}
+
+.badgeSecondary {
+  composes: badge;
+  background: var(--color-card-hover);
+  color: var(--color-muted);
+}
+
+/* Text utilities */
+.textMuted {
+  color: var(--color-muted);
+}
+
+.textDim {
+  color: var(--color-dim);
+}
+
+.textError {
+  color: var(--color-error);
+}
+
+.textAccent {
+  color: var(--color-accent);
+}
+
+/* Layout utilities */
+.flexCenter {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.flexBetween {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.flexColumn {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Divider */
+.divider {
+  height: 1px;
+  background: var(--color-border);
+  margin: 16px 0;
+}
