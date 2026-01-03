@@ -1,22 +1,68 @@
 import React, { useState, useEffect, useRef } from 'react';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
+// Generate browser fingerprint for anonymous tracking
+const getFingerprint = () => {
+  const stored = localStorage.getItem('mise_fingerprint');
+  if (stored) return stored;
+  
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
+  ctx.textBaseline = 'top';
+  ctx.font = '14px Arial';
+  ctx.fillText('fingerprint', 2, 2);
+  const canvasData = canvas.toDataURL();
+  
+  const data = [
+    navigator.userAgent,
+    navigator.language,
+    screen.width + 'x' + screen.height,
+    new Date().getTimezoneOffset(),
+    canvasData.slice(-50)
+  ].join('|');
+  
+  // Simple hash
+  let hash = 0;
+  for (let i = 0; i < data.length; i++) {
+    const char = data.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash;
+  }
+  const fingerprint = 'fp_' + Math.abs(hash).toString(36);
+  localStorage.setItem('mise_fingerprint', fingerprint);
+  return fingerprint;
+};
+
+// API with token-based auth
 const api = {
-  async post(path, body, email = null) {
+  getToken: () => localStorage.getItem('mise_token'),
+  setToken: (token) => token ? localStorage.setItem('mise_token', token) : localStorage.removeItem('mise_token'),
+  
+  async post(path, body = {}) {
     const headers = { 'Content-Type': 'application/json' };
-    if (email) headers['x-user-email'] = email;
+    const token = this.getToken();
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+    
+    // Add fingerprint for anonymous tracking
+    if (!token) body.fingerprint = getFingerprint();
+    
     const res = await fetch(`${API_URL}${path}`, { method: 'POST', headers, body: JSON.stringify(body) });
     return res.json();
   },
-  async get(path, email = null) {
+  async get(path) {
     const headers = {};
-    if (email) headers['x-user-email'] = email;
+    const token = this.getToken();
+    if (token) headers['Authorization'] = `Bearer ${token}`;
     const res = await fetch(`${API_URL}${path}`, { headers });
     return res.json();
   },
-  async delete(path, email) {
-    const res = await fetch(`${API_URL}${path}`, { method: 'DELETE', headers: { 'x-user-email': email } });
+  async delete(path) {
+    const headers = {};
+    const token = this.getToken();
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+    const res = await fetch(`${API_URL}${path}`, { method: 'DELETE', headers });
     return res.json();
   },
 };
@@ -459,14 +505,32 @@ export default function Mise() {
   ];
 
   useEffect(() => {
-    const savedEmail = localStorage.getItem('mise_user_email');
-    if (savedEmail) {
-      api.get('/api/auth/me', savedEmail).then(data => {
-        if (data.user) { setUser(data.user); setRecipesRemaining(data.user.recipesRemaining); loadSavedRecipes(savedEmail); }
-      });
+    // Check for existing session
+    const token = api.getToken();
+    if (token) {
+      api.get('/api/auth/me').then(data => {
+        if (data.user) { 
+          setUser(data.user); 
+          setRecipesRemaining(data.user.recipesRemaining); 
+          loadSavedRecipes(); 
+        } else {
+          // Invalid token, clear it
+          api.setToken(null);
+        }
+      }).catch(() => api.setToken(null));
     }
+    
     api.get('/api/payments/plans').then(setPlans);
     api.get('/api/ratings/summary').then(data => setRatingsSummary(data.display));
+    
+    // Load Google Sign-In script
+    if (GOOGLE_CLIENT_ID) {
+      const script = document.createElement('script');
+      script.src = 'https://accounts.google.com/gsi/client';
+      script.async = true;
+      script.defer = true;
+      document.body.appendChild(script);
+    }
   }, []);
 
   useEffect(() => {
@@ -483,8 +547,8 @@ export default function Mise() {
     return () => clearInterval(interval);
   }, [loading, inputMode]);
 
-  const loadSavedRecipes = async (userEmail) => {
-    const data = await api.get('/api/recipes/saved', userEmail);
+  const loadSavedRecipes = async () => {
+    const data = await api.get('/api/recipes/saved');
     if (data.recipes) setSavedRecipes(data.recipes);
   };
 
@@ -494,27 +558,56 @@ export default function Mise() {
     const endpoint = authMode === 'signup' ? '/api/auth/register' : '/api/auth/login';
     const data = await api.post(endpoint, { email, password });
     if (data.error) { setAuthError(data.error); }
-    else { localStorage.setItem('mise_user_email', email); setUser(data.user); setRecipesRemaining(data.user.recipesRemaining); setShowAuth(false); setEmail(''); setPassword(''); loadSavedRecipes(email); }
+    else { 
+      api.setToken(data.token);
+      setUser(data.user); 
+      setRecipesRemaining(data.user.recipesRemaining); 
+      setShowAuth(false); 
+      setEmail(''); 
+      setPassword(''); 
+      loadSavedRecipes(); 
+    }
     setAuthLoading(false);
   };
 
-  const handleLogout = () => { localStorage.removeItem('mise_user_email'); setUser(null); setSavedRecipes([]); setShowSaved(false); setRecipesRemaining(3); };
+  const handleGoogleAuth = async (response) => {
+    setAuthLoading(true); setAuthError('');
+    const data = await api.post('/api/auth/google', { credential: response.credential });
+    if (data.error) { setAuthError(data.error); }
+    else {
+      api.setToken(data.token);
+      setUser(data.user);
+      setRecipesRemaining(data.user.recipesRemaining);
+      setShowAuth(false);
+      loadSavedRecipes();
+    }
+    setAuthLoading(false);
+  };
+
+  const handleLogout = async () => { 
+    await api.post('/api/auth/logout');
+    api.setToken(null);
+    setUser(null); 
+    setSavedRecipes([]); 
+    setShowSaved(false); 
+    setRecipesRemaining(10); // Back to initial free
+  };
 
   const handleUpgrade = async (plan) => {
     if (!user) { setShowAuth(true); return; }
-    const data = await api.post('/api/payments/create-checkout', { plan, email: user.email });
+    const data = await api.post('/api/payments/create-checkout', { plan });
     if (data.url) window.location.href = data.url;
   };
 
   const saveCurrentRecipe = async () => {
     if (!user || !recipe) return;
     setSavingRecipe(true);
-    await api.post('/api/recipes/save', { recipe }, user.email);
-    await loadSavedRecipes(user.email);
+    await api.post('/api/recipes/save', { recipe });
+    await loadSavedRecipes();
     setSavingRecipe(false);
   };
 
-  const deleteRecipe = async (id) => { if (!user) return; await api.delete(`/api/recipes/${id}`, user.email); await loadSavedRecipes(user.email); };
+  const deleteRecipe = async (id) => { if (!user) return; await api.delete(`/api/recipes/${id}`); await loadSavedRecipes(); };
 
   const loadRecipe = (savedRecipe) => {
     setRecipe(savedRecipe); setServings(savedRecipe.servings); setPhase('prep');
@@ -539,8 +632,12 @@ export default function Mise() {
   const fetchFromUrl = async () => {
     if (!url.trim()) { setError('Please paste a recipe URL'); return; }
     setLoading(true); setError(''); setRecipe(null); resetCookingState();
-    const data = await api.post('/api/recipe/clean-url', { url, language }, user?.email);
-    if (data.error) { if (data.upgrade) setShowPricing(true); setError(data.message || data.error); }
+    const data = await api.post('/api/recipe/clean-url', { url, language });
+    if (data.error) { 
+      if (data.requiresSignup) { setShowAuth(true); setAuthMode('signup'); }
+      else if (data.upgrade) setShowPricing(true); 
+      setError(data.message || data.error); 
+    }
     else { setRecipe(data.recipe); setServings(data.recipe.servings); setRecipesRemaining(data.recipesRemaining); }
     setLoading(false);
   };
@@ -548,8 +645,12 @@ export default function Mise() {
   const processPhotos = async () => {
     if (!photos.length) { setError('Please add at least one photo'); return; }
     setLoading(true); setError(''); setRecipe(null); resetCookingState();
-    const data = await api.post('/api/recipe/clean-photo', { photos, language }, user?.email);
-    if (data.error) { if (data.upgrade) setShowPricing(true); setError(data.message || data.error); }
+    const data = await api.post('/api/recipe/clean-photo', { photos, language });
+    if (data.error) { 
+      if (data.requiresSignup) { setShowAuth(true); setAuthMode('signup'); }
+      else if (data.upgrade) setShowPricing(true); 
+      setError(data.message || data.error); 
+    }
     else { setRecipe(data.recipe); setServings(data.recipe.servings); setRecipesRemaining(data.recipesRemaining); setPhotos([]); }
     setLoading(false);
   };
@@ -557,8 +658,12 @@ export default function Mise() {
   const processYoutube = async () => {
     if (!youtubeUrl.trim()) { setError('Please paste a YouTube URL'); return; }
     setLoading(true); setError(''); setRecipe(null); resetCookingState();
-    const data = await api.post('/api/recipe/clean-youtube', { url: youtubeUrl, language }, user?.email);
-    if (data.error) { if (data.upgrade) setShowPricing(true); setError(data.message || data.error); }
+    const data = await api.post('/api/recipe/clean-youtube', { url: youtubeUrl, language });
+    if (data.error) { 
+      if (data.requiresSignup) { setShowAuth(true); setAuthMode('signup'); }
+      else if (data.upgrade) setShowPricing(true); 
+      setError(data.message || data.error); 
+    }
     else { setRecipe(data.recipe); setServings(data.recipe.servings); setRecipesRemaining(data.recipesRemaining); setYoutubeUrl(''); }
     setLoading(false);
   };
@@ -579,7 +684,7 @@ export default function Mise() {
   // Feedback handlers
   const submitFeedback = async () => {
     if (!feedbackText.trim()) return;
-    await api.post('/api/feedback', { message: feedbackText, type: 'idea' }, user?.email);
+    await api.post('/api/feedback', { message: feedbackText, type: 'idea' });
     setFeedbackSent(true);
     setFeedbackText('');
     setTimeout(() => { setShowFeedback(false); setFeedbackSent(false); }, 2000);
@@ -589,7 +694,7 @@ export default function Mise() {
   const submitRating = async (stars) => {
     setUserRating(stars);
     setHasRatedThisSession(true);
-    await api.post('/api/rating', { stars }, user?.email);
+    await api.post('/api/rating', { stars });
     // Refresh summary
     const data = await api.get('/api/ratings/summary');
     setRatingsSummary(data.display);
@@ -707,17 +812,17 @@ export default function Mise() {
           <MiseLogo size={48} />
           <h2 style={{ fontSize: '22px', fontWeight: '600', margin: '16px 0 8px' }}>Upgrade your plan</h2>
           <p style={{ color: c.muted, fontSize: '14px', marginBottom: '24px' }}>Clean more recipes, save them forever</p>
-          {['basic', 'unlimited'].map(plan => (
-            <div key={plan} style={{ background: c.card, borderRadius: '12px', border: `1px solid ${c.border}`, padding: '20px', marginBottom: '12px', textAlign: 'left' }}>
+          {['basic', 'pro'].map(plan => (
+            <div key={plan} style={{ background: c.card, borderRadius: '12px', border: `1px solid ${plan === 'pro' ? c.accent : c.border}`, padding: '20px', marginBottom: '12px', textAlign: 'left' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                <h3 style={{ fontSize: '18px', fontWeight: '600' }}>{plans[plan].name}</h3>
-                <span style={{ fontSize: '20px', fontWeight: '600' }}>${plans[plan].price}<span style={{ fontSize: '14px', color: c.muted }}>/mo</span></span>
+                <h3 style={{ fontSize: '18px', fontWeight: '600' }}>{plans[plan]?.name || plan}</h3>
+                <span style={{ fontSize: '20px', fontWeight: '600' }}>${plans[plan]?.price || '?'}<span style={{ fontSize: '14px', color: c.muted }}>/mo</span></span>
               </div>
               <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 16px 0' }}>
-                {plans[plan].features.map((f, i) => <li key={i} style={{ fontSize: '13px', color: c.muted, marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '8px' }}><span style={{ color: c.accent }}>✓</span> {f}</li>)}
+                {(plans[plan]?.features || []).map((f, i) => <li key={i} style={{ fontSize: '13px', color: c.muted, marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '8px' }}><span style={{ color: c.accent }}>✓</span> {f}</li>)}
               </ul>
-              <button onClick={() => handleUpgrade(plan)} style={{ width: '100%', padding: '12px', background: plan === 'unlimited' ? c.accent : c.cardHover, color: plan === 'unlimited' ? c.bg : c.text, border: `1px solid ${c.border}`, borderRadius: '8px', fontSize: '14px', fontWeight: '500', cursor: 'pointer' }}>
-                {plan === 'unlimited' ? 'Go Unlimited' : 'Get Basic'}
+              <button onClick={() => handleUpgrade(plan)} style={{ width: '100%', padding: '12px', background: plan === 'pro' ? c.accent : c.cardHover, color: plan === 'pro' ? c.bg : c.text, border: `1px solid ${c.border}`, borderRadius: '8px', fontSize: '14px', fontWeight: '500', cursor: 'pointer' }}>
+                {plan === 'pro' ? 'Go Pro' : 'Get Basic'}
               </button>
             </div>
           ))}
@@ -733,13 +838,51 @@ export default function Mise() {
       <div style={{ minHeight: '100vh', background: c.bg, fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", color: c.text, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
         <div style={{ width: '100%', maxWidth: '340px', background: c.card, borderRadius: '16px', padding: '28px 24px', border: `1px solid ${c.border}` }}>
           <button onClick={() => setShowAuth(false)} style={{ background: 'none', border: 'none', color: c.muted, fontSize: '14px', cursor: 'pointer', marginBottom: '16px', padding: 0 }}>← Back</button>
-          <h2 style={{ fontSize: '22px', fontWeight: '600', marginBottom: '6px' }}>{authMode === 'login' ? 'Welcome back' : 'Create account'}</h2>
-          <p style={{ fontSize: '14px', color: c.muted, marginBottom: '24px' }}>{authMode === 'login' ? 'Sign in to access saved recipes' : 'Get 3 free recipes/month'}</p>
-          <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="Email" style={{ width: '100%', padding: '12px 14px', fontSize: '15px', background: c.bg, border: `1px solid ${c.border}`, borderRadius: '8px', color: c.text, marginBottom: '12px', outline: 'none', boxSizing: 'border-box' }} />
-          <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="Password" onKeyDown={e => e.key === 'Enter' && handleAuth()} style={{ width: '100%', padding: '12px 14px', fontSize: '15px', background: c.bg, border: `1px solid ${c.border}`, borderRadius: '8px', color: c.text, marginBottom: '16px', outline: 'none', boxSizing: 'border-box' }} />
+          <h2 style={{ fontSize: '22px', fontWeight: '600', marginBottom: '6px' }}>{authMode === 'login' ? txt.welcomeBack : txt.createAccount}</h2>
+          <p style={{ fontSize: '14px', color: c.muted, marginBottom: '24px' }}>{authMode === 'login' ? 'Sign in to access saved recipes' : 'Get 3 free recipes every month'}</p>
+          
+          {/* Google Sign-In Button */}
+          {GOOGLE_CLIENT_ID && (
+            <>
+              <div 
+                id="google-signin-button"
+                ref={(el) => {
+                  if (el && window.google) {
+                    window.google.accounts.id.initialize({
+                      client_id: GOOGLE_CLIENT_ID,
+                      callback: handleGoogleAuth
+                    });
+                    window.google.accounts.id.renderButton(el, {
+                      theme: 'outline',
+                      size: 'large',
+                      width: '100%',
+                      text: 'continue_with'
+                    });
+                  }
+                }}
+                style={{ marginBottom: '16px' }}
+              />
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+                <div style={{ flex: 1, height: '1px', background: c.border }} />
+                <span style={{ fontSize: '12px', color: c.muted }}>or</span>
+                <div style={{ flex: 1, height: '1px', background: c.border }} />
+              </div>
+            </>
+          )}
+          
+          <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder={txt.email} style={{ width: '100%', padding: '12px 14px', fontSize: '15px', background: c.bg, border: `1px solid ${c.border}`, borderRadius: '8px', color: c.text, marginBottom: '12px', outline: 'none', boxSizing: 'border-box' }} />
+          <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder={txt.password} onKeyDown={e => e.key === 'Enter' && handleAuth()} style={{ width: '100%', padding: '12px 14px', fontSize: '15px', background: c.bg, border: `1px solid ${c.border}`, borderRadius: '8px', color: c.text, marginBottom: '16px', outline: 'none', boxSizing: 'border-box' }} />
           {authError && <p style={{ color: c.error, fontSize: '13px', marginBottom: '16px' }}>{authError}</p>}
-          <button onClick={handleAuth} disabled={authLoading} style={{ width: '100%', padding: '12px', fontSize: '15px', fontWeight: '600', background: c.accent, color: c.bg, border: 'none', borderRadius: '8px', cursor: authLoading ? 'wait' : 'pointer', marginBottom: '16px' }}>{authLoading ? '...' : (authMode === 'login' ? 'Sign In' : 'Create Account')}</button>
-          <p style={{ textAlign: 'center', fontSize: '14px', color: c.muted }}>{authMode === 'login' ? "No account? " : "Have an account? "}<button onClick={() => { setAuthMode(authMode === 'login' ? 'signup' : 'login'); setAuthError(''); }} style={{ background: 'none', border: 'none', color: c.accent, cursor: 'pointer', fontSize: '14px', padding: 0 }}>{authMode === 'login' ? 'Sign up' : 'Sign in'}</button></p>
+          <button onClick={handleAuth} disabled={authLoading} style={{ width: '100%', padding: '12px', fontSize: '15px', fontWeight: '600', background: c.accent, color: c.bg, border: 'none', borderRadius: '8px', cursor: authLoading ? 'wait' : 'pointer', marginBottom: '16px' }}>{authLoading ? '...' : (authMode === 'login' ? txt.signIn : txt.createAccount)}</button>
+          <p style={{ textAlign: 'center', fontSize: '14px', color: c.muted }}>{authMode === 'login' ? txt.needAccount : txt.haveAccount}<button onClick={() => { setAuthMode(authMode === 'login' ? 'signup' : 'login'); setAuthError(''); }} style={{ background: 'none', border: 'none', color: c.accent, cursor: 'pointer', fontSize: '14px', padding: 0, marginLeft: '4px' }}>{authMode === 'login' ? txt.createAccount : txt.signIn}</button></p>
+          
+          {/* Trust messaging */}
+          <div style={{ marginTop: '20px', padding: '12px', background: c.bg, borderRadius: '8px', textAlign: 'center' }}>
+            <p style={{ fontSize: '11px', color: c.dim, lineHeight: 1.5 }}>
+              🔒 We never share your email or data.<br/>
+              Secure payments via Stripe. Cancel anytime.
+            </p>
+          </div>
         </div>
       </div>
     );
