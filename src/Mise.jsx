@@ -35,35 +35,73 @@ const getFingerprint = () => {
   return fingerprint;
 };
 
+// Quota limits (must match backend config)
+const QUOTAS = {
+  anonymous: 10,
+  free: 3,
+  basic: 20,
+  pro: Infinity,
+};
+
+// Helper to normalize v2 API errors to v1 format
+const normalizeError = (data) => {
+  if (data.error && typeof data.error === 'object') {
+    // V2 format: { error: { code, message, details } }
+    const { code, message } = data.error;
+    return {
+      error: message,
+      code,
+      // Map error codes to v1-style flags
+      requiresSignup: code === 'QUOTA_EXCEEDED' && message.includes('sign up'),
+      upgrade: code === 'QUOTA_EXCEEDED' || code === 'FORBIDDEN',
+      message,
+    };
+  }
+  // Already v1 format or no error
+  return data;
+};
+
+// Helper to calculate recipesRemaining from user data
+const calculateRecipesRemaining = (user) => {
+  if (!user) return QUOTAS.anonymous;
+  const sub = (user.subscription || 'free').toLowerCase();
+  const limit = QUOTAS[sub] || QUOTAS.free;
+  if (limit === Infinity) return Infinity;
+  return Math.max(0, limit - (user.recipesUsedThisMonth || 0));
+};
+
 // API with token-based auth
 const api = {
   getToken: () => localStorage.getItem('mise_token'),
   setToken: (token) => token ? localStorage.setItem('mise_token', token) : localStorage.removeItem('mise_token'),
-  
+
   async post(path, body = {}) {
     const headers = { 'Content-Type': 'application/json' };
     const token = this.getToken();
     if (token) headers['Authorization'] = `Bearer ${token}`;
-    
+
     // Add fingerprint for anonymous tracking
     if (!token) body.fingerprint = getFingerprint();
-    
+
     const res = await fetch(`${API_URL}${path}`, { method: 'POST', headers, body: JSON.stringify(body) });
-    return res.json();
+    const data = await res.json();
+    return normalizeError(data);
   },
   async get(path) {
     const headers = {};
     const token = this.getToken();
     if (token) headers['Authorization'] = `Bearer ${token}`;
     const res = await fetch(`${API_URL}${path}`, { headers });
-    return res.json();
+    const data = await res.json();
+    return normalizeError(data);
   },
   async delete(path) {
     const headers = {};
     const token = this.getToken();
     if (token) headers['Authorization'] = `Bearer ${token}`;
     const res = await fetch(`${API_URL}${path}`, { method: 'DELETE', headers });
-    return res.json();
+    const data = await res.json();
+    return normalizeError(data);
   },
 };
 
@@ -656,20 +694,46 @@ export default function Mise() {
     const token = api.getToken();
     if (token) {
       api.get('/api/auth/me').then(data => {
-        if (data.user) { 
-          setUser(data.user); 
-          setRecipesRemaining(data.user.recipesRemaining); 
-          loadSavedRecipes(); 
+        if (data.user) {
+          setUser(data.user);
+          setRecipesRemaining(calculateRecipesRemaining(data.user));
+          loadSavedRecipes();
         } else {
           // Invalid token, clear it
           api.setToken(null);
         }
       }).catch(() => api.setToken(null));
     }
-    
-    api.get('/api/payments/plans').then(setPlans);
-    api.get('/api/ratings/summary').then(data => setRatingsSummary(data.display));
-    
+
+    // Load plans (v2 format)
+    api.get('/api/payments/plans').then(data => {
+      // v2 returns { basic: {...}, pro: {...} } with nested monthly/yearly
+      if (data.basic && data.pro) {
+        setPlans({
+          basic: {
+            name: 'Basic',
+            price: data.basic.monthly?.price || 1.99,
+            features: data.basic.features || ['20 recipes per month', 'Recipe translation', 'Save recipes'],
+          },
+          pro: {
+            name: 'Pro',
+            price: data.pro.monthly?.price || 4.99,
+            features: data.pro.features || ['Unlimited recipes', 'Recipe translation', 'Save recipes', 'Priority support'],
+          },
+        });
+      }
+    });
+
+    // Load ratings summary (v2 format: { average, total, distribution })
+    api.get('/api/feedback/ratings/summary').then(data => {
+      if (data.average !== undefined && data.total !== undefined) {
+        // Convert v2 format to display format
+        setRatingsSummary({
+          text: data.total > 0 ? `${data.average.toFixed(1)}★ (${data.total})` : null,
+        });
+      }
+    });
+
     // Load Google Sign-In script
     if (GOOGLE_CLIENT_ID) {
       const script = document.createElement('script');
@@ -697,7 +761,24 @@ export default function Mise() {
 
   const loadSavedRecipes = async () => {
     const data = await api.get('/api/recipes/saved');
-    if (data.recipes) setSavedRecipes(data.recipes);
+    if (data.recipes) {
+      // Transform snake_case from v2 backend to camelCase
+      const transformed = data.recipes.map(r => ({
+        id: r.id,
+        title: r.title,
+        servings: r.servings,
+        prepTime: r.prep_time || r.prepTime,
+        cookTime: r.cook_time || r.cookTime,
+        imageUrl: r.image_url || r.imageUrl,
+        ingredients: r.ingredients,
+        steps: r.steps,
+        tips: r.tips,
+        source: r.source,
+        sourceUrl: r.source_url || r.sourceUrl,
+        author: r.author,
+      }));
+      setSavedRecipes(transformed);
+    }
   };
 
   const handleAuth = async () => {
@@ -706,14 +787,14 @@ export default function Mise() {
     const endpoint = authMode === 'signup' ? '/api/auth/register' : '/api/auth/login';
     const data = await api.post(endpoint, { email, password });
     if (data.error) { setAuthError(data.error); }
-    else { 
+    else {
       api.setToken(data.token);
-      setUser(data.user); 
-      setRecipesRemaining(data.user.recipesRemaining); 
-      setShowAuth(false); 
-      setEmail(''); 
-      setPassword(''); 
-      loadSavedRecipes(); 
+      setUser(data.user);
+      setRecipesRemaining(calculateRecipesRemaining(data.user));
+      setShowAuth(false);
+      setEmail('');
+      setPassword('');
+      loadSavedRecipes();
     }
     setAuthLoading(false);
   };
@@ -725,7 +806,7 @@ export default function Mise() {
     else {
       api.setToken(data.token);
       setUser(data.user);
-      setRecipesRemaining(data.user.recipesRemaining);
+      setRecipesRemaining(calculateRecipesRemaining(data.user));
       setShowAuth(false);
       loadSavedRecipes();
     }
@@ -743,14 +824,30 @@ export default function Mise() {
 
   const handleUpgrade = async (plan) => {
     if (!user) { setShowAuth(true); return; }
-    const data = await api.post('/api/payments/create-checkout', { plan });
-    if (data.url) window.location.href = data.url;
+    // Map plan names to v2 format (basic/pro -> basic_monthly/pro_monthly)
+    const planMap = { basic: 'basic_monthly', pro: 'pro_monthly' };
+    const data = await api.post('/api/payments/create-checkout', { plan: planMap[plan] || plan });
+    // v2 uses checkoutUrl instead of url
+    if (data.checkoutUrl) window.location.href = data.checkoutUrl;
   };
 
   const saveCurrentRecipe = async () => {
     if (!user || !recipe) return;
     setSavingRecipe(true);
-    await api.post('/api/recipes/save', { recipe });
+    // v2 expects flat recipe object, not nested { recipe: {...} }
+    await api.post('/api/recipes/save', {
+      title: recipe.title,
+      servings: recipe.servings,
+      prepTime: recipe.prepTime,
+      cookTime: recipe.cookTime,
+      imageUrl: recipe.imageUrl,
+      ingredients: recipe.ingredients,
+      steps: recipe.steps,
+      tips: recipe.tips,
+      source: recipe.source,
+      sourceUrl: recipe.sourceUrl,
+      author: recipe.author,
+    });
     await loadSavedRecipes();
     setSavingRecipe(false);
   };
@@ -781,12 +878,17 @@ export default function Mise() {
     if (!url.trim()) { setError('Please paste a recipe URL'); return; }
     setLoading(true); setError(''); setRecipe(null); resetCookingState();
     const data = await api.post('/api/recipe/clean-url', { url, language });
-    if (data.error) { 
+    if (data.error) {
       if (data.requiresSignup) { setShowAuth(true); setAuthMode('signup'); }
-      else if (data.upgrade) setShowPricing(true); 
-      setError(data.message || data.error); 
+      else if (data.upgrade) setShowPricing(true);
+      setError(data.message || data.error);
     }
-    else { setRecipe(data.recipe); setServings(data.recipe.servings); setRecipesRemaining(data.recipesRemaining); }
+    else {
+      setRecipe(data.recipe);
+      setServings(data.recipe.servings);
+      // v2 doesn't return recipesRemaining, decrement locally
+      setRecipesRemaining(prev => prev === Infinity ? Infinity : Math.max(0, prev - 1));
+    }
     setLoading(false);
   };
 
@@ -794,12 +896,18 @@ export default function Mise() {
     if (!photos.length) { setError('Please add at least one photo'); return; }
     setLoading(true); setError(''); setRecipe(null); resetCookingState();
     const data = await api.post('/api/recipe/clean-photo', { photos, language });
-    if (data.error) { 
+    if (data.error) {
       if (data.requiresSignup) { setShowAuth(true); setAuthMode('signup'); }
-      else if (data.upgrade) setShowPricing(true); 
-      setError(data.message || data.error); 
+      else if (data.upgrade) setShowPricing(true);
+      setError(data.message || data.error);
     }
-    else { setRecipe(data.recipe); setServings(data.recipe.servings); setRecipesRemaining(data.recipesRemaining); setPhotos([]); }
+    else {
+      setRecipe(data.recipe);
+      setServings(data.recipe.servings);
+      // v2 doesn't return recipesRemaining, decrement locally
+      setRecipesRemaining(prev => prev === Infinity ? Infinity : Math.max(0, prev - 1));
+      setPhotos([]);
+    }
     setLoading(false);
   };
 
@@ -807,12 +915,18 @@ export default function Mise() {
     if (!youtubeUrl.trim()) { setError('Please paste a YouTube URL'); return; }
     setLoading(true); setError(''); setRecipe(null); resetCookingState();
     const data = await api.post('/api/recipe/clean-youtube', { url: youtubeUrl, language });
-    if (data.error) { 
+    if (data.error) {
       if (data.requiresSignup) { setShowAuth(true); setAuthMode('signup'); }
-      else if (data.upgrade) setShowPricing(true); 
-      setError(data.message || data.error); 
+      else if (data.upgrade) setShowPricing(true);
+      setError(data.message || data.error);
     }
-    else { setRecipe(data.recipe); setServings(data.recipe.servings); setRecipesRemaining(data.recipesRemaining); setYoutubeUrl(''); }
+    else {
+      setRecipe(data.recipe);
+      setServings(data.recipe.servings);
+      // v2 doesn't return recipesRemaining, decrement locally
+      setRecipesRemaining(prev => prev === Infinity ? Infinity : Math.max(0, prev - 1));
+      setYoutubeUrl('');
+    }
     setLoading(false);
   };
 
@@ -842,10 +956,15 @@ export default function Mise() {
   const submitRating = async (stars) => {
     setUserRating(stars);
     setHasRatedThisSession(true);
-    await api.post('/api/rating', { stars });
-    // Refresh summary
-    const data = await api.get('/api/ratings/summary');
-    setRatingsSummary(data.display);
+    // v2 uses /api/feedback/rating endpoint
+    await api.post('/api/feedback/rating', { stars });
+    // Refresh summary (v2 format: { average, total, distribution })
+    const data = await api.get('/api/feedback/ratings/summary');
+    if (data.average !== undefined && data.total !== undefined) {
+      setRatingsSummary({
+        text: data.total > 0 ? `${data.average.toFixed(1)}★ (${data.total})` : null,
+      });
+    }
   };
 
   const remainingIngredients = recipe?.ingredients?.map((ing, i) => ({ ing, i })).filter(({ i }) => !completedIngredients[i]) || [];
