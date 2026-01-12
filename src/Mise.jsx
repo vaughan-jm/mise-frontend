@@ -1242,87 +1242,87 @@ export default function Mise() {
         </div>
       </header>
 
-      {/* Input Section */}
+      {/* Landing Page Content - Centered for mobile thumb accessibility */}
       {!recipe && !loading && (
-        <div style={{ padding: '20px', maxWidth: '500px', margin: '0 auto' }}>
-          <div style={{ display: 'flex', marginBottom: '16px', background: c.card, borderRadius: '10px', padding: '4px', border: `1px solid ${c.border}` }}>
-            <button onClick={() => setInputMode('url')} style={{ flex: 1, padding: '10px 8px', fontSize: '12px', fontWeight: '500', background: inputMode === 'url' ? c.accent : 'transparent', color: inputMode === 'url' ? c.bg : c.muted, border: 'none', borderRadius: '8px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>🔗 {txt.pasteUrl}</button>
-            <button onClick={() => setInputMode('photo')} style={{ flex: 1, padding: '10px 8px', fontSize: '12px', fontWeight: '500', background: inputMode === 'photo' ? c.accent : 'transparent', color: inputMode === 'photo' ? c.bg : c.muted, border: 'none', borderRadius: '8px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>📷 {txt.snapPhoto}</button>
-            <button onClick={() => setInputMode('youtube')} style={{ flex: 1, padding: '10px 8px', fontSize: '12px', fontWeight: '500', background: inputMode === 'youtube' ? c.accent : 'transparent', color: inputMode === 'youtube' ? c.bg : c.muted, border: 'none', borderRadius: '8px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>▶️ {txt.youtube}</button>
-          </div>
-
-          {inputMode === 'url' && (
-            <div>
-              <div style={{ display: 'flex', gap: '8px' }}>
-                <input type="url" value={url} onChange={e => setUrl(e.target.value)} placeholder="Paste recipe URL..." onKeyDown={e => e.key === 'Enter' && fetchFromUrl()} style={{ flex: 1, padding: '14px 16px', fontSize: '15px', background: c.card, border: `1px solid ${c.border}`, borderRadius: '10px', color: c.text, outline: 'none' }} />
-                <button onClick={fetchFromUrl} style={{ padding: '14px 20px', fontSize: '14px', fontWeight: '500', background: c.accent, color: c.bg, border: 'none', borderRadius: '10px', cursor: 'pointer' }}>{txt.clean}</button>
-              </div>
-              <p style={{ fontSize: '12px', color: c.dim, textAlign: 'center', marginTop: '12px' }}>{txt.worksWithAny}</p>
+        <div style={{ minHeight: 'calc(100vh - 60px)', display: 'flex', flexDirection: 'column', justifyContent: 'center', paddingBottom: '60px' }}>
+          {/* Input Section */}
+          <div style={{ padding: '20px', maxWidth: '500px', margin: '0 auto' }}>
+            <div style={{ display: 'flex', marginBottom: '16px', background: c.card, borderRadius: '10px', padding: '4px', border: `1px solid ${c.border}` }}>
+              <button onClick={() => setInputMode('url')} style={{ flex: 1, padding: '10px 8px', fontSize: '12px', fontWeight: '500', background: inputMode === 'url' ? c.accent : 'transparent', color: inputMode === 'url' ? c.bg : c.muted, border: 'none', borderRadius: '8px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>🔗 {txt.pasteUrl}</button>
+              <button onClick={() => setInputMode('photo')} style={{ flex: 1, padding: '10px 8px', fontSize: '12px', fontWeight: '500', background: inputMode === 'photo' ? c.accent : 'transparent', color: inputMode === 'photo' ? c.bg : c.muted, border: 'none', borderRadius: '8px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>📷 {txt.snapPhoto}</button>
+              <button onClick={() => setInputMode('youtube')} style={{ flex: 1, padding: '10px 8px', fontSize: '12px', fontWeight: '500', background: inputMode === 'youtube' ? c.accent : 'transparent', color: inputMode === 'youtube' ? c.bg : c.muted, border: 'none', borderRadius: '8px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>▶️ {txt.youtube}</button>
             </div>
-          )}
 
-          {inputMode === 'photo' && (
-            <div>
-              <input ref={fileInputRef} type="file" accept="image/*" multiple onChange={handlePhotoSelect} style={{ display: 'none' }} />
-              {photos.length > 0 && (
-                <div style={{ marginBottom: '12px', display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                  {photos.map((photo, i) => (
-                    <div key={i} style={{ position: 'relative' }}>
-                      <img src={photo} alt={`Recipe ${i + 1}`} style={{ width: '80px', height: '80px', objectFit: 'cover', borderRadius: '8px', border: `1px solid ${c.border}` }} />
-                      <button onClick={() => removePhoto(i)} style={{ position: 'absolute', top: '-6px', right: '-6px', width: '20px', height: '20px', background: c.error, color: '#fff', border: 'none', borderRadius: '50%', fontSize: '12px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>×</button>
-                    </div>
-                  ))}
+            {inputMode === 'url' && (
+              <div>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <input type="url" value={url} onChange={e => setUrl(e.target.value)} placeholder="Paste recipe URL..." onKeyDown={e => e.key === 'Enter' && fetchFromUrl()} style={{ flex: 1, padding: '14px 16px', fontSize: '15px', background: c.card, border: `1px solid ${c.border}`, borderRadius: '10px', color: c.text, outline: 'none' }} />
+                  <button onClick={fetchFromUrl} style={{ padding: '14px 20px', fontSize: '14px', fontWeight: '500', background: c.accent, color: c.bg, border: 'none', borderRadius: '10px', cursor: 'pointer' }}>{txt.clean}</button>
                 </div>
-              )}
-              <div style={{ display: 'flex', gap: '8px' }}>
-                <button onClick={() => fileInputRef.current?.click()} style={{ flex: 1, padding: '16px', fontSize: '14px', background: c.card, color: c.text, border: `2px dashed ${c.border}`, borderRadius: '10px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-                  <span style={{ fontSize: '20px' }}>📷</span> {photos.length === 0 ? txt.addPhotos : txt.addMore}
-                </button>
+              </div>
+            )}
+
+            {inputMode === 'photo' && (
+              <div>
+                <input ref={fileInputRef} type="file" accept="image/*" multiple onChange={handlePhotoSelect} style={{ display: 'none' }} />
                 {photos.length > 0 && (
-                  <button onClick={processPhotos} style={{ padding: '16px 24px', fontSize: '14px', fontWeight: '500', background: c.accent, color: c.bg, border: 'none', borderRadius: '10px', cursor: 'pointer' }}>{txt.clean}</button>
+                  <div style={{ marginBottom: '12px', display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                    {photos.map((photo, i) => (
+                      <div key={i} style={{ position: 'relative' }}>
+                        <img src={photo} alt={`Recipe ${i + 1}`} style={{ width: '80px', height: '80px', objectFit: 'cover', borderRadius: '8px', border: `1px solid ${c.border}` }} />
+                        <button onClick={() => removePhoto(i)} style={{ position: 'absolute', top: '-6px', right: '-6px', width: '20px', height: '20px', background: c.error, color: '#fff', border: 'none', borderRadius: '50%', fontSize: '12px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>×</button>
+                      </div>
+                    ))}
+                  </div>
                 )}
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <button onClick={() => fileInputRef.current?.click()} style={{ flex: 1, padding: '16px', fontSize: '14px', background: c.card, color: c.text, border: `2px dashed ${c.border}`, borderRadius: '10px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                    <span style={{ fontSize: '20px' }}>📷</span> {photos.length === 0 ? txt.addPhotos : txt.addMore}
+                  </button>
+                  {photos.length > 0 && (
+                    <button onClick={processPhotos} style={{ padding: '16px 24px', fontSize: '14px', fontWeight: '500', background: c.accent, color: c.bg, border: 'none', borderRadius: '10px', cursor: 'pointer' }}>{txt.clean}</button>
+                  )}
+                </div>
+                <p style={{ fontSize: '12px', color: c.dim, textAlign: 'center', marginTop: '12px', lineHeight: 1.5 }}>{txt.uploadOrSnap}</p>
               </div>
-              <p style={{ fontSize: '12px', color: c.dim, textAlign: 'center', marginTop: '12px', lineHeight: 1.5 }}>{txt.uploadOrSnap}</p>
-            </div>
-          )}
+            )}
 
-          {inputMode === 'youtube' && (
-            <div>
-              <div style={{ display: 'flex', gap: '8px' }}>
-                <input type="url" value={youtubeUrl} onChange={e => setYoutubeUrl(e.target.value)} placeholder={txt.pasteYoutube} onKeyDown={e => e.key === 'Enter' && processYoutube()} style={{ flex: 1, padding: '14px 16px', fontSize: '15px', background: c.card, border: `1px solid ${c.border}`, borderRadius: '10px', color: c.text, outline: 'none' }} />
-                <button onClick={processYoutube} style={{ padding: '14px 20px', fontSize: '14px', fontWeight: '500', background: c.accent, color: c.bg, border: 'none', borderRadius: '10px', cursor: 'pointer' }}>{txt.clean}</button>
+            {inputMode === 'youtube' && (
+              <div>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <input type="url" value={youtubeUrl} onChange={e => setYoutubeUrl(e.target.value)} placeholder={txt.pasteYoutube} onKeyDown={e => e.key === 'Enter' && processYoutube()} style={{ flex: 1, padding: '14px 16px', fontSize: '15px', background: c.card, border: `1px solid ${c.border}`, borderRadius: '10px', color: c.text, outline: 'none' }} />
+                  <button onClick={processYoutube} style={{ padding: '14px 20px', fontSize: '14px', fontWeight: '500', background: c.accent, color: c.bg, border: 'none', borderRadius: '10px', cursor: 'pointer' }}>{txt.clean}</button>
+                </div>
+                <p style={{ fontSize: '12px', color: c.dim, textAlign: 'center', marginTop: '12px' }}>{txt.youtubeHelper}</p>
               </div>
-              <p style={{ fontSize: '12px', color: c.dim, textAlign: 'center', marginTop: '12px' }}>{txt.youtubeHelper}</p>
-            </div>
-          )}
+            )}
 
-          {error && <p style={{ textAlign: 'center', color: c.error, marginTop: '12px', fontSize: '13px' }}>{error}</p>}
-        </div>
-      )}
-
-      {/* Empty State Hero */}
-      {!recipe && !loading && (
-        <div style={{ padding: '30px 20px', textAlign: 'center' }}>
-          <h1 style={{ fontSize: '24px', fontWeight: '300', marginBottom: '8px', letterSpacing: '-0.5px' }}>{txt.justTheRecipe}</h1>
-          <p style={{ fontSize: '14px', color: c.muted, maxWidth: '280px', margin: '0 auto', lineHeight: 1.6 }}>{txt.worksWithAny}</p>
-          <div style={{ marginTop: '24px', display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
-            {!user && <button onClick={() => setShowAuth(true)} style={{ background: c.card, border: `1px solid ${c.border}`, color: c.text, padding: '10px 18px', borderRadius: '8px', fontSize: '13px', cursor: 'pointer' }}>{txt.signIn}</button>}
-            <button onClick={() => setShowPricing(true)} style={{ background: 'none', border: 'none', color: c.accent, fontSize: '13px', cursor: 'pointer' }}>{txt.upgrade} →</button>
+            {error && <p style={{ textAlign: 'center', color: c.error, marginTop: '12px', fontSize: '13px' }}>{error}</p>}
           </div>
-          
-          {/* Discreet feedback link */}
-          <button 
-            onClick={() => setShowFeedback(true)} 
-            style={{ 
-              marginTop: '40px', background: 'none', border: 'none', 
-              color: c.dim, fontSize: '11px', cursor: 'pointer',
-              opacity: 0.7, transition: 'opacity 0.2s',
-            }}
-            onMouseEnter={e => e.target.style.opacity = 1}
-            onMouseLeave={e => e.target.style.opacity = 0.7}
-          >
-            {txt.gotFeatureIdea}
-          </button>
+
+          {/* Empty State Hero */}
+          <div style={{ padding: '30px 20px', textAlign: 'center' }}>
+            <h1 style={{ fontSize: '24px', fontWeight: '300', marginBottom: '8px', letterSpacing: '-0.5px' }}>{txt.justTheRecipe}</h1>
+            <p style={{ fontSize: '14px', color: c.muted, maxWidth: '280px', margin: '0 auto', lineHeight: 1.6 }}>{txt.worksWithAny}</p>
+            <div style={{ marginTop: '24px', display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
+              {!user && <button onClick={() => setShowAuth(true)} style={{ background: c.card, border: `1px solid ${c.border}`, color: c.text, padding: '10px 18px', borderRadius: '8px', fontSize: '13px', cursor: 'pointer' }}>{txt.signIn}</button>}
+              <button onClick={() => setShowPricing(true)} style={{ background: 'none', border: 'none', color: c.accent, fontSize: '13px', cursor: 'pointer' }}>{txt.upgrade} →</button>
+            </div>
+
+            {/* Discreet feedback link */}
+            <button
+              onClick={() => setShowFeedback(true)}
+              style={{
+                marginTop: '40px', background: 'none', border: 'none',
+                color: c.dim, fontSize: '11px', cursor: 'pointer',
+                opacity: 0.7, transition: 'opacity 0.2s',
+              }}
+              onMouseEnter={e => e.target.style.opacity = 1}
+              onMouseLeave={e => e.target.style.opacity = 0.7}
+            >
+              {txt.gotFeatureIdea}
+            </button>
+          </div>
         </div>
       )}
 
