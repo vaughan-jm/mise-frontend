@@ -943,6 +943,18 @@ export default function Mise() {
     return ing.replace(/(\d+\.?\d*)/g, (m) => { const n = parseFloat(m) * ratio; return n % 1 === 0 ? n.toString() : n.toFixed(1); });
   };
 
+  // Match step ingredient name to full recipe ingredient (with amount)
+  const findFullIngredient = (stepIng) => {
+    if (!recipe?.ingredients) return stepIng;
+    const stepIngLower = stepIng.toLowerCase().trim();
+    // Try to find a matching full ingredient from recipe.ingredients
+    const match = recipe.ingredients.find(fullIng => {
+      const fullIngLower = fullIng.toLowerCase();
+      return fullIngLower.includes(stepIngLower) || stepIngLower.includes(fullIngLower);
+    });
+    return match || stepIng;
+  };
+
   // Feedback handlers
   const submitFeedback = async () => {
     if (!feedbackText.trim()) return;
@@ -1530,7 +1542,7 @@ export default function Mise() {
                         {stepIngredients?.length > 0 && (
                           <div style={{ marginTop: '12px', marginLeft: '36px', padding: '10px 12px', background: c.ingredientBg, borderRadius: '8px', border: `1px solid ${c.ingredientBorder}` }}>
                             <p style={{ fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.5px', color: c.accent, marginBottom: '6px', fontWeight: '600' }}>You'll need:</p>
-                            {stepIngredients.map((ing, j) => <p key={j} style={{ fontSize: '13px', color: c.text, marginBottom: j < stepIngredients.length - 1 ? '4px' : 0, lineHeight: 1.4 }}>• {scaleIngredient(ing)}</p>)}
+                            {stepIngredients.map((ing, j) => <p key={j} style={{ fontSize: '13px', color: c.text, marginBottom: j < stepIngredients.length - 1 ? '4px' : 0, lineHeight: 1.4 }}>• {scaleIngredient(findFullIngredient(ing))}</p>)}
                           </div>
                         )}
                       </div>
