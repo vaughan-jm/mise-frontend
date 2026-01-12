@@ -177,9 +177,9 @@ export default function Mise() {
       addPhotos: 'Add photos',
       addMore: 'Add more',
       worksWithAny: 'Works with any recipe website',
-      uploadOrSnap: 'Upload or snap cookbook pages',
-      pasteYoutube: 'Paste a YouTube cooking video URL',
-      youtubeHelper: 'Extract recipes from cooking videos',
+      uploadOrSnap: 'Snap or upload recipe photos',
+      pasteYoutube: 'YouTube video URL...',
+      youtubeHelper: 'Works with cooking videos',
       prep: 'Prep',
       cook: 'Cook',
       servings: 'Servings',
@@ -241,9 +241,9 @@ export default function Mise() {
       addPhotos: 'Añadir fotos',
       addMore: 'Añadir más',
       worksWithAny: 'Funciona con cualquier sitio de recetas',
-      uploadOrSnap: 'Sube o fotografía páginas de cocina',
-      pasteYoutube: 'Pega una URL de video de cocina de YouTube',
-      youtubeHelper: 'Extrae recetas de videos de cocina',
+      uploadOrSnap: 'Sube o fotografía recetas',
+      pasteYoutube: 'URL de video YouTube...',
+      youtubeHelper: 'Funciona con videos de cocina',
       prep: 'Prep',
       cook: 'Cocinar',
       servings: 'Porciones',
@@ -305,9 +305,9 @@ export default function Mise() {
       addPhotos: 'Ajouter photos',
       addMore: 'Ajouter plus',
       worksWithAny: 'Fonctionne avec tous les sites de recettes',
-      uploadOrSnap: 'Téléchargez ou photographiez des pages de cuisine',
-      pasteYoutube: 'Collez une URL de vidéo de cuisine YouTube',
-      youtubeHelper: 'Extraire des recettes de vidéos de cuisine',
+      uploadOrSnap: 'Photo ou téléchargez recettes',
+      pasteYoutube: 'URL vidéo YouTube...',
+      youtubeHelper: 'Fonctionne avec vidéos de cuisine',
       prep: 'Prép',
       cook: 'Cuisson',
       servings: 'portions',
@@ -352,9 +352,9 @@ export default function Mise() {
       addPhotos: 'Adicionar fotos',
       addMore: 'Adicionar mais',
       worksWithAny: 'Funciona com qualquer site de receitas',
-      uploadOrSnap: 'Envie ou fotografe páginas de receitas',
-      pasteYoutube: 'Cole uma URL de vídeo de culinária do YouTube',
-      youtubeHelper: 'Extraia receitas de vídeos de culinária',
+      uploadOrSnap: 'Envie ou fotografe receitas',
+      pasteYoutube: 'URL do vídeo YouTube...',
+      youtubeHelper: 'Funciona com vídeos de culinária',
       prep: 'Prep',
       cook: 'Cozinhar',
       servings: 'porções',
@@ -399,9 +399,9 @@ export default function Mise() {
       addPhotos: '添加照片',
       addMore: '添加更多',
       worksWithAny: '适用于任何食谱网站',
-      uploadOrSnap: '上传或拍摄食谱页面',
-      pasteYoutube: '粘贴YouTube烹饪视频链接',
-      youtubeHelper: '从烹饪视频中提取食谱',
+      uploadOrSnap: '上传或拍摄食谱照片',
+      pasteYoutube: 'YouTube视频链接...',
+      youtubeHelper: '支持烹饪视频',
       prep: '准备',
       cook: '烹饪',
       servings: '份',
@@ -446,9 +446,9 @@ export default function Mise() {
       addPhotos: 'फोटो जोड़ें',
       addMore: 'और जोड़ें',
       worksWithAny: 'किसी भी रेसिपी वेबसाइट के साथ काम करता है',
-      uploadOrSnap: 'कुकबुक पेज अपलोड या फोटो खींचें',
-      pasteYoutube: 'YouTube कुकिंग वीडियो URL पेस्ट करें',
-      youtubeHelper: 'कुकिंग वीडियो से रेसिपी निकालें',
+      uploadOrSnap: 'रेसिपी फोटो अपलोड करें',
+      pasteYoutube: 'YouTube वीडियो URL...',
+      youtubeHelper: 'कुकिंग वीडियो के साथ काम करता है',
       prep: 'तैयारी',
       cook: 'पकाना',
       servings: 'सर्विंग्स',
@@ -493,9 +493,9 @@ export default function Mise() {
       addPhotos: 'إضافة صور',
       addMore: 'إضافة المزيد',
       worksWithAny: 'يعمل مع أي موقع وصفات',
-      uploadOrSnap: 'ارفع أو صوّر صفحات كتاب الطبخ',
-      pasteYoutube: 'الصق رابط فيديو طبخ من يوتيوب',
-      youtubeHelper: 'استخرج الوصفات من فيديوهات الطبخ',
+      uploadOrSnap: 'ارفع أو صوّر الوصفات',
+      pasteYoutube: 'رابط فيديو يوتيوب...',
+      youtubeHelper: 'يعمل مع فيديوهات الطبخ',
       prep: 'تحضير',
       cook: 'طبخ',
       servings: 'حصص',
@@ -1246,56 +1246,59 @@ export default function Mise() {
       {!recipe && !loading && (
         <div style={{ minHeight: 'calc(100vh - 60px)', display: 'flex', flexDirection: 'column', justifyContent: 'center', paddingBottom: '60px' }}>
           {/* Input Section */}
-          <div style={{ padding: '20px', maxWidth: '500px', margin: '0 auto' }}>
+          <div style={{ padding: '20px', maxWidth: '500px', margin: '0 auto', width: '100%', boxSizing: 'border-box' }}>
+            {/* Tab buttons - fixed height */}
             <div style={{ display: 'flex', marginBottom: '16px', background: c.card, borderRadius: '10px', padding: '4px', border: `1px solid ${c.border}` }}>
-              <button onClick={() => setInputMode('url')} style={{ flex: 1, padding: '10px 8px', fontSize: '12px', fontWeight: '500', background: inputMode === 'url' ? c.accent : 'transparent', color: inputMode === 'url' ? c.bg : c.muted, border: 'none', borderRadius: '8px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>🔗 {txt.pasteUrl}</button>
-              <button onClick={() => setInputMode('photo')} style={{ flex: 1, padding: '10px 8px', fontSize: '12px', fontWeight: '500', background: inputMode === 'photo' ? c.accent : 'transparent', color: inputMode === 'photo' ? c.bg : c.muted, border: 'none', borderRadius: '8px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>📷 {txt.snapPhoto}</button>
-              <button onClick={() => setInputMode('youtube')} style={{ flex: 1, padding: '10px 8px', fontSize: '12px', fontWeight: '500', background: inputMode === 'youtube' ? c.accent : 'transparent', color: inputMode === 'youtube' ? c.bg : c.muted, border: 'none', borderRadius: '8px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>▶️ {txt.youtube}</button>
+              <button onClick={() => setInputMode('url')} style={{ flex: 1, padding: '10px 8px', fontSize: '12px', fontWeight: '500', background: inputMode === 'url' ? c.accent : 'transparent', color: inputMode === 'url' ? c.bg : c.muted, border: 'none', borderRadius: '8px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px', whiteSpace: 'nowrap' }}>🔗 {txt.pasteUrl}</button>
+              <button onClick={() => setInputMode('photo')} style={{ flex: 1, padding: '10px 8px', fontSize: '12px', fontWeight: '500', background: inputMode === 'photo' ? c.accent : 'transparent', color: inputMode === 'photo' ? c.bg : c.muted, border: 'none', borderRadius: '8px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px', whiteSpace: 'nowrap' }}>📷 {txt.snapPhoto}</button>
+              <button onClick={() => setInputMode('youtube')} style={{ flex: 1, padding: '10px 8px', fontSize: '12px', fontWeight: '500', background: inputMode === 'youtube' ? c.accent : 'transparent', color: inputMode === 'youtube' ? c.bg : c.muted, border: 'none', borderRadius: '8px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px', whiteSpace: 'nowrap' }}>▶️ {txt.youtube}</button>
             </div>
 
-            {inputMode === 'url' && (
-              <div>
-                <div style={{ display: 'flex', gap: '8px' }}>
-                  <input type="url" value={url} onChange={e => setUrl(e.target.value)} placeholder="Paste recipe URL..." onKeyDown={e => e.key === 'Enter' && fetchFromUrl()} style={{ flex: 1, padding: '14px 16px', fontSize: '15px', background: c.card, border: `1px solid ${c.border}`, borderRadius: '10px', color: c.text, outline: 'none' }} />
-                  <button onClick={fetchFromUrl} style={{ padding: '14px 20px', fontSize: '14px', fontWeight: '500', background: c.accent, color: c.bg, border: 'none', borderRadius: '10px', cursor: 'pointer' }}>{txt.clean}</button>
-                </div>
+            {/* Hidden file input for photo mode */}
+            <input ref={fileInputRef} type="file" accept="image/*" multiple onChange={handlePhotoSelect} style={{ display: 'none' }} />
+
+            {/* Photo previews - shown above input row when photos selected */}
+            {inputMode === 'photo' && photos.length > 0 && (
+              <div style={{ marginBottom: '12px', display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                {photos.map((photo, i) => (
+                  <div key={i} style={{ position: 'relative' }}>
+                    <img src={photo} alt={`Recipe ${i + 1}`} style={{ width: '80px', height: '80px', objectFit: 'cover', borderRadius: '8px', border: `1px solid ${c.border}` }} />
+                    <button onClick={() => removePhoto(i)} style={{ position: 'absolute', top: '-6px', right: '-6px', width: '20px', height: '20px', background: c.error, color: '#fff', border: 'none', borderRadius: '50%', fontSize: '12px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>×</button>
+                  </div>
+                ))}
               </div>
             )}
 
-            {inputMode === 'photo' && (
-              <div>
-                <input ref={fileInputRef} type="file" accept="image/*" multiple onChange={handlePhotoSelect} style={{ display: 'none' }} />
-                {photos.length > 0 && (
-                  <div style={{ marginBottom: '12px', display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                    {photos.map((photo, i) => (
-                      <div key={i} style={{ position: 'relative' }}>
-                        <img src={photo} alt={`Recipe ${i + 1}`} style={{ width: '80px', height: '80px', objectFit: 'cover', borderRadius: '8px', border: `1px solid ${c.border}` }} />
-                        <button onClick={() => removePhoto(i)} style={{ position: 'absolute', top: '-6px', right: '-6px', width: '20px', height: '20px', background: c.error, color: '#fff', border: 'none', borderRadius: '50%', fontSize: '12px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>×</button>
-                      </div>
-                    ))}
-                  </div>
-                )}
-                <div style={{ display: 'flex', gap: '8px' }}>
-                  <button onClick={() => fileInputRef.current?.click()} style={{ flex: 1, padding: '16px', fontSize: '14px', background: c.card, color: c.text, border: `2px dashed ${c.border}`, borderRadius: '10px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-                    <span style={{ fontSize: '20px' }}>📷</span> {photos.length === 0 ? txt.addPhotos : txt.addMore}
+            {/* Input row - consistent height across all modes */}
+            <div style={{ display: 'flex', gap: '8px', height: '48px' }}>
+              {inputMode === 'url' && (
+                <>
+                  <input type="url" value={url} onChange={e => setUrl(e.target.value)} placeholder="Recipe URL..." onKeyDown={e => e.key === 'Enter' && fetchFromUrl()} style={{ flex: 1, padding: '0 16px', fontSize: '15px', background: c.card, border: `1px solid ${c.border}`, borderRadius: '10px', color: c.text, outline: 'none', height: '100%', boxSizing: 'border-box' }} />
+                  <button onClick={fetchFromUrl} style={{ padding: '0 20px', fontSize: '14px', fontWeight: '500', background: c.accent, color: c.bg, border: 'none', borderRadius: '10px', cursor: 'pointer', height: '100%' }}>{txt.clean}</button>
+                </>
+              )}
+              {inputMode === 'photo' && (
+                <>
+                  <button onClick={() => fileInputRef.current?.click()} style={{ flex: 1, padding: '0 16px', fontSize: '15px', background: c.card, color: c.text, border: `2px dashed ${c.border}`, borderRadius: '10px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', height: '100%', boxSizing: 'border-box' }}>
+                    <span style={{ fontSize: '16px' }}>📷</span> {photos.length === 0 ? txt.addPhotos : txt.addMore}
                   </button>
                   {photos.length > 0 && (
-                    <button onClick={processPhotos} style={{ padding: '16px 24px', fontSize: '14px', fontWeight: '500', background: c.accent, color: c.bg, border: 'none', borderRadius: '10px', cursor: 'pointer' }}>{txt.clean}</button>
+                    <button onClick={processPhotos} style={{ padding: '0 20px', fontSize: '14px', fontWeight: '500', background: c.accent, color: c.bg, border: 'none', borderRadius: '10px', cursor: 'pointer', height: '100%' }}>{txt.clean}</button>
                   )}
-                </div>
-                <p style={{ fontSize: '12px', color: c.dim, textAlign: 'center', marginTop: '12px', lineHeight: 1.5 }}>{txt.uploadOrSnap}</p>
-              </div>
-            )}
+                </>
+              )}
+              {inputMode === 'youtube' && (
+                <>
+                  <input type="url" value={youtubeUrl} onChange={e => setYoutubeUrl(e.target.value)} placeholder={txt.pasteYoutube} onKeyDown={e => e.key === 'Enter' && processYoutube()} style={{ flex: 1, padding: '0 16px', fontSize: '15px', background: c.card, border: `1px solid ${c.border}`, borderRadius: '10px', color: c.text, outline: 'none', height: '100%', boxSizing: 'border-box' }} />
+                  <button onClick={processYoutube} style={{ padding: '0 20px', fontSize: '14px', fontWeight: '500', background: c.accent, color: c.bg, border: 'none', borderRadius: '10px', cursor: 'pointer', height: '100%' }}>{txt.clean}</button>
+                </>
+              )}
+            </div>
 
-            {inputMode === 'youtube' && (
-              <div>
-                <div style={{ display: 'flex', gap: '8px' }}>
-                  <input type="url" value={youtubeUrl} onChange={e => setYoutubeUrl(e.target.value)} placeholder={txt.pasteYoutube} onKeyDown={e => e.key === 'Enter' && processYoutube()} style={{ flex: 1, padding: '14px 16px', fontSize: '15px', background: c.card, border: `1px solid ${c.border}`, borderRadius: '10px', color: c.text, outline: 'none' }} />
-                  <button onClick={processYoutube} style={{ padding: '14px 20px', fontSize: '14px', fontWeight: '500', background: c.accent, color: c.bg, border: 'none', borderRadius: '10px', cursor: 'pointer' }}>{txt.clean}</button>
-                </div>
-                <p style={{ fontSize: '12px', color: c.dim, textAlign: 'center', marginTop: '12px' }}>{txt.youtubeHelper}</p>
-              </div>
-            )}
+            {/* Helper text - consistent height, always present */}
+            <p style={{ fontSize: '12px', color: c.dim, textAlign: 'center', marginTop: '12px', lineHeight: 1.5, minHeight: '18px', visibility: inputMode === 'url' ? 'hidden' : 'visible' }}>
+              {inputMode === 'photo' ? txt.uploadOrSnap : txt.youtubeHelper}
+            </p>
 
             {error && <p style={{ textAlign: 'center', color: c.error, marginTop: '12px', fontSize: '13px' }}>{error}</p>}
           </div>
