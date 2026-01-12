@@ -228,6 +228,31 @@ export default function Mise() {
       back: '← Back',
       deleteRecipe: 'Delete',
       cookRecipe: 'Cook',
+      originalRecipe: 'Original recipe',
+      thanksMessage: 'Thanks! We read every message.',
+      gotAnIdea: 'Got an idea?',
+      feedbackDescription: 'We ship updates weekly. Your suggestions become features.',
+      feedbackNotify: "We'll notify you when we build it.",
+      feedbackQuestion: 'What would make mise better?',
+      upgradePlan: 'Upgrade your plan',
+      upgradeDescription: 'Clean more recipes, save them forever',
+      goPro: 'Go Pro',
+      getBasic: 'Get Basic',
+      cancelAnytime: 'Cancel anytime. Secure payment via Stripe.',
+      signInAccess: 'Sign in to access saved recipes',
+      getFreeRecipes: 'Get 3 free recipes every month',
+      or: 'or',
+      trustMessage: 'We never share your email or data. Secure payments via Stripe. Cancel anytime.',
+      cookbook: 'Cookbook',
+      pasteRecipeUrl: 'Paste recipe URL...',
+      translateTo: 'Translate to',
+      upgradeTranslation: 'Upgrade for instant recipe translation',
+      translating: 'Translating...',
+      reset: 'Reset',
+      thanksRating: 'Thanks for rating!',
+      stepNum: 'Step',
+      prepNum: '1. Prep',
+      cookNum: '2. Cook',
     },
     es: {
       justTheRecipe: 'solo la receta',
@@ -292,6 +317,31 @@ export default function Mise() {
       back: '← Volver',
       deleteRecipe: 'Eliminar',
       cookRecipe: 'Cocinar',
+      originalRecipe: 'Receta original',
+      thanksMessage: '¡Gracias! Leemos cada mensaje.',
+      gotAnIdea: '¿Tienes una idea?',
+      feedbackDescription: 'Lanzamos actualizaciones semanalmente. Tus sugerencias se convierten en funciones.',
+      feedbackNotify: 'Te notificaremos cuando lo construyamos.',
+      feedbackQuestion: '¿Qué mejoraría mise para ti?',
+      upgradePlan: 'Mejora tu plan',
+      upgradeDescription: 'Limpia más recetas, guárdalas para siempre',
+      goPro: 'Hazte Pro',
+      getBasic: 'Obtener Básico',
+      cancelAnytime: 'Cancela cuando quieras. Pago seguro vía Stripe.',
+      signInAccess: 'Inicia sesión para acceder a recetas guardadas',
+      getFreeRecipes: 'Obtén 3 recetas gratis cada mes',
+      or: 'o',
+      trustMessage: 'Nunca compartimos tu correo ni datos. Pagos seguros vía Stripe. Cancela cuando quieras.',
+      cookbook: 'Libro de cocina',
+      pasteRecipeUrl: 'Pega la URL de la receta...',
+      translateTo: 'Traducir a',
+      upgradeTranslation: 'Mejora para traducción instantánea de recetas',
+      translating: 'Traduciendo...',
+      reset: 'Reiniciar',
+      thanksRating: '¡Gracias por calificar!',
+      stepNum: 'Paso',
+      prepNum: '1. Prep',
+      cookNum: '2. Cocinar',
     },
     fr: {
       justTheRecipe: 'juste la recette',
@@ -339,6 +389,48 @@ export default function Mise() {
       feedbackPlaceholder: 'Quelle fonction améliorerait mise?',
       sendFeedback: 'Envoyer',
       thanksFeedback: 'Merci pour votre avis!',
+      newRecipe: '← Nouvelle recette',
+      signInToSave: 'Connectez-vous pour sauver →',
+      scaled: 'ajusté',
+      gathered: 'rassemblés',
+      of: 'de',
+      undo: 'Annuler',
+      tapIngredient: '👆 Appuyez sur chaque ingrédient au fur et à mesure',
+      allGathered: '✓ Tous les ingrédients rassemblés!',
+      startCooking: 'Commencer à cuisiner →',
+      tapStep: '👆 Appuyez sur chaque étape une fois terminée',
+      allDone: '🎉 Terminé! Bon appétit!',
+      gotFeatureIdea: '💡 Une idée de fonctionnalité?',
+      usuallySeconds: 'Généralement 15-25 secondes',
+      usuallySecondsPhoto: 'Généralement 20-30 secondes',
+      back: '← Retour',
+      deleteRecipe: 'Supprimer',
+      cookRecipe: 'Cuisiner',
+      originalRecipe: 'Recette originale',
+      thanksMessage: 'Merci! Nous lisons chaque message.',
+      gotAnIdea: 'Une idée?',
+      feedbackDescription: 'Nous publions des mises à jour chaque semaine. Vos suggestions deviennent des fonctionnalités.',
+      feedbackNotify: 'Nous vous informerons quand ce sera prêt.',
+      feedbackQuestion: "Qu'est-ce qui améliorerait mise?",
+      upgradePlan: 'Améliorez votre plan',
+      upgradeDescription: 'Nettoyez plus de recettes, sauvegardez-les pour toujours',
+      goPro: 'Passer Pro',
+      getBasic: 'Obtenir Basic',
+      cancelAnytime: 'Annulez quand vous voulez. Paiement sécurisé via Stripe.',
+      signInAccess: 'Connectez-vous pour accéder aux recettes sauvées',
+      getFreeRecipes: 'Obtenez 3 recettes gratuites par mois',
+      or: 'ou',
+      trustMessage: 'Nous ne partageons jamais votre email ou vos données. Paiements sécurisés via Stripe. Annulez quand vous voulez.',
+      cookbook: 'Livre de cuisine',
+      pasteRecipeUrl: 'Collez l\'URL de la recette...',
+      translateTo: 'Traduire en',
+      upgradeTranslation: 'Améliorez pour la traduction instantanée',
+      translating: 'Traduction...',
+      reset: 'Réinitialiser',
+      thanksRating: 'Merci pour votre note!',
+      stepNum: 'Étape',
+      prepNum: '1. Prép',
+      cookNum: '2. Cuisson',
     },
     pt: {
       justTheRecipe: 'só a receita',
@@ -386,6 +478,48 @@ export default function Mise() {
       feedbackPlaceholder: 'Que função melhoraria o mise?',
       sendFeedback: 'Enviar',
       thanksFeedback: 'Obrigado pelo feedback!',
+      newRecipe: '← Nova receita',
+      signInToSave: 'Entre para salvar →',
+      scaled: 'ajustado',
+      gathered: 'reunidos',
+      of: 'de',
+      undo: 'Desfazer',
+      tapIngredient: '👆 Toque em cada ingrediente ao prepará-lo',
+      allGathered: '✓ Todos os ingredientes reunidos!',
+      startCooking: 'Começar a cozinhar →',
+      tapStep: '👆 Toque em cada passo ao completá-lo',
+      allDone: '🎉 Pronto! Bom apetite!',
+      gotFeatureIdea: '💡 Tem uma ideia?',
+      usuallySeconds: 'Geralmente 15-25 segundos',
+      usuallySecondsPhoto: 'Geralmente 20-30 segundos',
+      back: '← Voltar',
+      deleteRecipe: 'Excluir',
+      cookRecipe: 'Cozinhar',
+      originalRecipe: 'Receita original',
+      thanksMessage: 'Obrigado! Lemos cada mensagem.',
+      gotAnIdea: 'Tem uma ideia?',
+      feedbackDescription: 'Lançamos atualizações semanalmente. Suas sugestões viram funcionalidades.',
+      feedbackNotify: 'Vamos notificá-lo quando construirmos.',
+      feedbackQuestion: 'O que melhoraria o mise?',
+      upgradePlan: 'Melhore seu plano',
+      upgradeDescription: 'Limpe mais receitas, salve-as para sempre',
+      goPro: 'Seja Pro',
+      getBasic: 'Obter Básico',
+      cancelAnytime: 'Cancele quando quiser. Pagamento seguro via Stripe.',
+      signInAccess: 'Entre para acessar receitas salvas',
+      getFreeRecipes: 'Ganhe 3 receitas grátis por mês',
+      or: 'ou',
+      trustMessage: 'Nunca compartilhamos seu email ou dados. Pagamentos seguros via Stripe. Cancele quando quiser.',
+      cookbook: 'Livro de receitas',
+      pasteRecipeUrl: 'Cole a URL da receita...',
+      translateTo: 'Traduzir para',
+      upgradeTranslation: 'Melhore para tradução instantânea',
+      translating: 'Traduzindo...',
+      reset: 'Reiniciar',
+      thanksRating: 'Obrigado por avaliar!',
+      stepNum: 'Passo',
+      prepNum: '1. Prep',
+      cookNum: '2. Cozinhar',
     },
     zh: {
       justTheRecipe: '只要食谱',
@@ -433,6 +567,48 @@ export default function Mise() {
       feedbackPlaceholder: '什么功能能让mise更好?',
       sendFeedback: '发送',
       thanksFeedback: '感谢您的反馈!',
+      newRecipe: '← 新食谱',
+      signInToSave: '登录以保存 →',
+      scaled: '已调整',
+      gathered: '已准备',
+      of: '/',
+      undo: '撤销',
+      tapIngredient: '👆 点击每个食材以标记已准备',
+      allGathered: '✓ 所有食材已准备好!',
+      startCooking: '开始烹饪 →',
+      tapStep: '👆 点击每个步骤以标记完成',
+      allDone: '🎉 完成！请享用!',
+      gotFeatureIdea: '💡 有功能建议?',
+      usuallySeconds: '通常需要15-25秒',
+      usuallySecondsPhoto: '通常需要20-30秒',
+      back: '← 返回',
+      deleteRecipe: '删除',
+      cookRecipe: '烹饪',
+      originalRecipe: '原始食谱',
+      thanksMessage: '谢谢！我们会阅读每条消息。',
+      gotAnIdea: '有想法吗？',
+      feedbackDescription: '我们每周发布更新。您的建议会成为功能。',
+      feedbackNotify: '我们会在完成时通知您。',
+      feedbackQuestion: '什么能让mise更好？',
+      upgradePlan: '升级您的计划',
+      upgradeDescription: '清理更多食谱，永久保存',
+      goPro: '升级Pro',
+      getBasic: '获取基础版',
+      cancelAnytime: '随时取消。通过Stripe安全支付。',
+      signInAccess: '登录以访问保存的食谱',
+      getFreeRecipes: '每月获得3个免费食谱',
+      or: '或',
+      trustMessage: '我们绝不分享您的邮箱或数据。通过Stripe安全支付。随时取消。',
+      cookbook: '食谱书',
+      pasteRecipeUrl: '粘贴食谱链接...',
+      translateTo: '翻译成',
+      upgradeTranslation: '升级以获得即时翻译',
+      translating: '翻译中...',
+      reset: '重置',
+      thanksRating: '感谢评价！',
+      stepNum: '步骤',
+      prepNum: '1. 准备',
+      cookNum: '2. 烹饪',
     },
     hi: {
       justTheRecipe: 'सिर्फ रेसिपी',
@@ -480,6 +656,48 @@ export default function Mise() {
       feedbackPlaceholder: 'कौन सी सुविधा mise को बेहतर बनाएगी?',
       sendFeedback: 'भेजें',
       thanksFeedback: 'आपकी प्रतिक्रिया के लिए धन्यवाद!',
+      newRecipe: '← नई रेसिपी',
+      signInToSave: 'सेव करने के लिए साइन इन करें →',
+      scaled: 'स्केल किया गया',
+      gathered: 'इकट्ठा किया',
+      of: 'का',
+      undo: 'वापस लें',
+      tapIngredient: '👆 प्रत्येक सामग्री को तैयार करते समय टैप करें',
+      allGathered: '✓ सभी सामग्री तैयार!',
+      startCooking: 'पकाना शुरू करें →',
+      tapStep: '👆 प्रत्येक चरण पूरा करने पर टैप करें',
+      allDone: '🎉 हो गया! खाना खाइए!',
+      gotFeatureIdea: '💡 कोई विचार है?',
+      usuallySeconds: 'आमतौर पर 15-25 सेकंड',
+      usuallySecondsPhoto: 'आमतौर पर 20-30 सेकंड',
+      back: '← वापस',
+      deleteRecipe: 'हटाएं',
+      cookRecipe: 'पकाएं',
+      originalRecipe: 'मूल रेसिपी',
+      thanksMessage: 'धन्यवाद! हम हर संदेश पढ़ते हैं।',
+      gotAnIdea: 'कोई विचार है?',
+      feedbackDescription: 'हम साप्ताहिक अपडेट जारी करते हैं। आपके सुझाव फीचर बनते हैं।',
+      feedbackNotify: 'जब हम इसे बनाएंगे तो आपको सूचित करेंगे।',
+      feedbackQuestion: 'क्या mise को बेहतर बनाएगा?',
+      upgradePlan: 'अपना प्लान अपग्रेड करें',
+      upgradeDescription: 'अधिक रेसिपी साफ करें, हमेशा के लिए सेव करें',
+      goPro: 'प्रो बनें',
+      getBasic: 'बेसिक लें',
+      cancelAnytime: 'कभी भी रद्द करें। Stripe के माध्यम से सुरक्षित भुगतान।',
+      signInAccess: 'सेव की गई रेसिपी देखने के लिए साइन इन करें',
+      getFreeRecipes: 'हर महीने 3 मुफ्त रेसिपी पाएं',
+      or: 'या',
+      trustMessage: 'हम आपका ईमेल या डेटा कभी साझा नहीं करते। Stripe के माध्यम से सुरक्षित भुगतान। कभी भी रद्द करें।',
+      cookbook: 'रसोई की किताब',
+      pasteRecipeUrl: 'रेसिपी URL पेस्ट करें...',
+      translateTo: 'में अनुवाद करें',
+      upgradeTranslation: 'तुरंत अनुवाद के लिए अपग्रेड करें',
+      translating: 'अनुवाद हो रहा है...',
+      reset: 'रीसेट',
+      thanksRating: 'रेटिंग के लिए धन्यवाद!',
+      stepNum: 'चरण',
+      prepNum: '1. तैयारी',
+      cookNum: '2. पकाना',
     },
     ar: {
       justTheRecipe: 'فقط الوصفة',
@@ -527,6 +745,48 @@ export default function Mise() {
       feedbackPlaceholder: 'ما الميزة التي ستحسن mise؟',
       sendFeedback: 'إرسال',
       thanksFeedback: 'شكراً على رأيك!',
+      newRecipe: '← وصفة جديدة',
+      signInToSave: 'سجل الدخول للحفظ →',
+      scaled: 'معدّل',
+      gathered: 'تم جمعها',
+      of: 'من',
+      undo: 'تراجع',
+      tapIngredient: '👆 انقر على كل مكون عند تجهيزه',
+      allGathered: '✓ تم جمع جميع المكونات!',
+      startCooking: 'ابدأ الطبخ →',
+      tapStep: '👆 انقر على كل خطوة عند إكمالها',
+      allDone: '🎉 انتهى! بالعافية!',
+      gotFeatureIdea: '💡 لديك فكرة؟',
+      usuallySeconds: 'عادة 15-25 ثانية',
+      usuallySecondsPhoto: 'عادة 20-30 ثانية',
+      back: '← رجوع',
+      deleteRecipe: 'حذف',
+      cookRecipe: 'اطبخ',
+      originalRecipe: 'الوصفة الأصلية',
+      thanksMessage: 'شكراً! نقرأ كل رسالة.',
+      gotAnIdea: 'لديك فكرة؟',
+      feedbackDescription: 'نصدر تحديثات أسبوعياً. اقتراحاتك تصبح ميزات.',
+      feedbackNotify: 'سنخبرك عندما ننفذها.',
+      feedbackQuestion: 'ما الذي سيحسن mise؟',
+      upgradePlan: 'قم بترقية خطتك',
+      upgradeDescription: 'نظّف المزيد من الوصفات، احفظها للأبد',
+      goPro: 'انتقل إلى Pro',
+      getBasic: 'احصل على Basic',
+      cancelAnytime: 'ألغِ في أي وقت. دفع آمن عبر Stripe.',
+      signInAccess: 'سجل الدخول للوصول إلى الوصفات المحفوظة',
+      getFreeRecipes: 'احصل على 3 وصفات مجانية كل شهر',
+      or: 'أو',
+      trustMessage: 'لا نشارك بريدك أو بياناتك أبداً. دفع آمن عبر Stripe. ألغِ في أي وقت.',
+      cookbook: 'كتاب الطبخ',
+      pasteRecipeUrl: 'الصق رابط الوصفة...',
+      translateTo: 'ترجم إلى',
+      upgradeTranslation: 'قم بالترقية للترجمة الفورية',
+      translating: 'جاري الترجمة...',
+      reset: 'إعادة تعيين',
+      thanksRating: 'شكراً على التقييم!',
+      stepNum: 'خطوة',
+      prepNum: '1. تحضير',
+      cookNum: '2. طبخ',
     },
   };
   
@@ -994,7 +1254,7 @@ export default function Mise() {
     if (!recipe.source && !recipe.author) return null;
     return (
       <div style={{ padding: '12px 14px', background: c.card, borderRadius: '10px', border: `1px solid ${c.border}`, marginBottom: '16px' }}>
-        <p style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.5px', color: c.muted, marginBottom: '6px' }}>Original recipe</p>
+        <p style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.5px', color: c.muted, marginBottom: '6px' }}>{txt.originalRecipe}</p>
         <p style={{ fontSize: '14px', color: c.text, lineHeight: 1.4 }}>
           {recipe.author && <span>{recipe.author} · </span>}
           {recipe.sourceUrl ? <a href={recipe.sourceUrl} target="_blank" rel="noopener noreferrer" style={{ color: c.accent, textDecoration: 'none' }} onClick={e => e.stopPropagation()}>{recipe.source}</a> : <span style={{ color: c.muted }}>{recipe.source}</span>}
@@ -1028,24 +1288,24 @@ export default function Mise() {
     return (
       <div style={{ minHeight: '100vh', background: c.bg, fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", color: c.text, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
         <div style={{ width: '100%', maxWidth: '400px', background: c.card, borderRadius: '16px', padding: '24px', border: `1px solid ${c.border}` }}>
-          <button onClick={() => setShowFeedback(false)} style={{ background: 'none', border: 'none', color: c.muted, fontSize: '14px', cursor: 'pointer', marginBottom: '16px', padding: 0 }}>← Back</button>
-          
+          <button onClick={() => setShowFeedback(false)} style={{ background: 'none', border: 'none', color: c.muted, fontSize: '14px', cursor: 'pointer', marginBottom: '16px', padding: 0 }}>{txt.back}</button>
+
           {feedbackSent ? (
             <div style={{ textAlign: 'center', padding: '20px 0' }}>
               <span style={{ fontSize: '32px' }}>💚</span>
-              <p style={{ fontSize: '16px', marginTop: '12px' }}>Thanks! We read every message.</p>
+              <p style={{ fontSize: '16px', marginTop: '12px' }}>{txt.thanksMessage}</p>
             </div>
           ) : (
             <>
-              <h2 style={{ fontSize: '18px', fontWeight: '600', marginBottom: '8px' }}>Got an idea?</h2>
+              <h2 style={{ fontSize: '18px', fontWeight: '600', marginBottom: '8px' }}>{txt.gotAnIdea}</h2>
               <p style={{ fontSize: '13px', color: c.muted, marginBottom: '16px', lineHeight: 1.5 }}>
-                We ship updates weekly. Your suggestions become features.
-                {user?.email && <span style={{ display: 'block', marginTop: '4px', color: c.dim }}>We'll notify you when we build it.</span>}
+                {txt.feedbackDescription}
+                {user?.email && <span style={{ display: 'block', marginTop: '4px', color: c.dim }}>{txt.feedbackNotify}</span>}
               </p>
               <textarea
                 value={feedbackText}
                 onChange={e => setFeedbackText(e.target.value)}
-                placeholder="What would make mise better?"
+                placeholder={txt.feedbackQuestion}
                 style={{
                   width: '100%', height: '100px', padding: '12px', fontSize: '14px',
                   background: c.bg, border: `1px solid ${c.border}`, borderRadius: '8px',
@@ -1061,7 +1321,7 @@ export default function Mise() {
                   border: 'none', borderRadius: '8px', cursor: feedbackText.trim() ? 'pointer' : 'not-allowed',
                 }}
               >
-                Send
+                {txt.sendFeedback}
               </button>
             </>
           )}
@@ -1074,11 +1334,11 @@ export default function Mise() {
   if (showPricing && plans) {
     return (
       <div style={{ minHeight: '100vh', background: c.bg, fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", color: c.text, padding: '20px' }}>
-        <button onClick={() => setShowPricing(false)} style={{ background: 'none', border: 'none', color: c.muted, fontSize: '14px', cursor: 'pointer', marginBottom: '20px' }}>← Back</button>
+        <button onClick={() => setShowPricing(false)} style={{ background: 'none', border: 'none', color: c.muted, fontSize: '14px', cursor: 'pointer', marginBottom: '20px' }}>{txt.back}</button>
         <div style={{ maxWidth: '400px', margin: '0 auto', textAlign: 'center' }}>
           <MiseLogo size={48} />
-          <h2 style={{ fontSize: '22px', fontWeight: '600', margin: '16px 0 8px' }}>Upgrade your plan</h2>
-          <p style={{ color: c.muted, fontSize: '14px', marginBottom: '24px' }}>Clean more recipes, save them forever</p>
+          <h2 style={{ fontSize: '22px', fontWeight: '600', margin: '16px 0 8px' }}>{txt.upgradePlan}</h2>
+          <p style={{ color: c.muted, fontSize: '14px', marginBottom: '24px' }}>{txt.upgradeDescription}</p>
           {['basic', 'pro'].map(plan => (
             <div key={plan} style={{ background: c.card, borderRadius: '12px', border: `1px solid ${plan === 'pro' ? c.accent : c.border}`, padding: '20px', marginBottom: '12px', textAlign: 'left' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
@@ -1089,11 +1349,11 @@ export default function Mise() {
                 {(plans[plan]?.features || []).map((f, i) => <li key={i} style={{ fontSize: '13px', color: c.muted, marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '8px' }}><span style={{ color: c.accent }}>✓</span> {f}</li>)}
               </ul>
               <button onClick={() => handleUpgrade(plan)} style={{ width: '100%', padding: '12px', background: plan === 'pro' ? c.accent : c.cardHover, color: plan === 'pro' ? c.bg : c.text, border: `1px solid ${c.border}`, borderRadius: '8px', fontSize: '14px', fontWeight: '500', cursor: 'pointer' }}>
-                {plan === 'pro' ? 'Go Pro' : 'Get Basic'}
+                {plan === 'pro' ? txt.goPro : txt.getBasic}
               </button>
             </div>
           ))}
-          <p style={{ fontSize: '12px', color: c.dim, marginTop: '16px' }}>Cancel anytime. Secure payment via Stripe.</p>
+          <p style={{ fontSize: '12px', color: c.dim, marginTop: '16px' }}>{txt.cancelAnytime}</p>
         </div>
       </div>
     );
@@ -1104,9 +1364,9 @@ export default function Mise() {
     return (
       <div style={{ minHeight: '100vh', background: c.bg, fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", color: c.text, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
         <div style={{ width: '100%', maxWidth: '340px', background: c.card, borderRadius: '16px', padding: '28px 24px', border: `1px solid ${c.border}` }}>
-          <button onClick={() => setShowAuth(false)} style={{ background: 'none', border: 'none', color: c.muted, fontSize: '14px', cursor: 'pointer', marginBottom: '16px', padding: 0 }}>← Back</button>
+          <button onClick={() => setShowAuth(false)} style={{ background: 'none', border: 'none', color: c.muted, fontSize: '14px', cursor: 'pointer', marginBottom: '16px', padding: 0 }}>{txt.back}</button>
           <h2 style={{ fontSize: '22px', fontWeight: '600', marginBottom: '6px' }}>{authMode === 'login' ? txt.welcomeBack : txt.createAccount}</h2>
-          <p style={{ fontSize: '14px', color: c.muted, marginBottom: '24px' }}>{authMode === 'login' ? 'Sign in to access saved recipes' : 'Get 3 free recipes every month'}</p>
+          <p style={{ fontSize: '14px', color: c.muted, marginBottom: '24px' }}>{authMode === 'login' ? txt.signInAccess : txt.getFreeRecipes}</p>
           
           {/* Google Sign-In Button */}
           {GOOGLE_CLIENT_ID && (
@@ -1131,7 +1391,7 @@ export default function Mise() {
               />
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
                 <div style={{ flex: 1, height: '1px', background: c.border }} />
-                <span style={{ fontSize: '12px', color: c.muted }}>or</span>
+                <span style={{ fontSize: '12px', color: c.muted }}>{txt.or}</span>
                 <div style={{ flex: 1, height: '1px', background: c.border }} />
               </div>
             </>
@@ -1146,8 +1406,7 @@ export default function Mise() {
           {/* Trust messaging */}
           <div style={{ marginTop: '20px', padding: '12px', background: c.bg, borderRadius: '8px', textAlign: 'center' }}>
             <p style={{ fontSize: '11px', color: c.dim, lineHeight: 1.5 }}>
-              🔒 We never share your email or data.<br/>
-              Secure payments via Stripe. Cancel anytime.
+              🔒 {txt.trustMessage}
             </p>
           </div>
         </div>
@@ -1160,13 +1419,13 @@ export default function Mise() {
     return (
       <div style={{ minHeight: '100vh', background: c.bg, fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", color: c.text }}>
         <header style={{ padding: '14px 20px', borderBottom: `1px solid ${c.border}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <button onClick={() => setShowSaved(false)} style={{ background: 'none', border: 'none', color: c.muted, fontSize: '14px', cursor: 'pointer', padding: 0 }}>← Back</button>
-          <span style={{ fontSize: '13px', color: c.muted }}>{savedRecipes.length} recipes</span>
+          <button onClick={() => setShowSaved(false)} style={{ background: 'none', border: 'none', color: c.muted, fontSize: '14px', cursor: 'pointer', padding: 0 }}>{txt.back}</button>
+          <span style={{ fontSize: '13px', color: c.muted }}>{savedRecipes.length} {txt.recipes}</span>
         </header>
         <div style={{ padding: '20px' }}>
-          <h2 style={{ fontSize: '18px', fontWeight: '600', marginBottom: '20px' }}>Saved Recipes</h2>
+          <h2 style={{ fontSize: '18px', fontWeight: '600', marginBottom: '20px' }}>{txt.savedRecipes}</h2>
           {savedRecipes.length === 0 ? (
-            <p style={{ color: c.muted, textAlign: 'center', padding: '40px 0' }}>No saved recipes yet</p>
+            <p style={{ color: c.muted, textAlign: 'center', padding: '40px 0' }}>{txt.noSavedRecipes}</p>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
               {savedRecipes.map(r => (
@@ -1174,11 +1433,11 @@ export default function Mise() {
                   {r.imageUrl && <div style={{ width: '72px', height: '72px', flexShrink: 0, background: `url(${r.imageUrl}) center/cover` }} />}
                   <div style={{ flex: 1, padding: '10px 14px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
                     <h3 style={{ fontSize: '14px', fontWeight: '500', marginBottom: '2px', lineHeight: 1.3 }}>{r.title}</h3>
-                    <p style={{ fontSize: '11px', color: c.muted }}>{r.source || 'Cookbook'}</p>
+                    <p style={{ fontSize: '11px', color: c.muted }}>{r.source || txt.cookbook}</p>
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column', borderLeft: `1px solid ${c.border}` }}>
-                    <button onClick={() => loadRecipe(r)} style={{ flex: 1, padding: '0 14px', background: 'none', border: 'none', color: c.accent, fontSize: '12px', cursor: 'pointer', borderBottom: `1px solid ${c.border}` }}>Cook</button>
-                    <button onClick={() => deleteRecipe(r.id)} style={{ flex: 1, padding: '0 14px', background: 'none', border: 'none', color: c.error, fontSize: '12px', cursor: 'pointer' }}>Delete</button>
+                    <button onClick={() => loadRecipe(r)} style={{ flex: 1, padding: '0 14px', background: 'none', border: 'none', color: c.accent, fontSize: '12px', cursor: 'pointer', borderBottom: `1px solid ${c.border}` }}>{txt.cookRecipe}</button>
+                    <button onClick={() => deleteRecipe(r.id)} style={{ flex: 1, padding: '0 14px', background: 'none', border: 'none', color: c.error, fontSize: '12px', cursor: 'pointer' }}>{txt.deleteRecipe}</button>
                   </div>
                 </div>
               ))}
@@ -1256,7 +1515,7 @@ export default function Mise() {
             {inputMode === 'url' && (
               <div>
                 <div style={{ display: 'flex', gap: '8px' }}>
-                  <input type="url" value={url} onChange={e => setUrl(e.target.value)} placeholder="Paste recipe URL..." onKeyDown={e => e.key === 'Enter' && fetchFromUrl()} style={{ flex: 1, padding: '14px 16px', fontSize: '15px', background: c.card, border: `1px solid ${c.border}`, borderRadius: '10px', color: c.text, outline: 'none' }} />
+                  <input type="url" value={url} onChange={e => setUrl(e.target.value)} placeholder={txt.pasteRecipeUrl} onKeyDown={e => e.key === 'Enter' && fetchFromUrl()} style={{ flex: 1, padding: '14px 16px', fontSize: '15px', background: c.card, border: `1px solid ${c.border}`, borderRadius: '10px', color: c.text, outline: 'none' }} />
                   <button onClick={fetchFromUrl} style={{ padding: '14px 20px', fontSize: '14px', fontWeight: '500', background: c.accent, color: c.bg, border: 'none', borderRadius: '10px', cursor: 'pointer' }}>{txt.clean}</button>
                 </div>
               </div>
@@ -1358,10 +1617,10 @@ export default function Mise() {
           <span style={{ fontSize: '24px' }}>🌍</span>
           <div style={{ flex: 1 }}>
             <p style={{ fontSize: '14px', color: c.text, fontWeight: '500', marginBottom: '2px' }}>
-              Translate to {languages.find(l => l.code === translateToast.language)?.name || translateToast.language}?
+              {txt.translateTo} {languages.find(l => l.code === translateToast.language)?.name || translateToast.language}?
             </p>
             <p style={{ fontSize: '12px', color: c.muted }}>
-              Upgrade for instant recipe translation
+              {txt.upgradeTranslation}
             </p>
           </div>
           <button 
@@ -1416,7 +1675,7 @@ export default function Mise() {
             }}>
               <div style={{ textAlign: 'center' }}>
                 <div style={{ width: '32px', height: '32px', border: `2px solid ${c.border}`, borderTopColor: c.accent, borderRadius: '50%', margin: '0 auto 12px', animation: 'spin 0.7s linear infinite' }} />
-                <p style={{ color: c.text, fontSize: '14px' }}>Translating...</p>
+                <p style={{ color: c.text, fontSize: '14px' }}>{txt.translating}</p>
               </div>
             </div>
           )}
@@ -1451,8 +1710,8 @@ export default function Mise() {
           </div>
 
           <div style={{ display: 'flex', marginBottom: '16px', background: c.card, borderRadius: '10px', padding: '4px', border: `1px solid ${c.border}` }}>
-            <button onClick={() => setPhase('prep')} style={{ flex: 1, padding: '10px', fontSize: '13px', fontWeight: '500', background: phase === 'prep' ? c.accent : 'transparent', color: phase === 'prep' ? c.bg : c.muted, border: 'none', borderRadius: '8px', cursor: 'pointer' }}>1. Prep {ingredientsDone > 0 && `(${ingredientsDone}/${recipe.ingredients?.length})`}</button>
-            <button onClick={() => setPhase('cook')} style={{ flex: 1, padding: '10px', fontSize: '13px', fontWeight: '500', background: phase === 'cook' ? c.accent : 'transparent', color: phase === 'cook' ? c.bg : c.muted, border: 'none', borderRadius: '8px', cursor: 'pointer' }}>2. Cook {stepsDone > 0 && `(${stepsDone}/${recipe.steps?.length})`}</button>
+            <button onClick={() => setPhase('prep')} style={{ flex: 1, padding: '10px', fontSize: '13px', fontWeight: '500', background: phase === 'prep' ? c.accent : 'transparent', color: phase === 'prep' ? c.bg : c.muted, border: 'none', borderRadius: '8px', cursor: 'pointer' }}>{txt.prepNum} {ingredientsDone > 0 && `(${ingredientsDone}/${recipe.ingredients?.length})`}</button>
+            <button onClick={() => setPhase('cook')} style={{ flex: 1, padding: '10px', fontSize: '13px', fontWeight: '500', background: phase === 'cook' ? c.accent : 'transparent', color: phase === 'cook' ? c.bg : c.muted, border: 'none', borderRadius: '8px', cursor: 'pointer' }}>{txt.cookNum} {stepsDone > 0 && `(${stepsDone}/${recipe.steps?.length})`}</button>
           </div>
 
           {/* Prep Phase */}
@@ -1492,7 +1751,7 @@ export default function Mise() {
                   <span style={{ fontSize: '12px' }}>{stepsDone} {txt.of} {recipe.steps?.length}</span>
                   <div style={{ display: 'flex', gap: '12px' }}>
                     <button onClick={undoLastStep} style={{ background: 'none', border: 'none', color: c.text, fontSize: '12px', cursor: 'pointer', opacity: 0.8 }}>{txt.undo}</button>
-                    <button onClick={resetAll} style={{ background: 'none', border: 'none', color: c.text, fontSize: '12px', cursor: 'pointer', opacity: 0.8 }}>Reset</button>
+                    <button onClick={resetAll} style={{ background: 'none', border: 'none', color: c.text, fontSize: '12px', cursor: 'pointer', opacity: 0.8 }}>{txt.reset}</button>
                   </div>
                 </div>
               )}
@@ -1511,10 +1770,10 @@ export default function Mise() {
                     </div>
                   )}
                   {hasRatedThisSession && (
-                    <p style={{ fontSize: '12px', color: c.accent, marginBottom: '16px' }}>Thanks for rating! 💚</p>
+                    <p style={{ fontSize: '12px', color: c.accent, marginBottom: '16px' }}>{txt.thanksRating} 💚</p>
                   )}
                   
-                  <button onClick={resetAll} style={{ background: c.cardHover, border: `1px solid ${c.border}`, color: c.text, padding: '10px 16px', borderRadius: '8px', fontSize: '13px', cursor: 'pointer' }}>Cook Again</button>
+                  <button onClick={resetAll} style={{ background: c.cardHover, border: `1px solid ${c.border}`, color: c.text, padding: '10px 16px', borderRadius: '8px', fontSize: '13px', cursor: 'pointer' }}>{txt.cookAgain}</button>
                 </div>
               ) : (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
@@ -1529,7 +1788,7 @@ export default function Mise() {
                         </div>
                         {stepIngredients?.length > 0 && (
                           <div style={{ marginTop: '12px', marginLeft: '36px', padding: '10px 12px', background: c.ingredientBg, borderRadius: '8px', border: `1px solid ${c.ingredientBorder}` }}>
-                            <p style={{ fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.5px', color: c.accent, marginBottom: '6px', fontWeight: '600' }}>You'll need:</p>
+                            <p style={{ fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.5px', color: c.accent, marginBottom: '6px', fontWeight: '600' }}>{txt.youllNeed}</p>
                             {stepIngredients.map((ing, j) => <p key={j} style={{ fontSize: '13px', color: c.text, marginBottom: j < stepIngredients.length - 1 ? '4px' : 0, lineHeight: 1.4 }}>• {scaleIngredient(ing)}</p>)}
                           </div>
                         )}
@@ -1543,7 +1802,7 @@ export default function Mise() {
 
           {recipe.tips?.length > 0 && recipe.tips[0] && (
             <div style={{ marginTop: '24px', background: `${c.warm}15`, padding: '14px 16px', borderRadius: '12px', borderLeft: `3px solid ${c.warm}` }}>
-              <h3 style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '1px', color: c.warm, marginBottom: '8px', fontWeight: '600' }}>💡 Tips</h3>
+              <h3 style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '1px', color: c.warm, marginBottom: '8px', fontWeight: '600' }}>💡 {txt.tips}</h3>
               <ul style={{ margin: 0, padding: '0 0 0 16px', fontSize: '13px', color: c.text, lineHeight: 1.5 }}>
                 {recipe.tips.filter(t => t).map((tip, i) => <li key={i} style={{ marginBottom: '4px' }}>{tip}</li>)}
               </ul>
@@ -1552,11 +1811,11 @@ export default function Mise() {
           
           {/* Discreet feedback link at bottom of recipe */}
           <div style={{ marginTop: '32px', textAlign: 'center' }}>
-            <button 
-              onClick={() => setShowFeedback(true)} 
+            <button
+              onClick={() => setShowFeedback(true)}
               style={{ background: 'none', border: 'none', color: c.dim, fontSize: '11px', cursor: 'pointer' }}
             >
-              💡 Suggest a feature
+              {txt.suggestFeature}
             </button>
           </div>
         </div>
