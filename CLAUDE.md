@@ -43,12 +43,7 @@ Frontend was updated to work with v2 backend:
 - Save recipe: sends flat object (not nested)
 - Saved recipes: transforms snake_case to camelCase
 
-## Known Issues (TODO)
-1. **Create account not working** - Returns INTERNAL_ERROR from backend
-   - Likely database issue on Railway (need to check logs)
-
-2. **Clean image not working** - Screenshots from Mac not processing
-   - May be image format or size issue
-
-3. **Cook tab missing ingredient amounts** - YouTube recipes show amounts in ingredients tab but not in cook tab
-   - Check how `phase === 'cook'` renders ingredients in Mise.jsx
+## Recent Fixes
+1. **Create account** - Fixed `crypto is not defined` error by adding `import crypto from 'node:crypto'` in auth.ts
+2. **Mac screenshots** - Fixed hardcoded `image/jpeg` media type - now detects from base64 data URL
+3. **Cook tab ingredients** - Updated Claude prompt to return step objects with `{instruction, ingredients}` format
