@@ -70,6 +70,13 @@ const calculateRecipesRemaining = (user) => {
   return Math.max(0, limit - (user.recipesUsedThisMonth || 0));
 };
 
+// Helper to parse servings to integer
+const parseServingsToInt = (servings) => {
+  if (servings === undefined || servings === null) return 4;
+  const parsed = parseInt(String(servings).replace(',', '.'), 10);
+  return isNaN(parsed) || parsed < 1 ? 4 : parsed;
+};
+
 // API with token-based auth
 const api = {
   getToken: () => localStorage.getItem('mise_token'),
@@ -1145,7 +1152,7 @@ export default function Mise() {
     }
     else {
       setRecipe(data.recipe);
-      setServings(data.recipe.servings);
+      setServings(parseServingsToInt(data.recipe.servings));
       // v2 doesn't return recipesRemaining, decrement locally
       setRecipesRemaining(prev => prev === Infinity ? Infinity : Math.max(0, prev - 1));
     }
@@ -1163,7 +1170,7 @@ export default function Mise() {
     }
     else {
       setRecipe(data.recipe);
-      setServings(data.recipe.servings);
+      setServings(parseServingsToInt(data.recipe.servings));
       // v2 doesn't return recipesRemaining, decrement locally
       setRecipesRemaining(prev => prev === Infinity ? Infinity : Math.max(0, prev - 1));
       setPhotos([]);
@@ -1182,7 +1189,7 @@ export default function Mise() {
     }
     else {
       setRecipe(data.recipe);
-      setServings(data.recipe.servings);
+      setServings(parseServingsToInt(data.recipe.servings));
       // v2 doesn't return recipesRemaining, decrement locally
       setRecipesRemaining(prev => prev === Infinity ? Infinity : Math.max(0, prev - 1));
       setYoutubeUrl('');
