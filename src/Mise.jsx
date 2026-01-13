@@ -136,6 +136,7 @@ export default function Mise() {
   const [savingRecipe, setSavingRecipe] = useState(false);
   const [showPricing, setShowPricing] = useState(false);
   const [plans, setPlans] = useState(null);
+  const [upgradingPlan, setUpgradingPlan] = useState(null);
 
   // Feedback & Rating state
   const [showFeedback, setShowFeedback] = useState(false);
@@ -1084,11 +1085,13 @@ export default function Mise() {
 
   const handleUpgrade = async (plan) => {
     if (!user) { setShowAuth(true); return; }
+    setUpgradingPlan(plan);
     // Map plan names to v2 format (basic/pro -> basic_monthly/pro_monthly)
     const planMap = { basic: 'basic_monthly', pro: 'pro_monthly' };
     const data = await api.post('/api/payments/create-checkout', { plan: planMap[plan] || plan });
     // v2 uses checkoutUrl instead of url
     if (data.checkoutUrl) window.location.href = data.checkoutUrl;
+    else setUpgradingPlan(null); // Reset on error
   };
 
   const saveCurrentRecipe = async () => {
@@ -1360,8 +1363,17 @@ export default function Mise() {
               <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 16px 0' }}>
                 {(plans[plan]?.features || []).map((f, i) => <li key={i} style={{ fontSize: '13px', color: c.muted, marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '8px' }}><span style={{ color: c.accent }}>✓</span> {f}</li>)}
               </ul>
-              <button onClick={() => handleUpgrade(plan)} style={{ width: '100%', padding: '12px', background: plan === 'pro' ? c.accent : c.cardHover, color: plan === 'pro' ? c.bg : c.text, border: `1px solid ${c.border}`, borderRadius: '8px', fontSize: '14px', fontWeight: '500', cursor: 'pointer' }}>
-                {plan === 'pro' ? txt.goPro : txt.getBasic}
+              <button
+                onClick={() => handleUpgrade(plan)}
+                disabled={upgradingPlan !== null}
+                style={{ width: '100%', padding: '12px', background: plan === 'pro' ? c.accent : c.cardHover, color: plan === 'pro' ? c.bg : c.text, border: `1px solid ${c.border}`, borderRadius: '8px', fontSize: '14px', fontWeight: '500', cursor: upgradingPlan ? 'not-allowed' : 'pointer', opacity: upgradingPlan && upgradingPlan !== plan ? 0.6 : 1 }}
+              >
+                {upgradingPlan === plan ? (
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+                    <span style={{ width: '14px', height: '14px', border: '2px solid currentColor', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></span>
+                    Loading...
+                  </span>
+                ) : (plan === 'pro' ? txt.goPro : txt.getBasic)}
               </button>
             </div>
           ))}
