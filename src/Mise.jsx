@@ -229,6 +229,10 @@ export default function Mise() {
       deleteRecipe: 'Delete',
       cookRecipe: 'Cook',
       originalRecipe: 'Original recipe',
+      viewOriginal: 'view original',
+      viewOriginalRecipe: 'View original recipe',
+      fromPhoto: 'From photo',
+      fromYouTube: 'From YouTube video',
       thanksMessage: 'Thanks! We read every message.',
       gotAnIdea: 'Got an idea?',
       feedbackDescription: 'We ship updates weekly. Your suggestions become features.',
@@ -318,6 +322,10 @@ export default function Mise() {
       deleteRecipe: 'Eliminar',
       cookRecipe: 'Cocinar',
       originalRecipe: 'Receta original',
+      viewOriginal: 'ver original',
+      viewOriginalRecipe: 'Ver receta original',
+      fromPhoto: 'De foto',
+      fromYouTube: 'De video de YouTube',
       thanksMessage: '¡Gracias! Leemos cada mensaje.',
       gotAnIdea: '¿Tienes una idea?',
       feedbackDescription: 'Lanzamos actualizaciones semanalmente. Tus sugerencias se convierten en funciones.',
@@ -407,6 +415,10 @@ export default function Mise() {
       deleteRecipe: 'Supprimer',
       cookRecipe: 'Cuisiner',
       originalRecipe: 'Recette originale',
+      viewOriginal: 'voir l\'original',
+      viewOriginalRecipe: 'Voir la recette originale',
+      fromPhoto: 'Depuis une photo',
+      fromYouTube: 'Depuis une vidéo YouTube',
       thanksMessage: 'Merci! Nous lisons chaque message.',
       gotAnIdea: 'Une idée?',
       feedbackDescription: 'Nous publions des mises à jour chaque semaine. Vos suggestions deviennent des fonctionnalités.',
@@ -496,6 +508,10 @@ export default function Mise() {
       deleteRecipe: 'Excluir',
       cookRecipe: 'Cozinhar',
       originalRecipe: 'Receita original',
+      viewOriginal: 'ver original',
+      viewOriginalRecipe: 'Ver receita original',
+      fromPhoto: 'Da foto',
+      fromYouTube: 'Do vídeo do YouTube',
       thanksMessage: 'Obrigado! Lemos cada mensagem.',
       gotAnIdea: 'Tem uma ideia?',
       feedbackDescription: 'Lançamos atualizações semanalmente. Suas sugestões viram funcionalidades.',
@@ -585,6 +601,10 @@ export default function Mise() {
       deleteRecipe: '删除',
       cookRecipe: '烹饪',
       originalRecipe: '原始食谱',
+      viewOriginal: '查看原文',
+      viewOriginalRecipe: '查看原始食谱',
+      fromPhoto: '来自照片',
+      fromYouTube: '来自YouTube视频',
       thanksMessage: '谢谢！我们会阅读每条消息。',
       gotAnIdea: '有想法吗？',
       feedbackDescription: '我们每周发布更新。您的建议会成为功能。',
@@ -674,6 +694,10 @@ export default function Mise() {
       deleteRecipe: 'हटाएं',
       cookRecipe: 'पकाएं',
       originalRecipe: 'मूल रेसिपी',
+      viewOriginal: 'मूल देखें',
+      viewOriginalRecipe: 'मूल रेसिपी देखें',
+      fromPhoto: 'फ़ोटो से',
+      fromYouTube: 'YouTube वीडियो से',
       thanksMessage: 'धन्यवाद! हम हर संदेश पढ़ते हैं।',
       gotAnIdea: 'कोई विचार है?',
       feedbackDescription: 'हम साप्ताहिक अपडेट जारी करते हैं। आपके सुझाव फीचर बनते हैं।',
@@ -763,6 +787,10 @@ export default function Mise() {
       deleteRecipe: 'حذف',
       cookRecipe: 'اطبخ',
       originalRecipe: 'الوصفة الأصلية',
+      viewOriginal: 'عرض الأصل',
+      viewOriginalRecipe: 'عرض الوصفة الأصلية',
+      fromPhoto: 'من صورة',
+      fromYouTube: 'من فيديو يوتيوب',
       thanksMessage: 'شكراً! نقرأ كل رسالة.',
       gotAnIdea: 'لديك فكرة؟',
       feedbackDescription: 'نصدر تحديثات أسبوعياً. اقتراحاتك تصبح ميزات.',
@@ -1263,13 +1291,42 @@ export default function Mise() {
   );
 
   const Attribution = ({ recipe }) => {
-    if (!recipe.source && !recipe.author) return null;
+    if (!recipe.source && !recipe.author && !recipe.sourceUrl) return null;
+
+    const renderAttribution = () => {
+      // Photo source - no link
+      if (recipe.source === 'photo') {
+        return <span style={{ color: c.muted }}>{txt.fromPhoto}</span>;
+      }
+      // YouTube source - link to video
+      if (recipe.source === 'youtube') {
+        return recipe.sourceUrl
+          ? <a href={recipe.sourceUrl} target="_blank" rel="noopener noreferrer" style={{ color: c.accent, textDecoration: 'none' }} onClick={e => e.stopPropagation()}>{txt.fromYouTube}</a>
+          : <span style={{ color: c.muted }}>{txt.fromYouTube}</span>;
+      }
+      // Has author - show author name with "view original" link
+      if (recipe.author) {
+        return (
+          <>
+            <span>{recipe.author}</span>
+            {recipe.sourceUrl && (
+              <span> · <a href={recipe.sourceUrl} target="_blank" rel="noopener noreferrer" style={{ color: c.accent, textDecoration: 'none', fontSize: '12px' }} onClick={e => e.stopPropagation()}>{txt.viewOriginal}</a></span>
+            )}
+          </>
+        );
+      }
+      // No author but has URL - show "View original recipe" link
+      if (recipe.sourceUrl) {
+        return <a href={recipe.sourceUrl} target="_blank" rel="noopener noreferrer" style={{ color: c.accent, textDecoration: 'none' }} onClick={e => e.stopPropagation()}>{txt.viewOriginalRecipe}</a>;
+      }
+      return null;
+    };
+
     return (
       <div style={{ padding: '12px 14px', background: c.card, borderRadius: '10px', border: `1px solid ${c.border}`, marginBottom: '16px' }}>
         <p style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.5px', color: c.muted, marginBottom: '6px' }}>{txt.originalRecipe}</p>
         <p style={{ fontSize: '14px', color: c.text, lineHeight: 1.4 }}>
-          {recipe.author && <span>{recipe.author} · </span>}
-          {recipe.sourceUrl ? <a href={recipe.sourceUrl} target="_blank" rel="noopener noreferrer" style={{ color: c.accent, textDecoration: 'none' }} onClick={e => e.stopPropagation()}>{recipe.source}</a> : <span style={{ color: c.muted }}>{recipe.source}</span>}
+          {renderAttribution()}
         </p>
       </div>
     );
