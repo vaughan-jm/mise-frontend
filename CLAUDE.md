@@ -4,46 +4,79 @@
 React frontend for Mise recipe extraction app. Single-page app that extracts recipes from URLs, photos, and YouTube videos.
 
 ## Tech Stack
-- **Framework**: React 18 (single JSX file)
+- **Framework**: React 18
 - **Build**: Vite 5
 - **Styling**: Inline CSS-in-JS
 - **API**: Fetch to backend REST API
-- **Auth**: JWT tokens stored in localStorage
+- **Auth**: Clerk (@clerk/clerk-react)
+- **Testing**: Playwright
 
 ## Structure
 ```
 src/
-  Mise.jsx    # Entire app in one file (~1500 lines)
-  main.jsx    # React entry point
+  Mise.jsx           # Main app component (~1500 lines)
+  main.jsx           # React entry point with ClerkProvider
+  lib/
+    api.js           # API client, utilities, constants
+    translations.js  # UI translations (7 languages)
+tests/
+  app.spec.js        # UI and navigation tests (13 tests)
+  recipe.spec.js     # Input mode tests (8 tests)
 ```
 
 ## Common Commands
 ```bash
 npm run dev      # Start dev server (localhost:5173)
 npm run build    # Build for production
+npm test         # Run Playwright tests
+npm run test:ui  # Run tests with Playwright UI
 ```
 
 ## Environment Variables
 Set in Vercel dashboard:
 - `VITE_API_URL` - Backend API URL
-- `VITE_GOOGLE_CLIENT_ID` - Google OAuth client ID (optional)
+- `VITE_CLERK_PUBLISHABLE_KEY` - Clerk publishable key
 
 ## Deployment
 - **Hosting**: Vercel (auto-deploys from GitHub)
 - **Production URL**: https://mise-frontend-alpha.vercel.app
 - **Backend**: https://mise-backend-v2-production.up.railway.app
 
-## API Integration (v2 Backend)
-Frontend was updated to work with v2 backend:
-- Error format: `{ error: { code, message } }` - normalized via `normalizeError()`
-- User object: calculates `recipesRemaining` from `recipesUsedThisMonth`
-- Plans: transforms nested v2 format
-- Checkout: uses `checkoutUrl` instead of `url`
-- Ratings: `/api/feedback/rating` and `/api/feedback/ratings/summary`
-- Save recipe: sends flat object (not nested)
-- Saved recipes: transforms snake_case to camelCase
+## Authentication (Clerk)
+Auth is handled by Clerk. Key components:
+- `ClerkProvider` wraps the app in `main.jsx`
+- `useUser()` and `useAuth()` hooks for auth state
+- `SignIn`, `SignUp` components for auth modals
+- `UserButton` for logged-in user menu
+- Tokens are automatically included in API calls via `getToken()`
 
-## Recent Fixes
-1. **Create account** - Fixed `crypto is not defined` error by adding `import crypto from 'node:crypto'` in auth.ts
-2. **Mac screenshots** - Fixed hardcoded `image/jpeg` media type - now detects from base64 data URL
-3. **Cook tab ingredients** - Updated Claude prompt to return step objects with `{instruction, ingredients}` format
+## Key Features
+- **Recipe extraction**: URL, photo, YouTube video inputs
+- **Multi-language**: EN, ES, FR, PT, ZH, HI, AR
+- **Cooking mode**: Prep/Cook phases with ingredient/step tracking
+- **Saved recipes**: Requires login
+- **Pricing/subscriptions**: Free (3/month), Basic (20/month), Pro (unlimited)
+- **Legal pages**: Privacy, Terms, Refund policies
+- **Contact form**: Sends to backend which emails via Resend
+
+## API Integration (v2 Backend)
+- Error format: `{ error: { code, message } }` - normalized via `normalizeError()` in api.js
+- User object: calculates `recipesRemaining` from `recipesUsedThisMonth`
+- Checkout: uses `checkoutUrl` from response
+
+## Testing
+21 Playwright E2E tests covering:
+- App loading and UI elements
+- Language switching
+- Input mode switching (URL/Photo/Video)
+- Footer links and legal pages
+- Contact form
+
+Run tests: `npm test`
+
+## Recent Changes (Jan 2026)
+1. **Clerk auth** - Replaced custom JWT auth with Clerk
+2. **Code extraction** - Moved translations and API utils to lib/
+3. **Playwright tests** - Added 21 E2E tests
+4. **Legal pages** - Added Privacy, Terms, Refund pages
+5. **Contact form** - Added contact modal with backend integration
