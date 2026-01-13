@@ -152,6 +152,14 @@ export default function Mise() {
   const [userRating, setUserRating] = useState(null);
   const [ratingsSummary, setRatingsSummary] = useState(null);
   const [hasRatedThisSession, setHasRatedThisSession] = useState(false);
+
+  // Admin dashboard state
+  const [showAdmin, setShowAdmin] = useState(false);
+  const [adminUsers, setAdminUsers] = useState([]);
+  const [adminStats, setAdminStats] = useState(null);
+  const [adminPage, setAdminPage] = useState(1);
+  const [adminPagination, setAdminPagination] = useState(null);
+  const [adminLoading, setAdminLoading] = useState(false);
   
   // Language state
   const [language, setLanguage] = useState(() => {
@@ -1277,6 +1285,43 @@ export default function Mise() {
     }
   };
 
+  // Admin dashboard functions
+  const loadAdminData = async (page = 1) => {
+    setAdminLoading(true);
+    const [usersData, statsData] = await Promise.all([
+      api.get(`/api/admin/users?page=${page}&limit=20`),
+      api.get('/api/admin/stats'),
+    ]);
+    if (usersData.users) {
+      setAdminUsers(usersData.users);
+      setAdminPagination(usersData.pagination);
+      setAdminPage(page);
+    }
+    if (statsData.totalUsers !== undefined) {
+      setAdminStats(statsData);
+    }
+    setAdminLoading(false);
+  };
+
+  const openAdminDashboard = () => {
+    setShowAdmin(true);
+    loadAdminData(1);
+  };
+
+  const exportUsersCSV = async () => {
+    const token = api.getToken();
+    const res = await fetch(`${API_URL}/api/admin/users/export`, {
+      headers: token ? { 'Authorization': `Bearer ${token}` } : {},
+    });
+    const blob = await res.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'users.csv';
+    a.click();
+    window.URL.revokeObjectURL(url);
+  };
+
   const remainingIngredients = recipe?.ingredients?.map((ing, i) => ({ ing, i })).filter(({ i }) => !completedIngredients[i]) || [];
   const remainingSteps = recipe?.steps?.map((step, i) => ({ step, i })).filter(({ i }) => !completedSteps[i]) || [];
   const ingredientsDone = Object.values(completedIngredients).filter(Boolean).length;
@@ -1536,6 +1581,147 @@ export default function Mise() {
     );
   }
 
+  // Admin Dashboard
+  if (showAdmin) {
+    return (
+      <div style={{ minHeight: '100vh', background: c.bg, fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", color: c.text }}>
+        <header style={{ padding: '14px 20px', borderBottom: `1px solid ${c.border}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <button onClick={() => setShowAdmin(false)} style={{ background: 'none', border: 'none', color: c.muted, fontSize: '14px', cursor: 'pointer', padding: 0 }}>{txt.back}</button>
+          <span style={{ fontSize: '13px', color: c.warm, fontWeight: '600' }}>Admin Dashboard</span>
+        </header>
+        <div style={{ padding: '20px', maxWidth: '800px', margin: '0 auto' }}>
+          {/* Stats Cards */}
+          {adminStats && (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '12px', marginBottom: '24px' }}>
+              <div style={{ background: c.card, borderRadius: '10px', padding: '16px', border: `1px solid ${c.border}` }}>
+                <p style={{ fontSize: '11px', color: c.muted, marginBottom: '4px' }}>Total Users</p>
+                <p style={{ fontSize: '24px', fontWeight: '600', color: c.text }}>{adminStats.totalUsers}</p>
+              </div>
+              <div style={{ background: c.card, borderRadius: '10px', padding: '16px', border: `1px solid ${c.border}` }}>
+                <p style={{ fontSize: '11px', color: c.muted, marginBottom: '4px' }}>Free Tier</p>
+                <p style={{ fontSize: '24px', fontWeight: '600', color: c.text }}>{adminStats.bySubscription.free}</p>
+              </div>
+              <div style={{ background: c.card, borderRadius: '10px', padding: '16px', border: `1px solid ${c.border}` }}>
+                <p style={{ fontSize: '11px', color: c.muted, marginBottom: '4px' }}>Basic</p>
+                <p style={{ fontSize: '24px', fontWeight: '600', color: c.accent }}>{adminStats.bySubscription.basic}</p>
+              </div>
+              <div style={{ background: c.card, borderRadius: '10px', padding: '16px', border: `1px solid ${c.border}` }}>
+                <p style={{ fontSize: '11px', color: c.muted, marginBottom: '4px' }}>Pro</p>
+                <p style={{ fontSize: '24px', fontWeight: '600', color: c.warm }}>{adminStats.bySubscription.pro}</p>
+              </div>
+              <div style={{ background: c.card, borderRadius: '10px', padding: '16px', border: `1px solid ${c.border}` }}>
+                <p style={{ fontSize: '11px', color: c.muted, marginBottom: '4px' }}>Last 7 Days</p>
+                <p style={{ fontSize: '24px', fontWeight: '600', color: c.text }}>{adminStats.recentSignups}</p>
+              </div>
+            </div>
+          )}
+
+          {/* Export Button */}
+          <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <h2 style={{ fontSize: '16px', fontWeight: '600' }}>Users</h2>
+            <button
+              onClick={exportUsersCSV}
+              style={{
+                background: c.accent,
+                border: 'none',
+                color: c.bg,
+                padding: '8px 16px',
+                borderRadius: '6px',
+                fontSize: '12px',
+                fontWeight: '500',
+                cursor: 'pointer',
+              }}
+            >
+              Export CSV
+            </button>
+          </div>
+
+          {/* Loading */}
+          {adminLoading && (
+            <div style={{ padding: '40px 0', textAlign: 'center' }}>
+              <div style={{ width: '32px', height: '32px', border: `2px solid ${c.border}`, borderTopColor: c.accent, borderRadius: '50%', margin: '0 auto', animation: 'spin 0.7s linear infinite' }} />
+            </div>
+          )}
+
+          {/* Users Table */}
+          {!adminLoading && adminUsers.length > 0 && (
+            <>
+              <div style={{ background: c.card, borderRadius: '10px', border: `1px solid ${c.border}`, overflow: 'hidden' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 80px', padding: '12px 16px', borderBottom: `1px solid ${c.border}`, background: c.cardHover }}>
+                  <span style={{ fontSize: '11px', fontWeight: '600', color: c.muted, textTransform: 'uppercase' }}>Email</span>
+                  <span style={{ fontSize: '11px', fontWeight: '600', color: c.muted, textTransform: 'uppercase' }}>Subscription</span>
+                  <span style={{ fontSize: '11px', fontWeight: '600', color: c.muted, textTransform: 'uppercase' }}>Joined</span>
+                  <span style={{ fontSize: '11px', fontWeight: '600', color: c.muted, textTransform: 'uppercase', textAlign: 'right' }}>Recipes</span>
+                </div>
+                {adminUsers.map((u) => (
+                  <div key={u.id} style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 80px', padding: '12px 16px', borderBottom: `1px solid ${c.border}` }}>
+                    <span style={{ fontSize: '13px', color: c.text, overflow: 'hidden', textOverflow: 'ellipsis' }}>{u.email}</span>
+                    <span style={{
+                      fontSize: '11px',
+                      padding: '2px 8px',
+                      borderRadius: '4px',
+                      background: u.subscription === 'pro' ? c.warm : u.subscription === 'basic' ? c.accent : c.dim,
+                      color: c.bg,
+                      width: 'fit-content',
+                      fontWeight: '500',
+                    }}>{u.subscription || 'free'}</span>
+                    <span style={{ fontSize: '12px', color: c.muted }}>{u.createdAt ? new Date(u.createdAt).toLocaleDateString() : '-'}</span>
+                    <span style={{ fontSize: '13px', color: c.text, textAlign: 'right' }}>{u.recipesUsed}</span>
+                  </div>
+                ))}
+              </div>
+
+              {/* Pagination */}
+              {adminPagination && adminPagination.totalPages > 1 && (
+                <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', marginTop: '16px' }}>
+                  <button
+                    onClick={() => loadAdminData(adminPage - 1)}
+                    disabled={adminPage <= 1}
+                    style={{
+                      background: c.card,
+                      border: `1px solid ${c.border}`,
+                      color: adminPage <= 1 ? c.dim : c.text,
+                      padding: '8px 16px',
+                      borderRadius: '6px',
+                      fontSize: '12px',
+                      cursor: adminPage <= 1 ? 'not-allowed' : 'pointer',
+                    }}
+                  >
+                    Previous
+                  </button>
+                  <span style={{ padding: '8px 12px', fontSize: '12px', color: c.muted }}>
+                    Page {adminPage} of {adminPagination.totalPages}
+                  </span>
+                  <button
+                    onClick={() => loadAdminData(adminPage + 1)}
+                    disabled={adminPage >= adminPagination.totalPages}
+                    style={{
+                      background: c.card,
+                      border: `1px solid ${c.border}`,
+                      color: adminPage >= adminPagination.totalPages ? c.dim : c.text,
+                      padding: '8px 16px',
+                      borderRadius: '6px',
+                      fontSize: '12px',
+                      cursor: adminPage >= adminPagination.totalPages ? 'not-allowed' : 'pointer',
+                    }}
+                  >
+                    Next
+                  </button>
+                </div>
+              )}
+            </>
+          )}
+
+          {/* Empty state */}
+          {!adminLoading && adminUsers.length === 0 && (
+            <p style={{ color: c.muted, textAlign: 'center', padding: '40px 0' }}>No users found</p>
+          )}
+        </div>
+        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+      </div>
+    );
+  }
+
   // Main app
   return (
     <div style={{ minHeight: '100vh', background: c.bg, fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", color: c.text }}>
@@ -1580,6 +1766,9 @@ export default function Mise() {
           </span>
           {user ? (
             <>
+              {user.isAdmin && (
+                <button onClick={openAdminDashboard} style={{ background: c.card, border: `1px solid ${c.border}`, color: c.warm, padding: '6px 10px', borderRadius: '6px', fontSize: '12px', cursor: 'pointer' }}>Admin</button>
+              )}
               <button onClick={() => setShowSaved(true)} style={{ background: c.card, border: `1px solid ${c.border}`, color: c.text, padding: '6px 10px', borderRadius: '6px', fontSize: '12px', cursor: 'pointer' }}>📚 {savedRecipes.length}</button>
               <button onClick={handleLogout} style={{ background: 'none', border: 'none', color: c.muted, fontSize: '12px', cursor: 'pointer' }}>{txt.logout}</button>
             </>
