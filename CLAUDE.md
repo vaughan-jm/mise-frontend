@@ -10,6 +10,8 @@ React frontend for Mise recipe extraction app. Single-page app that extracts rec
 - **API**: Fetch to backend REST API
 - **Auth**: Clerk (@clerk/clerk-react)
 - **Testing**: Playwright
+- **Error Tracking**: Sentry (@sentry/react)
+- **Analytics**: PostHog (posthog-js)
 
 ## Structure
 ```
@@ -36,6 +38,19 @@ npm run test:ui  # Run tests with Playwright UI
 Set in Vercel dashboard:
 - `VITE_API_URL` - Backend API URL
 - `VITE_CLERK_PUBLISHABLE_KEY` - Clerk publishable key
+- `VITE_SENTRY_DSN` - Sentry error tracking DSN
+- `VITE_PUBLIC_POSTHOG_KEY` - PostHog analytics API key
+- `VITE_PUBLIC_POSTHOG_HOST` - PostHog host URL (https://us.i.posthog.com)
+
+## Observability
+- **Sentry**: Error tracking and performance monitoring
+  - Dashboard: https://john-vaughan.sentry.io
+  - Initialized in `main.jsx` with `@sentry/react`
+  - Captures unhandled errors and performance data
+- **PostHog**: Product analytics
+  - Dashboard: https://us.posthog.com
+  - Initialized in `main.jsx` with `posthog-js`
+  - Tracks pageviews, clicks (autocapture), and custom events
 
 ## Deployment
 - **Hosting**: Vercel (auto-deploys from GitHub)
@@ -74,9 +89,12 @@ Auth is handled by Clerk. Key components:
 
 Run tests: `npm test`
 
-## Recent Changes (Jan 2026)
-1. **Clerk auth** - Replaced custom JWT auth with Clerk
-2. **Code extraction** - Moved translations and API utils to lib/
-3. **Playwright tests** - Added 21 E2E tests
-4. **Legal pages** - Added Privacy, Terms, Refund pages
-5. **Contact form** - Added contact modal with backend integration
+## Deployment Notes
+- Vercel auto-deploys from GitHub
+- Environment variables set in Vercel dashboard: `VITE_CLERK_PUBLISHABLE_KEY`, `VITE_API_URL`
+- Using Clerk **test keys** (production keys require custom domain)
+
+### To go live with Clerk production keys:
+1. Connect a custom domain to Vercel
+2. Create Clerk production instance
+3. Update Vercel env vars with `pk_live_` key

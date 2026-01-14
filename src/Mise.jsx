@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { useUser, useAuth, SignIn, SignUp, UserButton, SignedIn, SignedOut } from '@clerk/clerk-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { useUser, useAuth, SignIn, SignUp, UserButton } from '@clerk/clerk-react';
 import { api, setClerkGetToken, calculateRecipesRemaining, parseServingsToInt, QUOTAS } from './lib/api.js';
 import { languages, getTranslations } from './lib/translations.js';
 
