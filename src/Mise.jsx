@@ -36,6 +36,8 @@ export default function Mise() {
   const [showPricing, setShowPricing] = useState(false);
   const [plans, setPlans] = useState(null);
   const [upgradingPlan, setUpgradingPlan] = useState(null);
+  const [billingPeriod, setBillingPeriod] = useState('monthly'); // 'monthly' | 'yearly'
+  const [isApiReady, setIsApiReady] = useState(false); // Guards API calls until token is ready
 
   // Feedback & Rating state
   const [showFeedback, setShowFeedback] = useState(false);
@@ -236,11 +238,12 @@ export default function Mise() {
   // Initialize Clerk token getter for API calls
   useEffect(() => {
     setClerkGetToken(getToken);
+    setIsApiReady(true);
   }, [getToken]);
 
-  // Sync Clerk user with backend when signed in
+  // Sync Clerk user with backend when signed in (guarded by isApiReady to prevent race condition)
   useEffect(() => {
-    if (!isClerkLoaded) return;
+    if (!isClerkLoaded || !isApiReady) return;
 
     if (isSignedIn && clerkUser) {
       // User is signed in with Clerk, sync with backend
@@ -250,30 +253,41 @@ export default function Mise() {
           setRecipesRemaining(calculateRecipesRemaining(data.user));
           loadSavedRecipes();
         }
-      }).catch(console.error);
+      }).catch(err => {
+        console.error('Failed to sync user:', err);
+      });
     } else {
       // User is signed out
       setUser(null);
       setSavedRecipes([]);
       setRecipesRemaining(10); // Anonymous limit
     }
-  }, [isClerkLoaded, isSignedIn, clerkUser]);
+  }, [isClerkLoaded, isSignedIn, clerkUser, isApiReady]);
+
+  // Close auth modal when sign-in succeeds
+  useEffect(() => {
+    if (isSignedIn && showAuth) {
+      setShowAuth(false);
+    }
+  }, [isSignedIn, showAuth]);
 
   // Load plans and ratings summary on mount
   useEffect(() => {
-    // Load plans (v2 format)
+    // Load plans (v2 format) - keep full structure with monthly/yearly pricing
     api.get('/api/payments/plans').then(data => {
       // v2 returns { basic: {...}, pro: {...} } with nested monthly/yearly
       if (data.basic && data.pro) {
         setPlans({
           basic: {
             name: 'Basic',
-            price: data.basic.monthly?.price || 1.99,
+            monthly: data.basic.monthly || { price: 1.99 },
+            yearly: data.basic.yearly || { price: 14.99, savings: '37%' },
             features: data.basic.features || ['20 recipes per month', 'Recipe translation', 'Save recipes'],
           },
           pro: {
             name: 'Pro',
-            price: data.pro.monthly?.price || 4.99,
+            monthly: data.pro.monthly || { price: 4.99 },
+            yearly: data.pro.yearly || { price: 39.99, savings: '33%' },
             features: data.pro.features || ['Unlimited recipes', 'Recipe translation', 'Save recipes', 'Priority support'],
           },
         });
@@ -366,12 +380,20 @@ export default function Mise() {
   const handleUpgrade = async (plan) => {
     if (!user) { setShowAuth(true); setAuthMode('signin'); return; }
     setUpgradingPlan(plan);
-    // Map plan names to v2 format (basic/pro -> basic_monthly/pro_monthly)
-    const planMap = { basic: 'basic_monthly', pro: 'pro_monthly' };
-    const data = await api.post('/api/payments/create-checkout', { plan: planMap[plan] || plan });
-    // v2 uses checkoutUrl instead of url
-    if (data.checkoutUrl) window.location.href = data.checkoutUrl;
-    else setUpgradingPlan(null); // Reset on error
+    setError(''); // Clear any previous error
+    try {
+      // Build plan key with billing period (e.g., 'basic_monthly', 'pro_yearly')
+      const planKey = `${plan}_${billingPeriod}`;
+      const data = await api.post('/api/payments/create-checkout', { plan: planKey });
+      if (data.checkoutUrl) {
+        window.location.href = data.checkoutUrl;
+      } else {
+        throw new Error(data.error || 'Failed to create checkout');
+      }
+    } catch (err) {
+      setError(txt.paymentError || 'Payment failed. Please try again.');
+      setUpgradingPlan(null);
+    }
   };
 
   const saveCurrentRecipe = async () => {
@@ -835,29 +857,81 @@ export default function Mise() {
           <MiseLogo size={48} />
           <h2 style={{ fontSize: '22px', fontWeight: '600', margin: '16px 0 8px' }}>{txt.upgradePlan}</h2>
           <p style={{ color: c.muted, fontSize: '14px', marginBottom: '24px' }}>{txt.upgradeDescription}</p>
-          {['basic', 'pro'].map(plan => (
-            <div key={plan} style={{ background: c.card, borderRadius: '12px', border: `1px solid ${plan === 'pro' ? c.accent : c.border}`, padding: '20px', marginBottom: '12px', textAlign: 'left' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                <h3 style={{ fontSize: '18px', fontWeight: '600' }}>{plans[plan]?.name || plan}</h3>
-                <span style={{ fontSize: '20px', fontWeight: '600' }}>${plans[plan]?.price || '?'}<span style={{ fontSize: '14px', color: c.muted }}>/mo</span></span>
-              </div>
-              <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 16px 0' }}>
-                {(plans[plan]?.features || []).map((f, i) => <li key={i} style={{ fontSize: '13px', color: c.muted, marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '8px' }}><span style={{ color: c.accent }}>✓</span> {f}</li>)}
-              </ul>
-              <button
-                onClick={() => handleUpgrade(plan)}
-                disabled={upgradingPlan !== null}
-                style={{ width: '100%', padding: '12px', background: plan === 'pro' ? c.accent : c.cardHover, color: plan === 'pro' ? c.bg : c.text, border: `1px solid ${c.border}`, borderRadius: '8px', fontSize: '14px', fontWeight: '500', cursor: upgradingPlan ? 'not-allowed' : 'pointer', opacity: upgradingPlan && upgradingPlan !== plan ? 0.6 : 1 }}
-              >
-                {upgradingPlan === plan ? (
-                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
-                    <span style={{ width: '14px', height: '14px', border: '2px solid currentColor', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></span>
-                    Loading...
-                  </span>
-                ) : (plan === 'pro' ? txt.goPro : txt.getBasic)}
-              </button>
+
+          {/* Billing period toggle */}
+          <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', marginBottom: '24px' }}>
+            <button
+              onClick={() => setBillingPeriod('monthly')}
+              style={{
+                padding: '10px 20px',
+                background: billingPeriod === 'monthly' ? c.accent : 'transparent',
+                color: billingPeriod === 'monthly' ? c.bg : c.text,
+                border: `1px solid ${billingPeriod === 'monthly' ? c.accent : c.border}`,
+                borderRadius: '8px',
+                fontSize: '14px',
+                fontWeight: '500',
+                cursor: 'pointer',
+              }}
+            >
+              Monthly
+            </button>
+            <button
+              onClick={() => setBillingPeriod('yearly')}
+              style={{
+                padding: '10px 20px',
+                background: billingPeriod === 'yearly' ? c.accent : 'transparent',
+                color: billingPeriod === 'yearly' ? c.bg : c.text,
+                border: `1px solid ${billingPeriod === 'yearly' ? c.accent : c.border}`,
+                borderRadius: '8px',
+                fontSize: '14px',
+                fontWeight: '500',
+                cursor: 'pointer',
+              }}
+            >
+              Yearly <span style={{ color: billingPeriod === 'yearly' ? c.bg : c.accent, fontSize: '12px', marginLeft: '4px' }}>Save 37%</span>
+            </button>
+          </div>
+
+          {error && (
+            <div style={{ background: '#fef2f2', border: '1px solid #fecaca', color: '#dc2626', padding: '12px', borderRadius: '8px', marginBottom: '16px', fontSize: '14px' }}>
+              {error}
             </div>
-          ))}
+          )}
+
+          {['basic', 'pro'].map(plan => {
+            const priceData = plans[plan]?.[billingPeriod] || {};
+            return (
+              <div key={plan} style={{ background: c.card, borderRadius: '12px', border: `1px solid ${plan === 'pro' ? c.accent : c.border}`, padding: '20px', marginBottom: '12px', textAlign: 'left' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                  <h3 style={{ fontSize: '18px', fontWeight: '600' }}>{plans[plan]?.name || plan}</h3>
+                  <div style={{ textAlign: 'right' }}>
+                    <span style={{ fontSize: '20px', fontWeight: '600' }}>
+                      ${priceData.price || '?'}
+                      <span style={{ fontSize: '14px', color: c.muted }}>/{billingPeriod === 'yearly' ? 'yr' : 'mo'}</span>
+                    </span>
+                    {billingPeriod === 'yearly' && priceData.savings && (
+                      <div style={{ fontSize: '12px', color: c.accent, marginTop: '2px' }}>Save {priceData.savings}</div>
+                    )}
+                  </div>
+                </div>
+                <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 16px 0' }}>
+                  {(plans[plan]?.features || []).map((f, i) => <li key={i} style={{ fontSize: '13px', color: c.muted, marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '8px' }}><span style={{ color: c.accent }}>✓</span> {f}</li>)}
+                </ul>
+                <button
+                  onClick={() => handleUpgrade(plan)}
+                  disabled={upgradingPlan !== null}
+                  style={{ width: '100%', padding: '12px', background: plan === 'pro' ? c.accent : c.cardHover, color: plan === 'pro' ? c.bg : c.text, border: `1px solid ${c.border}`, borderRadius: '8px', fontSize: '14px', fontWeight: '500', cursor: upgradingPlan ? 'not-allowed' : 'pointer', opacity: upgradingPlan && upgradingPlan !== plan ? 0.6 : 1 }}
+                >
+                  {upgradingPlan === plan ? (
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+                      <span style={{ width: '14px', height: '14px', border: '2px solid currentColor', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></span>
+                      Loading...
+                    </span>
+                  ) : (plan === 'pro' ? txt.goPro : txt.getBasic)}
+                </button>
+              </div>
+            );
+          })}
           <p style={{ fontSize: '12px', color: c.dim, marginTop: '16px' }}>{txt.cancelAnytime}</p>
         </div>
       </div>
