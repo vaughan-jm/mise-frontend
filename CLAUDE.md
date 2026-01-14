@@ -74,9 +74,12 @@ Auth is handled by Clerk. Key components:
 
 Run tests: `npm test`
 
-## Recent Changes (Jan 2026)
-1. **Clerk auth** - Replaced custom JWT auth with Clerk
-2. **Code extraction** - Moved translations and API utils to lib/
-3. **Playwright tests** - Added 21 E2E tests
-4. **Legal pages** - Added Privacy, Terms, Refund pages
-5. **Contact form** - Added contact modal with backend integration
+## Deployment Notes
+- Vercel auto-deploys from GitHub
+- Environment variables set in Vercel dashboard: `VITE_CLERK_PUBLISHABLE_KEY`, `VITE_API_URL`
+- Using Clerk **test keys** (production keys require custom domain)
+
+### To go live with Clerk production keys:
+1. Connect a custom domain to Vercel
+2. Create Clerk production instance
+3. Update Vercel env vars with `pk_live_` key
