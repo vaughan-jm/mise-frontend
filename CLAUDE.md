@@ -10,6 +10,8 @@ React frontend for Mise recipe extraction app. Single-page app that extracts rec
 - **API**: Fetch to backend REST API
 - **Auth**: Clerk (@clerk/clerk-react)
 - **Testing**: Playwright
+- **Error Tracking**: Sentry (@sentry/react)
+- **Analytics**: PostHog (posthog-js)
 
 ## Structure
 ```
@@ -36,6 +38,19 @@ npm run test:ui  # Run tests with Playwright UI
 Set in Vercel dashboard:
 - `VITE_API_URL` - Backend API URL
 - `VITE_CLERK_PUBLISHABLE_KEY` - Clerk publishable key
+- `VITE_SENTRY_DSN` - Sentry error tracking DSN
+- `VITE_PUBLIC_POSTHOG_KEY` - PostHog analytics API key
+- `VITE_PUBLIC_POSTHOG_HOST` - PostHog host URL (https://us.i.posthog.com)
+
+## Observability
+- **Sentry**: Error tracking and performance monitoring
+  - Dashboard: https://john-vaughan.sentry.io
+  - Initialized in `main.jsx` with `@sentry/react`
+  - Captures unhandled errors and performance data
+- **PostHog**: Product analytics
+  - Dashboard: https://us.posthog.com
+  - Initialized in `main.jsx` with `posthog-js`
+  - Tracks pageviews, clicks (autocapture), and custom events
 
 ## Deployment
 - **Hosting**: Vercel (auto-deploys from GitHub)
