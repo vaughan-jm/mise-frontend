@@ -350,6 +350,19 @@ export default function Mise() {
     setRecipesRemaining(10); // Back to anonymous limit
   };
 
+  // Refetch quota from backend after successful extraction (for logged-in users)
+  const refetchQuota = async () => {
+    if (!user) return; // Only for logged-in users
+    try {
+      const data = await api.get('/api/auth/me');
+      if (data.user) {
+        setRecipesRemaining(calculateRecipesRemaining(data.user));
+      }
+    } catch (err) {
+      console.error('Failed to refetch quota:', err);
+    }
+  };
+
   const submitContact = async () => {
     if (!contactName.trim() || !contactEmail.trim() || !contactMessage.trim()) {
       setContactError('Please fill in all fields');
@@ -378,7 +391,7 @@ export default function Mise() {
   };
 
   const handleUpgrade = async (plan) => {
-    if (!user) { setShowAuth(true); setAuthMode('signin'); return; }
+    if (!user) { setShowPricing(false); setShowAuth(true); setAuthMode('signin'); return; }
     setUpgradingPlan(plan);
     setError(''); // Clear any previous error
     try {
@@ -391,6 +404,7 @@ export default function Mise() {
         throw new Error(data.error || 'Failed to create checkout');
       }
     } catch (err) {
+      console.error('Upgrade failed:', err);
       setError(txt.paymentError || 'Payment failed. Please try again.');
       setUpgradingPlan(null);
     }
@@ -451,8 +465,9 @@ export default function Mise() {
     else {
       setRecipe(data.recipe);
       setServings(parseServingsToInt(data.recipe.servings));
-      // v2 doesn't return recipesRemaining, decrement locally
+      // Decrement locally immediately, then refetch real quota from backend
       setRecipesRemaining(prev => prev === Infinity ? Infinity : Math.max(0, prev - 1));
+      refetchQuota(); // Get actual quota from server
     }
     setLoading(false);
   };
@@ -469,8 +484,9 @@ export default function Mise() {
     else {
       setRecipe(data.recipe);
       setServings(parseServingsToInt(data.recipe.servings));
-      // v2 doesn't return recipesRemaining, decrement locally
+      // Decrement locally immediately, then refetch real quota from backend
       setRecipesRemaining(prev => prev === Infinity ? Infinity : Math.max(0, prev - 1));
+      refetchQuota(); // Get actual quota from server
       setPhotos([]);
     }
     setLoading(false);
@@ -488,8 +504,9 @@ export default function Mise() {
     else {
       setRecipe(data.recipe);
       setServings(parseServingsToInt(data.recipe.servings));
-      // v2 doesn't return recipesRemaining, decrement locally
+      // Decrement locally immediately, then refetch real quota from backend
       setRecipesRemaining(prev => prev === Infinity ? Infinity : Math.max(0, prev - 1));
+      refetchQuota(); // Get actual quota from server
       setYoutubeUrl('');
     }
     setLoading(false);
