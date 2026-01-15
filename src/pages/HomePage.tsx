@@ -134,15 +134,9 @@ export default function HomePage() {
 
   return (
     <PageLayout centered maxWidth="md" className="px-4">
-      <div className="w-full max-w-md mx-auto space-y-8">
-        {/* Logo & Tagline */}
-        <div className="text-center space-y-2">
-          <h1 className="text-5xl font-bold text-bone lowercase">{t.appName}</h1>
-          <p className="text-xl text-ash">{t.tagline}</p>
-        </div>
-
-        {/* Input Section */}
-        <div className="space-y-4">
+      <div className="w-full flex flex-col items-center space-y-6">
+        {/* Input Section - centered, constrained width */}
+        <div className="w-full max-w-[340px] space-y-4">
           {/* Mode Tabs */}
           <div className="flex justify-center">
             <TabSwitcher
@@ -153,102 +147,109 @@ export default function HomePage() {
             />
           </div>
 
-          {/* URL Input */}
-          <AnimatePresence mode="wait">
-            {mode === 'url' && (
-              <motion.div
-                key="url"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.15 }}
-              >
-                <Input
-                  type="url"
-                  placeholder={t.urlPlaceholder}
-                  value={urlInput}
-                  onChange={(e) => setUrlInput(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  inputSize="lg"
-                  disabled={isLoading}
-                />
-              </motion.div>
-            )}
-
-            {/* Photo Input */}
-            {mode === 'photo' && (
-              <motion.div
-                key="photo"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.15 }}
-                className="space-y-3"
-              >
-                {/* Photo previews */}
-                {photos.length > 0 && (
-                  <div className="flex flex-wrap gap-2">
-                    {photos.map((photo, index) => (
-                      <div key={index} className="relative group">
-                        <img
-                          src={photo}
-                          alt={`Upload ${index + 1}`}
-                          className="w-16 h-16 object-cover rounded-lg"
-                        />
-                        <button
-                          onClick={() => removePhoto(index)}
-                          className="absolute -top-1 -right-1 w-5 h-5 bg-rust text-bone rounded-full text-xs opacity-0 group-hover:opacity-100 transition-opacity"
-                        >
-                          ×
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                {/* Upload button */}
-                <button
-                  onClick={() => fileInputRef.current?.click()}
-                  disabled={isLoading}
-                  className="w-full py-8 border-2 border-dashed border-ash/30 rounded-lg text-ash hover:border-sage hover:text-bone transition-colors"
+          {/* Input area - fixed height to prevent layout shifts */}
+          <div className="min-h-[52px]">
+            <AnimatePresence mode="wait">
+              {mode === 'url' && (
+                <motion.div
+                  key="url"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.15 }}
                 >
-                  <div className="flex flex-col items-center gap-2">
-                    <CameraIcon />
-                    <span className="text-sm">{t.dragDropPhotos}</span>
-                  </div>
-                </button>
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/*"
-                  multiple
-                  onChange={handlePhotoUpload}
-                  className="hidden"
-                />
-              </motion.div>
-            )}
+                  <Input
+                    type="url"
+                    placeholder={t.urlPlaceholder}
+                    value={urlInput}
+                    onChange={(e) => setUrlInput(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                    inputSize="lg"
+                    disabled={isLoading}
+                  />
+                </motion.div>
+              )}
 
-            {/* YouTube Input */}
-            {mode === 'youtube' && (
-              <motion.div
-                key="youtube"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.15 }}
-              >
-                <Input
-                  type="url"
-                  placeholder={t.youtubePlaceholder}
-                  value={youtubeInput}
-                  onChange={(e) => setYoutubeInput(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  inputSize="lg"
-                  disabled={isLoading}
-                />
-              </motion.div>
-            )}
-          </AnimatePresence>
+              {/* Photo Input - same height as URL input */}
+              {mode === 'photo' && (
+                <motion.div
+                  key="photo"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.15 }}
+                >
+                  <button
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={isLoading}
+                    className="w-full px-5 py-3 text-lg rounded-lg bg-gunmetal border border-ash/20 text-ash hover:border-sage hover:text-bone transition-colors text-left"
+                  >
+                    {photos.length > 0 ? (
+                      <span className="flex items-center gap-2">
+                        <CameraIcon />
+                        <span>{photos.length} photo{photos.length > 1 ? 's' : ''} selected</span>
+                      </span>
+                    ) : (
+                      <span className="flex items-center gap-2">
+                        <CameraIcon />
+                        <span>{t.dragDropPhotos}</span>
+                      </span>
+                    )}
+                  </button>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={handlePhotoUpload}
+                    className="hidden"
+                  />
+                </motion.div>
+              )}
+
+              {/* YouTube Input */}
+              {mode === 'youtube' && (
+                <motion.div
+                  key="youtube"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.15 }}
+                >
+                  <Input
+                    type="url"
+                    placeholder={t.youtubePlaceholder}
+                    value={youtubeInput}
+                    onChange={(e) => setYoutubeInput(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                    inputSize="lg"
+                    disabled={isLoading}
+                  />
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+
+          {/* Photo previews - shown below input when photos are selected */}
+          {mode === 'photo' && photos.length > 0 && (
+            <div className="flex flex-wrap gap-2 justify-center">
+              {photos.map((photo, index) => (
+                <div key={index} className="relative group">
+                  <img
+                    src={photo}
+                    alt={`Upload ${index + 1}`}
+                    className="w-12 h-12 object-cover rounded-lg"
+                  />
+                  <button
+                    onClick={() => removePhoto(index)}
+                    className="absolute -top-1 -right-1 w-4 h-4 bg-rust text-bone rounded-full text-xs opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
+                  >
+                    ×
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
 
           {/* Extract Button */}
           <Button
@@ -257,6 +258,11 @@ export default function HomePage() {
             isLoading={isLoading}
             fullWidth
             size="lg"
+            rightIcon={!isLoading && (
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+              </svg>
+            )}
           >
             {isLoading ? loadingMessages[loadingMessageIndex] : t.extractButton}
           </Button>
@@ -273,15 +279,12 @@ export default function HomePage() {
           )}
         </div>
 
-        {/* Quota & Subtitle */}
-        <div className="text-center space-y-2">
-          <p className="text-sm text-ash">
-            {isUnlimited
-              ? t.unlimited
-              : translate('recipesRemaining', { count: remaining })}
-          </p>
-          <p className="text-xs text-ash/60">{t.worksWithAnySite}</p>
-        </div>
+        {/* Quota indicator */}
+        <p className="text-center text-sm text-ash">
+          {isUnlimited
+            ? t.unlimited
+            : translate('recipesRemaining', { count: remaining })}
+        </p>
       </div>
     </PageLayout>
   )

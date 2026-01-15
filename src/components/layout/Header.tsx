@@ -8,6 +8,7 @@
 import { Link, useLocation } from 'react-router-dom'
 import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/clerk-react'
 import { useApp } from '../../context/AppContext'
+import logoSvg from '../../assets/brand/svg/icon-only-dark-mode.svg'
 
 interface HeaderProps {
   showNav?: boolean
@@ -29,12 +30,17 @@ export default function Header({ showNav = true, className = '' }: HeaderProps) 
         ${className}
       `}
     >
-      {/* Logo */}
-      <Link
-        to="/"
-        className="text-xl font-bold text-bone lowercase hover:text-sage transition-colors"
-      >
-        {t.appName}
+      {/* Logo + Branding */}
+      <Link to="/" className="flex items-center gap-3 group">
+        <img src={logoSvg} alt="Pare" className="h-8 w-auto" />
+        <div className="flex flex-col">
+          <span className="text-2xl font-bold text-bone lowercase group-hover:text-sage transition-colors">
+            {t.appName}
+          </span>
+          <span className="text-xs text-ash lowercase">
+            {t.tagline}
+          </span>
+        </div>
       </Link>
 
       {/* Right side: nav + auth */}
@@ -59,13 +65,6 @@ export default function Header({ showNav = true, className = '' }: HeaderProps) 
                 {t.cookbook}
               </Link>
             </SignedIn>
-
-            <Link
-              to="/pricing"
-              className="text-sm text-ash hover:text-bone transition-colors lowercase"
-            >
-              {t.pricing}
-            </Link>
           </nav>
         )}
 

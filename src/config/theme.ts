@@ -16,8 +16,8 @@ export const colors = {
   ash: '#A0A0A0',         // Secondary text, muted
 
   // Accent
-  sage: '#7B927A',        // Primary accent (Pare logo green)
-  sageHover: '#6A8069',   // Accent hover state
+  sage: '#8F9E8B',        // Primary accent (Pare logo green)
+  sageHover: '#7A8977',   // Accent hover state
 
   // Semantic
   rust: '#8B4A4A',        // Errors, destructive actions

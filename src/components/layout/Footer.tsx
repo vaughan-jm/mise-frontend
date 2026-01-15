@@ -17,7 +17,6 @@ export default function Footer({ className = '' }: FooterProps) {
   const links = [
     { label: t.privacy, href: '/privacy' },
     { label: t.terms, href: '/terms' },
-    { label: t.refund, href: '/refund' },
     { label: t.contact, href: '/contact' },
   ]
 

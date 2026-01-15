@@ -82,6 +82,13 @@ function QuotaCard() {
           </a>
         </div>
       )}
+
+      {/* Refund policy link */}
+      <div className="mt-4 pt-4 border-t border-obsidian">
+        <a href="/refund" className="text-sm text-ash hover:text-bone transition-colors">
+          {t.refund} policy →
+        </a>
+      </div>
     </Card>
   )
 }

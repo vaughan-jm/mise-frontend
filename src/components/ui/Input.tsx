@@ -54,7 +54,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
           className={`
             block rounded-lg
             bg-gunmetal text-bone
-            border border-transparent
+            border border-ash/20
             placeholder:text-ash/60
             focus:outline-none focus:ring-2 focus:ring-sage/50 focus:border-sage
             disabled:bg-gunmetal/50 disabled:text-ash disabled:cursor-not-allowed

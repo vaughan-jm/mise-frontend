@@ -40,8 +40,7 @@ export default function TabSwitcher<T extends string>({
   return (
     <div
       className={`
-        inline-flex items-center
-        bg-obsidian rounded-lg p-1
+        inline-flex items-center gap-1
         ${fullWidth ? 'w-full' : ''}
         ${className}
       `}
@@ -60,7 +59,7 @@ export default function TabSwitcher<T extends string>({
               focus:outline-none focus:ring-2 focus:ring-sage/50
               ${sizeStyles[size]}
               ${fullWidth ? 'flex-1' : ''}
-              ${isActive ? 'text-obsidian' : 'text-ash hover:text-bone'}
+              ${isActive ? 'text-obsidian' : 'text-ash hover:text-bone border border-ash/10'}
             `}
           >
             {/* Active background */}
@@ -68,7 +67,7 @@ export default function TabSwitcher<T extends string>({
               <motion.div
                 layoutId="tab-active-bg"
                 className="absolute inset-0 bg-sage rounded-md"
-                transition={{ type: 'spring', duration: 0.3, bounce: 0.2 }}
+                transition={{ type: 'tween', duration: 0.2, ease: 'easeOut' }}
               />
             )}
 

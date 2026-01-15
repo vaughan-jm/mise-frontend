@@ -11,7 +11,7 @@
 export const hero = {
   tagline: 'just the recipe',
   subtitle: 'Works with any recipe website',
-  ctaText: 'pare',
+  ctaText: 'extract',
 }
 
 /**

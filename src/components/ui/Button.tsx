@@ -28,7 +28,7 @@ interface ButtonProps {
 
 const variantStyles: Record<ButtonVariant, string> = {
   primary:
-    'bg-sage text-obsidian hover:bg-sage-hover active:bg-sage-hover disabled:bg-ash disabled:text-gunmetal',
+    'bg-sage text-obsidian border border-sage/30 shadow-md shadow-sage/25 hover:bg-sage-hover hover:shadow-lg hover:shadow-sage/30 active:bg-sage-hover disabled:bg-gunmetal disabled:text-ash disabled:border-ash/30 disabled:shadow-none',
   secondary:
     'bg-transparent border border-sage text-sage hover:bg-sage/10 active:bg-sage/20 disabled:border-ash disabled:text-ash',
   ghost:

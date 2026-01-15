@@ -7,11 +7,8 @@ test.describe('App Loading', () => {
   test('should load the homepage with Pare branding', async ({ page }) => {
     await page.goto('/');
 
-    // Check the Pare logo/title is visible
-    await expect(page.getByRole('heading', { name: 'pare', exact: true })).toBeVisible();
-
-    // Check the tagline is visible
-    await expect(page.getByText('just the recipe')).toBeVisible();
+    // Check the Pare branding is visible in header (logo link area)
+    await expect(page.getByRole('link', { name: /pare.*just the recipe/i })).toBeVisible();
   });
 
   test('should show URL input mode by default', async ({ page }) => {
@@ -20,8 +17,8 @@ test.describe('App Loading', () => {
     // Check URL input is visible
     await expect(page.getByPlaceholder(/paste any recipe url/i)).toBeVisible();
 
-    // Check the pare button is visible
-    await expect(page.getByRole('button', { name: 'pare' })).toBeVisible();
+    // Check the extract button is visible
+    await expect(page.getByRole('button', { name: 'extract' })).toBeVisible();
   });
 
   test('should show input mode tabs', async ({ page }) => {
@@ -68,23 +65,15 @@ test.describe('Navigation', () => {
     // Should see sign in button in header
     await expect(page.getByRole('button', { name: /sign in/i })).toBeVisible();
   });
-
-  test('should show pricing link', async ({ page }) => {
-    await page.goto('/');
-
-    // Should see pricing link
-    await expect(page.getByRole('link', { name: /pricing/i })).toBeVisible();
-  });
 });
 
 test.describe('Footer Links', () => {
   test('should show all footer links', async ({ page }) => {
     await page.goto('/');
 
-    // Check all footer links are visible
+    // Check all footer links are visible (refunds moved to account page)
     await expect(page.getByRole('link', { name: 'privacy' })).toBeVisible();
     await expect(page.getByRole('link', { name: 'terms' })).toBeVisible();
-    await expect(page.getByRole('link', { name: 'refunds' })).toBeVisible();
     await expect(page.getByRole('link', { name: 'contact' })).toBeVisible();
   });
 
@@ -109,10 +98,8 @@ test.describe('Footer Links', () => {
   });
 
   test('should navigate to refund page', async ({ page }) => {
-    await page.goto('/');
-
-    // Click refund link
-    await page.getByRole('link', { name: 'refunds' }).click();
+    // Navigate directly to refund page (link moved to account page)
+    await page.goto('/refund');
 
     // Check refund policy content is visible
     await expect(page.getByRole('heading', { name: 'Refund Policy', exact: true })).toBeVisible();

@@ -12,8 +12,8 @@ export default {
         gunmetal: '#1E1E1E',
         bone: '#E0E0E0',
         ash: '#A0A0A0',
-        sage: '#7B927A',
-        'sage-hover': '#6A8069',
+        sage: '#8F9E8B',
+        'sage-hover': '#7A8977',
         rust: '#8B4A4A',
       },
       fontFamily: {

@@ -16,20 +16,20 @@ test.describe('Recipe URL Input', () => {
     // Enter a URL
     await input.fill('https://example.com/my-recipe');
 
-    // Check the pare button is visible and can be clicked
-    const pareButton = page.getByRole('button', { name: 'pare' });
-    await expect(pareButton).toBeVisible();
-    await expect(pareButton).toBeEnabled();
+    // Check the extract button is visible and can be clicked
+    const extractButton = page.getByRole('button', { name: 'extract' });
+    await expect(extractButton).toBeVisible();
+    await expect(extractButton).toBeEnabled();
   });
 
-  test('should show loading state when pare is clicked', async ({ page }) => {
+  test('should show loading state when extract is clicked', async ({ page }) => {
     await page.goto('/');
 
     // Enter a URL
     await page.getByPlaceholder(/paste any recipe url/i).fill('https://example.com/recipe');
 
-    // Click pare - will start loading (even if API fails)
-    await page.getByRole('button', { name: 'pare' }).click();
+    // Click extract - will start loading (even if API fails)
+    await page.getByRole('button', { name: 'extract' }).click();
 
     // The button should show loading state (text changes to loading message)
     // Wait briefly for loading UI
@@ -91,7 +91,7 @@ test.describe('Video Input Mode', () => {
     await input.fill('https://www.youtube.com/watch?v=dQw4w9WgXcQ');
 
     // Check button is enabled
-    await expect(page.getByRole('button', { name: 'pare' })).toBeEnabled();
+    await expect(page.getByRole('button', { name: 'extract' })).toBeEnabled();
   });
 });
 
@@ -109,13 +109,6 @@ test.describe('Input Mode Switching', () => {
 
     // URL input should still have the value
     await expect(urlInput).toHaveValue('https://my-recipe.com');
-  });
-
-  test('should show works with any site text', async ({ page }) => {
-    await page.goto('/');
-
-    // Check helper text
-    await expect(page.getByText(/works with any recipe website/i)).toBeVisible();
   });
 });
 
