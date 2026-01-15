@@ -56,7 +56,7 @@ interface UseRecipeReturn {
 }
 
 export function useRecipe(): UseRecipeReturn {
-  const { refreshQuota, decrementQuota, isApiReady, language } = useApp()
+  const { refreshQuota, decrementQuota, setAnonymousQuotaExhausted, isApiReady, language } = useApp()
 
   // State
   const [recipe, setRecipe] = useState<Recipe | null>(null)
@@ -142,13 +142,19 @@ export function useRecipe(): UseRecipeReturn {
           err instanceof ApiRequestError
             ? err.message
             : 'Failed to extract recipe. Please try again.'
+
+        // If quota error, update local state to reflect exhaustion
+        if (err instanceof ApiRequestError && err.status === 403) {
+          setAnonymousQuotaExhausted()
+        }
+
         setError(message)
         return null
       } finally {
         setIsLoading(false)
       }
     },
-    [isApiReady, language, decrementQuota, refreshQuota]
+    [isApiReady, language, decrementQuota, refreshQuota, setAnonymousQuotaExhausted]
   )
 
   // Translate recipe

@@ -52,6 +52,7 @@ interface AppContextValue {
   quota: QuotaInfo
   decrementQuota: () => void
   refreshQuota: () => Promise<void>
+  setAnonymousQuotaExhausted: () => void
 
   // API readiness (auth token ready)
   isApiReady: boolean
@@ -70,6 +71,7 @@ const defaultContext: AppContextValue = {
   quota: { used: 0, limit: 10, remaining: 10, tier: 'free' },
   decrementQuota: () => {},
   refreshQuota: async () => {},
+  setAnonymousQuotaExhausted: () => {},
   isApiReady: false,
 }
 
@@ -229,6 +231,15 @@ export function AppProvider({ children }: AppProviderProps) {
     }
   }, [user, isApiReady])
 
+  // Mark anonymous quota as exhausted (when backend returns 403)
+  const setAnonymousQuotaExhausted = useCallback(() => {
+    if (!user) {
+      const exhausted = anonymousLimits.recipesTotal
+      setAnonymousUsed(exhausted)
+      localStorage.setItem(ANONYMOUS_USED_KEY, String(exhausted))
+    }
+  }, [user])
+
   // Combine loading states
   const isLoading = !isAuthLoaded || isLoadingUser
 
@@ -246,6 +257,7 @@ export function AppProvider({ children }: AppProviderProps) {
       quota,
       decrementQuota,
       refreshQuota,
+      setAnonymousQuotaExhausted,
       isApiReady,
     }),
     [
@@ -260,6 +272,7 @@ export function AppProvider({ children }: AppProviderProps) {
       quota,
       decrementQuota,
       refreshQuota,
+      setAnonymousQuotaExhausted,
       isApiReady,
     ]
   )
