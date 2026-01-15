@@ -27,7 +27,7 @@ import {
   detectLanguage,
   type Translations,
 } from '../lib/translations'
-import { setAuthTokenGetter, getMe, syncUser } from '../lib/api'
+import { setAuthTokenGetter, getMe } from '../lib/api'
 import { getRecipeLimit, anonymousLimits } from '../config/pricing'
 
 // LocalStorage keys
@@ -134,14 +134,30 @@ export function AppProvider({ children }: AppProviderProps) {
   )
 
   // Set up auth token getter for API client
+  // Wait for both Clerk to load AND ensure we can get a token if signed in
   useEffect(() => {
-    if (isAuthLoaded) {
-      setAuthTokenGetter(getToken)
+    if (!isAuthLoaded) return
+
+    setAuthTokenGetter(getToken)
+
+    // If signed in, verify we can get a token before marking API as ready
+    if (clerkSignedIn) {
+      getToken().then((token) => {
+        if (token) {
+          setIsApiReady(true)
+        } else {
+          // Retry after a short delay if token not ready
+          setTimeout(() => setIsApiReady(true), 500)
+        }
+      })
+    } else {
+      // Not signed in, API is ready for anonymous calls
       setIsApiReady(true)
     }
-  }, [isAuthLoaded, getToken])
+  }, [isAuthLoaded, getToken, clerkSignedIn])
 
-  // Fetch/sync user from backend when signed in
+  // Fetch user from backend when signed in
+  // Backend auto-creates user via getOrCreateUserFromClerk in requireAuth middleware
   const refreshUser = useCallback(async () => {
     if (!isApiReady || !clerkSignedIn) {
       setUser(null)
@@ -151,18 +167,11 @@ export function AppProvider({ children }: AppProviderProps) {
 
     setIsLoadingUser(true)
     try {
-      // First try to get existing user
       const backendUser = await getMe()
       setUser(backendUser)
-    } catch {
-      // If user doesn't exist, sync/create them
-      try {
-        const syncedUser = await syncUser()
-        setUser(syncedUser)
-      } catch (syncError) {
-        console.error('Failed to sync user:', syncError)
-        setUser(null)
-      }
+    } catch (error) {
+      console.error('Failed to fetch user:', error)
+      setUser(null)
     } finally {
       setIsLoadingUser(false)
     }
