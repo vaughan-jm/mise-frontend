@@ -1,130 +1,171 @@
 import { test, expect } from '@playwright/test';
 
 /**
- * Basic app loading and UI tests
+ * Pare App - Basic loading and UI tests
  */
 test.describe('App Loading', () => {
-  test('should load the homepage', async ({ page }) => {
+  test('should load the homepage with Pare branding', async ({ page }) => {
     await page.goto('/');
 
-    // Check the main title/logo is visible
-    await expect(page.getByRole('heading', { name: 'just the recipe' })).toBeVisible();
+    // Check the Pare logo/title is visible
+    await expect(page.getByRole('heading', { name: 'pare', exact: true })).toBeVisible();
+
+    // Check the tagline is visible
+    await expect(page.getByText('just the recipe')).toBeVisible();
   });
 
   test('should show URL input mode by default', async ({ page }) => {
     await page.goto('/');
 
     // Check URL input is visible
-    await expect(page.getByRole('textbox', { name: 'Recipe URL...' })).toBeVisible();
+    await expect(page.getByPlaceholder(/paste any recipe url/i)).toBeVisible();
 
-    // Check the Clean button is visible
-    await expect(page.getByRole('button', { name: 'Clean' })).toBeVisible();
+    // Check the pare button is visible
+    await expect(page.getByRole('button', { name: 'pare' })).toBeVisible();
   });
 
-  test('should allow switching between input modes', async ({ page }) => {
+  test('should show input mode tabs', async ({ page }) => {
     await page.goto('/');
 
     // Check all input mode tabs are visible
-    await expect(page.getByRole('button', { name: /Paste URL/ })).toBeVisible();
-    await expect(page.getByRole('button', { name: /Photo/ })).toBeVisible();
-    await expect(page.getByRole('button', { name: /Video/ })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'url' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'photo' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'video' })).toBeVisible();
+  });
+
+  test('should switch to photo mode', async ({ page }) => {
+    await page.goto('/');
 
     // Click on Photo mode
-    await page.getByRole('button', { name: /Photo/ }).click();
+    await page.getByRole('button', { name: 'photo' }).click();
 
     // Check photo upload area appears
-    await expect(page.getByText('Add photos')).toBeVisible();
+    await expect(page.getByText(/drag & drop photos/i)).toBeVisible();
+  });
+
+  test('should switch to video mode', async ({ page }) => {
+    await page.goto('/');
+
+    // Click on Video mode
+    await page.getByRole('button', { name: 'video' }).click();
+
+    // Check YouTube input appears
+    await expect(page.getByPlaceholder(/paste youtube url/i)).toBeVisible();
   });
 
   test('should show recipes remaining counter', async ({ page }) => {
     await page.goto('/');
 
-    // Should show "left" text with a number
-    await expect(page.getByText(/\d+\s*left/)).toBeVisible();
-  });
-
-  test('should show language selector', async ({ page }) => {
-    await page.goto('/');
-
-    // Check language combobox is visible
-    await expect(page.getByRole('combobox')).toBeVisible();
+    // Should show remaining text
+    await expect(page.getByText(/\d+\s*recipes?\s*remaining/i)).toBeVisible();
   });
 });
 
-test.describe('Language Switching', () => {
-  test('should switch to Spanish', async ({ page }) => {
+test.describe('Navigation', () => {
+  test('should show sign in button for logged out users', async ({ page }) => {
     await page.goto('/');
 
-    // Select Spanish from dropdown
-    await page.getByRole('combobox').selectOption('es');
-
-    // Check text changed to Spanish
-    await expect(page.getByRole('heading', { name: 'solo la receta' })).toBeVisible();
+    // Should see sign in button in header
+    await expect(page.getByRole('button', { name: /sign in/i })).toBeVisible();
   });
 
-  test('should switch to French', async ({ page }) => {
+  test('should show pricing link', async ({ page }) => {
     await page.goto('/');
 
-    // Select French from dropdown
-    await page.getByRole('combobox').selectOption('fr');
-
-    // Check text changed to French
-    await expect(page.getByRole('heading', { name: 'juste la recette' })).toBeVisible();
+    // Should see pricing link
+    await expect(page.getByRole('link', { name: /pricing/i })).toBeVisible();
   });
 });
 
 test.describe('Footer Links', () => {
-  test('should show privacy policy link', async ({ page }) => {
+  test('should show all footer links', async ({ page }) => {
     await page.goto('/');
 
-    // Check privacy link is visible
-    await expect(page.getByRole('button', { name: 'Privacy' })).toBeVisible();
+    // Check all footer links are visible
+    await expect(page.getByRole('link', { name: 'privacy' })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'terms' })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'refunds' })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'contact' })).toBeVisible();
   });
 
-  test('should show terms link', async ({ page }) => {
-    await page.goto('/');
-
-    // Check terms link is visible
-    await expect(page.getByRole('button', { name: 'Terms' })).toBeVisible();
-  });
-
-  test('should show contact link', async ({ page }) => {
-    await page.goto('/');
-
-    // Check contact link is visible
-    await expect(page.getByRole('button', { name: 'Contact' })).toBeVisible();
-  });
-
-  test('should open privacy policy page', async ({ page }) => {
+  test('should navigate to privacy policy page', async ({ page }) => {
     await page.goto('/');
 
     // Click privacy link
-    await page.getByRole('button', { name: 'Privacy' }).click();
+    await page.getByRole('link', { name: 'privacy' }).click();
 
     // Check privacy policy content is visible
-    await expect(page.getByRole('heading', { name: 'Privacy Policy' })).toBeVisible();
-    await expect(page.getByText('Information We Collect')).toBeVisible();
+    await expect(page.getByRole('heading', { name: /privacy policy/i })).toBeVisible();
   });
 
-  test('should open terms page', async ({ page }) => {
+  test('should navigate to terms page', async ({ page }) => {
     await page.goto('/');
 
     // Click terms link
-    await page.getByRole('button', { name: 'Terms' }).click();
+    await page.getByRole('link', { name: 'terms' }).click();
 
     // Check terms content is visible
-    await expect(page.getByText('Terms of Service')).toBeVisible();
+    await expect(page.getByRole('heading', { name: /terms of service/i })).toBeVisible();
   });
 
-  test('should open contact form', async ({ page }) => {
+  test('should navigate to refund page', async ({ page }) => {
+    await page.goto('/');
+
+    // Click refund link
+    await page.getByRole('link', { name: 'refunds' }).click();
+
+    // Check refund policy content is visible
+    await expect(page.getByRole('heading', { name: 'Refund Policy', exact: true })).toBeVisible();
+  });
+
+  test('should navigate to contact page', async ({ page }) => {
     await page.goto('/');
 
     // Click contact link
-    await page.getByRole('button', { name: 'Contact' }).click();
+    await page.getByRole('link', { name: 'contact' }).click();
 
     // Check contact form is visible
-    await expect(page.getByRole('heading', { name: 'Contact Us' })).toBeVisible();
-    await expect(page.getByRole('textbox', { name: 'Your name' })).toBeVisible();
-    await expect(page.getByRole('textbox', { name: 'Your email' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'contact' })).toBeVisible();
+    await expect(page.getByPlaceholder('your name')).toBeVisible();
+    await expect(page.getByPlaceholder('you@example.com')).toBeVisible();
+  });
+});
+
+test.describe('Pricing Page', () => {
+  test('should show pricing tiers', async ({ page }) => {
+    await page.goto('/pricing');
+
+    // Check pricing page loads
+    await expect(page.getByRole('heading', { name: 'pricing' })).toBeVisible();
+
+    // Check tier cards are visible (use heading role to avoid matching price text)
+    await expect(page.getByRole('heading', { name: 'Free' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Basic' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Pro' })).toBeVisible();
+  });
+
+  test('should toggle between monthly and yearly billing', async ({ page }) => {
+    await page.goto('/pricing');
+
+    // Should have billing toggle
+    await expect(page.getByRole('button', { name: 'monthly' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'yearly' })).toBeVisible();
+
+    // Click yearly
+    await page.getByRole('button', { name: 'yearly' }).click();
+
+    // Should show yearly prices (check for savings badge - use first() as multiple tiers show savings)
+    await expect(page.getByText(/save \d+%/i).first()).toBeVisible();
+  });
+});
+
+test.describe('404 Page', () => {
+  test('should show 404 for unknown routes', async ({ page }) => {
+    await page.goto('/unknown-route-12345');
+
+    // Check 404 content
+    await expect(page.getByText('404')).toBeVisible();
+    await expect(page.getByText('page not found')).toBeVisible();
+    await expect(page.getByRole('link', { name: 'go home' })).toBeVisible();
   });
 });

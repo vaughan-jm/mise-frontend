@@ -1,0 +1,112 @@
+@import 'tailwindcss';
+
+/*
+ * Pare Global Styles
+ * "Cast Iron & Steam" palette
+ */
+
+/* CSS Variables for dynamic theming */
+:root {
+  --color-obsidian: #121212;
+  --color-gunmetal: #1E1E1E;
+  --color-bone: #E0E0E0;
+  --color-ash: #A0A0A0;
+  --color-sage: #7B927A;
+  --color-sage-hover: #6A8069;
+  --color-rust: #8B4A4A;
+}
+
+/* Base styles */
+html {
+  font-family: 'Inter', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--color-obsidian);
+  color: var(--color-bone);
+  min-height: 100vh;
+  line-height: 1.6;
+}
+
+/* Selection color */
+::selection {
+  background-color: var(--color-sage);
+  color: var(--color-obsidian);
+}
+
+/* Focus styles for accessibility */
+:focus-visible {
+  outline: 2px solid var(--color-sage);
+  outline-offset: 2px;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-obsidian);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-ash);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-bone);
+}
+
+/* Prevent overscroll bounce on mobile */
+html, body {
+  overscroll-behavior: none;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Typography utilities */
+.lowercase-heading {
+  text-transform: lowercase;
+  font-weight: 700;
+}
+
+/* Tap highlight removal for mobile */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Loading animation keyframes */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
