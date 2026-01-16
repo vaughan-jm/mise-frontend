@@ -39,7 +39,7 @@ body {
 }
 
 /* Focus styles for accessibility */
-:focus-visible {
+:focus-visible:not(input):not(textarea) {
   outline: 2px solid var(--color-sage);
   outline-offset: 2px;
 }
