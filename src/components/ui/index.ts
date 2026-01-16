@@ -23,3 +23,6 @@ export type { Tab } from './TabSwitcher'
 
 export { ToastProvider, useToast } from './Toast'
 export type { ToastType } from './Toast'
+
+export { default as SmartInput } from './SmartInput'
+export type { InputType } from './SmartInput'

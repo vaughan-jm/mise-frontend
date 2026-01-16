@@ -13,7 +13,6 @@ interface PageLayoutProps {
   children: ReactNode
   showHeader?: boolean
   showFooter?: boolean
-  showNav?: boolean
   centered?: boolean
   maxWidth?: 'sm' | 'md' | 'lg' | 'xl' | '2xl' | 'full'
   className?: string
@@ -32,7 +31,6 @@ export default function PageLayout({
   children,
   showHeader = true,
   showFooter = true,
-  showNav = true,
   centered = false,
   maxWidth = '2xl',
   className = '',
@@ -42,7 +40,6 @@ export default function PageLayout({
       {/* Header */}
       {showHeader && (
         <Header
-          showNav={showNav}
           className={`mx-auto w-full ${maxWidthStyles[maxWidth]}`}
         />
       )}
