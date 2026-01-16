@@ -83,7 +83,7 @@ export default function HomePage() {
             onSubmit={handleSubmit}
             isLoading={isLoading}
             disabled={!canExtract}
-            placeholder="paste any recipe url"
+            placeholder="recipe or YouTube URL"
           />
 
           {/* Loading message */}

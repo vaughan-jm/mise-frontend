@@ -205,7 +205,6 @@ export default function SmartInput({
           type="file"
           accept="image/*"
           multiple
-          capture="environment"
           onChange={(e) => handleFileSelect(e.target.files)}
           className="hidden"
         />
@@ -226,7 +225,7 @@ export default function SmartInput({
             flex-1 h-full
             bg-transparent
             text-lg text-bone placeholder:text-ash
-            outline-none
+            outline-none focus:outline-none focus-visible:outline-none
             ${photos.length > 0 ? 'cursor-default' : ''}
           `}
         />

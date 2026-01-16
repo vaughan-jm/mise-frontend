@@ -7,54 +7,33 @@ test.describe('App Loading', () => {
   test('should load the homepage with Pare branding', async ({ page }) => {
     await page.goto('/');
 
-    // Check the Pare branding is visible in header (logo link area)
-    await expect(page.getByRole('link', { name: /pare.*just the recipe/i })).toBeVisible();
+    // Check the Pare branding is visible - h1 "pare" heading
+    await expect(page.getByRole('heading', { name: 'pare', level: 1 })).toBeVisible();
+
+    // Check tagline is visible
+    await expect(page.getByText('just the recipe.')).toBeVisible();
   });
 
-  test('should show URL input mode by default', async ({ page }) => {
+  test('should show smart input field', async ({ page }) => {
     await page.goto('/');
 
-    // Check URL input is visible
-    await expect(page.getByPlaceholder(/paste any recipe url/i)).toBeVisible();
+    // Check input is visible with new placeholder
+    await expect(page.getByPlaceholder(/recipe or youtube url/i)).toBeVisible();
 
-    // Check the extract button is visible
-    await expect(page.getByRole('button', { name: 'extract' })).toBeVisible();
+    // Check the extract button (arrow) is visible
+    await expect(page.getByRole('button', { name: /extract recipe/i })).toBeVisible();
   });
 
-  test('should show input mode tabs', async ({ page }) => {
+  test('should have camera button for photo upload', async ({ page }) => {
     await page.goto('/');
 
-    // Check all input mode tabs are visible
-    await expect(page.getByRole('button', { name: 'url' })).toBeVisible();
-    await expect(page.getByRole('button', { name: 'photo' })).toBeVisible();
-    await expect(page.getByRole('button', { name: 'video' })).toBeVisible();
-  });
+    // Check camera button for photo upload is visible
+    await expect(page.getByRole('button', { name: /upload photos/i })).toBeVisible();
 
-  test('should switch to photo mode', async ({ page }) => {
-    await page.goto('/');
-
-    // Click on Photo mode
-    await page.getByRole('button', { name: 'photo' }).click();
-
-    // Check photo upload area appears
-    await expect(page.getByText(/drag & drop photos/i)).toBeVisible();
-  });
-
-  test('should switch to video mode', async ({ page }) => {
-    await page.goto('/');
-
-    // Click on Video mode
-    await page.getByRole('button', { name: 'video' }).click();
-
-    // Check YouTube input appears
-    await expect(page.getByPlaceholder(/paste youtube url/i)).toBeVisible();
-  });
-
-  test('should show recipes remaining counter', async ({ page }) => {
-    await page.goto('/');
-
-    // Should show remaining text
-    await expect(page.getByText(/\d+\s*recipes?\s*remaining/i)).toBeVisible();
+    // Check file input exists (hidden but present)
+    const fileInput = page.locator('input[type="file"]');
+    await expect(fileInput).toBeAttached();
+    await expect(fileInput).toHaveAttribute('accept', 'image/*');
   });
 });
 
