@@ -1,29 +1,55 @@
-# Mise Frontend - Claude Instructions
+# Pare Frontend - Claude Instructions
 
 ## Project Overview
-React frontend for Mise recipe extraction app. Single-page app that extracts recipes from URLs, photos, and YouTube videos.
+React frontend for Pare recipe extraction app. Single-page app that extracts recipes from URLs, photos, and YouTube videos.
 
 ## Tech Stack
-- **Framework**: React 18
+- **Framework**: React 18 with TypeScript
 - **Build**: Vite 5
-- **Styling**: Inline CSS-in-JS
-- **API**: Fetch to backend REST API
+- **Styling**: Tailwind CSS with custom design tokens
+- **Routing**: React Router v7
 - **Auth**: Clerk (@clerk/clerk-react)
-- **Testing**: Playwright
 - **Error Tracking**: Sentry (@sentry/react)
 - **Analytics**: PostHog (posthog-js)
+- **Testing**: Playwright
 
 ## Structure
 ```
 src/
-  Mise.jsx           # Main app component (~1500 lines)
-  main.jsx           # React entry point with ClerkProvider
-  lib/
-    api.js           # API client, utilities, constants
-    translations.js  # UI translations (7 languages)
-tests/
-  app.spec.js        # UI and navigation tests (13 tests)
-  recipe.spec.js     # Input mode tests (8 tests)
+├── main.tsx              # Entry point (Clerk, Sentry, PostHog init)
+├── App.tsx               # Main routing
+├── index.css             # Global styles + Tailwind
+├── config/
+│   ├── theme.ts          # Design tokens
+│   ├── pricing.ts        # Pricing tiers and Stripe IDs
+│   └── content.ts        # Content strings
+├── lib/
+│   ├── api.ts            # API client with Clerk auth
+│   ├── types.ts          # TypeScript types
+│   └── translations.ts   # i18n (7 languages)
+├── context/
+│   └── AppContext.tsx    # Global state (language, auth, quota)
+├── hooks/
+│   ├── useRecipe.ts      # Recipe extraction logic
+│   ├── useQuota.ts       # Quota helpers
+│   ├── useSavedRecipes.ts
+│   ├── useCookingMode.ts
+│   ├── useHaptics.ts
+│   └── useWakeLock.ts
+├── pages/
+│   ├── HomePage.tsx      # Main input
+│   ├── RecipePage.tsx    # Recipe display + cooking mode
+│   ├── PricingPage.tsx   # Subscription plans
+│   ├── AccountPage.tsx   # User account
+│   ├── CookbookPage.tsx  # Saved recipes
+│   ├── AdminPage.tsx     # Admin dashboard
+│   ├── ContactPage.tsx   # Contact form
+│   ├── PrivacyPage.tsx   # Privacy policy
+│   ├── TermsPage.tsx     # Terms of service
+│   └── RefundPage.tsx    # Refund policy
+└── components/
+    ├── layout/           # Header, Footer, PageLayout
+    └── ui/               # Button, Card, Input, Modal, etc.
 ```
 
 ## Common Commands
@@ -32,69 +58,56 @@ npm run dev      # Start dev server (localhost:5173)
 npm run build    # Build for production
 npm test         # Run Playwright tests
 npm run test:ui  # Run tests with Playwright UI
+npm run typecheck # Type check
 ```
 
 ## Environment Variables
-Set in Vercel dashboard:
+Set in Vercel dashboard or `.env`:
 - `VITE_API_URL` - Backend API URL
 - `VITE_CLERK_PUBLISHABLE_KEY` - Clerk publishable key
 - `VITE_SENTRY_DSN` - Sentry error tracking DSN
 - `VITE_PUBLIC_POSTHOG_KEY` - PostHog analytics API key
-- `VITE_PUBLIC_POSTHOG_HOST` - PostHog host URL (https://us.i.posthog.com)
+- `VITE_PUBLIC_POSTHOG_HOST` - PostHog host URL
+- `VITE_STRIPE_*_PRICE_ID` - Stripe price IDs
 
-## Observability
-- **Sentry**: Error tracking and performance monitoring
-  - Dashboard: https://john-vaughan.sentry.io
-  - Initialized in `main.jsx` with `@sentry/react`
-  - Captures unhandled errors and performance data
-- **PostHog**: Product analytics
-  - Dashboard: https://us.posthog.com
-  - Initialized in `main.jsx` with `posthog-js`
-  - Tracks pageviews, clicks (autocapture), and custom events
+## Architecture Pattern
+```
+Pages → Hooks → API Client → Context
+```
+- **Pages**: Full page components with routing
+- **Hooks**: Reusable logic (useRecipe, useQuota, etc.)
+- **API Client**: Typed fetch wrapper with Clerk auth
+- **Context**: Global state for language, auth, quota
+
+## Code Conventions
+- All environment variables should be imported from `src/config.ts`
+- Error classes in `src/lib/errors.ts`
+- TypeScript strict mode enabled
+- Use existing components from `src/components/ui/`
+
+## Authentication (Clerk)
+- `ClerkProvider` wraps the app in `main.tsx`
+- `useUser()` and `useAuth()` hooks for auth state
+- Tokens automatically included in API calls via `getToken()`
 
 ## Deployment
 - **Hosting**: Vercel (auto-deploys from GitHub)
 - **Production URL**: https://mise-frontend-alpha.vercel.app
 - **Backend**: https://mise-backend-v2-production.up.railway.app
 
-## Authentication (Clerk)
-Auth is handled by Clerk. Key components:
-- `ClerkProvider` wraps the app in `main.jsx`
-- `useUser()` and `useAuth()` hooks for auth state
-- `SignIn`, `SignUp` components for auth modals
-- `UserButton` for logged-in user menu
-- Tokens are automatically included in API calls via `getToken()`
-
 ## Key Features
-- **Recipe extraction**: URL, photo, YouTube video inputs
-- **Multi-language**: EN, ES, FR, PT, ZH, HI, AR
-- **Cooking mode**: Prep/Cook phases with ingredient/step tracking
-- **Saved recipes**: Requires login
-- **Pricing/subscriptions**: Free (3/month), Basic (20/month), Pro (unlimited)
-- **Legal pages**: Privacy, Terms, Refund policies
-- **Contact form**: Sends to backend which emails via Resend
-
-## API Integration (v2 Backend)
-- Error format: `{ error: { code, message } }` - normalized via `normalizeError()` in api.js
-- User object: calculates `recipesRemaining` from `recipesUsedThisMonth`
-- Checkout: uses `checkoutUrl` from response
+- Recipe extraction: URL, photo, YouTube video inputs
+- Multi-language: EN, ES, FR, PT, ZH, HI, AR
+- Cooking mode: Prep/Cook phases with ingredient/step tracking
+- Saved recipes: Requires login
+- Pricing/subscriptions: Free (3/month), Basic (20/month), Pro (unlimited)
 
 ## Testing
-21 Playwright E2E tests covering:
+Playwright E2E tests in `tests/`:
 - App loading and UI elements
 - Language switching
-- Input mode switching (URL/Photo/Video)
+- Input mode switching
 - Footer links and legal pages
 - Contact form
 
-Run tests: `npm test`
-
-## Deployment Notes
-- Vercel auto-deploys from GitHub
-- Environment variables set in Vercel dashboard: `VITE_CLERK_PUBLISHABLE_KEY`, `VITE_API_URL`
-- Using Clerk **test keys** (production keys require custom domain)
-
-### To go live with Clerk production keys:
-1. Connect a custom domain to Vercel
-2. Create Clerk production instance
-3. Update Vercel env vars with `pk_live_` key
+Run: `npm test`

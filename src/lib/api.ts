@@ -10,45 +10,14 @@ import type {
   ApiError,
   LanguageCode,
 } from './types'
+import { env } from '../config'
+import { ApiRequestError, normalizeError } from './errors'
 
-// API base URL
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001'
+// Re-export for backwards compatibility
+export { ApiRequestError } from './errors'
 
 // Request timeout (ms)
 const REQUEST_TIMEOUT = 60000
-
-/**
- * Custom error class for API errors
- */
-export class ApiRequestError extends Error {
-  code: string
-  status?: number
-
-  constructor(message: string, code: string, status?: number) {
-    super(message)
-    this.name = 'ApiRequestError'
-    this.code = code
-    this.status = status
-  }
-}
-
-/**
- * Normalize error response from API
- */
-function normalizeError(error: unknown): ApiRequestError {
-  if (error instanceof ApiRequestError) {
-    return error
-  }
-
-  if (error instanceof Error) {
-    if (error.name === 'AbortError') {
-      return new ApiRequestError('Request timed out', 'TIMEOUT')
-    }
-    return new ApiRequestError(error.message, 'UNKNOWN')
-  }
-
-  return new ApiRequestError('An unexpected error occurred', 'UNKNOWN')
-}
 
 /**
  * Get auth token from Clerk
@@ -86,7 +55,7 @@ async function request<T>(
       }
     }
 
-    const response = await fetch(`${API_URL}${endpoint}`, {
+    const response = await fetch(`${env.API_URL}${endpoint}`, {
       ...options,
       headers,
       signal: controller.signal,

@@ -6,14 +6,14 @@
  */
 
 import type { PricingTier, SubscriptionTier } from '../lib/types'
+import { env } from '../config'
 
-// Stripe Price IDs - set these in environment or hardcode for now
-// These come from your Stripe dashboard
+// Stripe Price IDs from centralized config
 const STRIPE_PRICE_IDS = {
-  basicMonthly: import.meta.env.VITE_STRIPE_BASIC_MONTHLY_PRICE_ID || 'price_basic_monthly',
-  basicYearly: import.meta.env.VITE_STRIPE_BASIC_YEARLY_PRICE_ID || 'price_basic_yearly',
-  proMonthly: import.meta.env.VITE_STRIPE_PRO_MONTHLY_PRICE_ID || 'price_pro_monthly',
-  proYearly: import.meta.env.VITE_STRIPE_PRO_YEARLY_PRICE_ID || 'price_pro_yearly',
+  basicMonthly: env.STRIPE_BASIC_MONTHLY_PRICE_ID,
+  basicYearly: env.STRIPE_BASIC_YEARLY_PRICE_ID,
+  proMonthly: env.STRIPE_PRO_MONTHLY_PRICE_ID,
+  proYearly: env.STRIPE_PRO_YEARLY_PRICE_ID,
 }
 
 /**

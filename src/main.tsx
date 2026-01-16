@@ -6,19 +6,14 @@ import posthog from 'posthog-js'
 import { BrowserRouter } from 'react-router-dom'
 import { AppProvider } from './context/AppContext'
 import { ToastProvider } from './components/ui/Toast'
+import { env } from './config'
 import App from './App'
 import './index.css'
 
-// Environment variables
-const CLERK_PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY as string | undefined
-const SENTRY_DSN = import.meta.env.VITE_SENTRY_DSN as string | undefined
-const POSTHOG_KEY = import.meta.env.VITE_PUBLIC_POSTHOG_KEY as string | undefined
-const POSTHOG_HOST = import.meta.env.VITE_PUBLIC_POSTHOG_HOST as string | undefined
-
 // Initialize Sentry (error tracking)
-if (SENTRY_DSN) {
+if (env.SENTRY_DSN) {
   Sentry.init({
-    dsn: SENTRY_DSN,
+    dsn: env.SENTRY_DSN,
     integrations: [
       Sentry.browserTracingIntegration(),
       Sentry.replayIntegration(),
@@ -30,16 +25,16 @@ if (SENTRY_DSN) {
 }
 
 // Initialize PostHog (analytics)
-if (POSTHOG_KEY && POSTHOG_HOST) {
-  posthog.init(POSTHOG_KEY, {
-    api_host: POSTHOG_HOST,
+if (env.POSTHOG_KEY && env.POSTHOG_HOST) {
+  posthog.init(env.POSTHOG_KEY, {
+    api_host: env.POSTHOG_HOST,
     capture_pageview: true,
     autocapture: true,
   })
 }
 
 // Warn in development if Clerk key is missing
-if (!CLERK_PUBLISHABLE_KEY) {
+if (!env.CLERK_PUBLISHABLE_KEY) {
   console.warn(
     '[Pare] Missing VITE_CLERK_PUBLISHABLE_KEY. Auth will not work. ' +
     'Set this in your .env file or Vercel environment variables.'
@@ -53,8 +48,8 @@ if (!rootElement) {
 
 createRoot(rootElement).render(
   <StrictMode>
-    {CLERK_PUBLISHABLE_KEY ? (
-      <ClerkProvider publishableKey={CLERK_PUBLISHABLE_KEY}>
+    {env.CLERK_PUBLISHABLE_KEY ? (
+      <ClerkProvider publishableKey={env.CLERK_PUBLISHABLE_KEY}>
         <BrowserRouter>
           <AppProvider>
             <ToastProvider>
