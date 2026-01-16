@@ -10,7 +10,7 @@
  */
 
 import { useState, useCallback } from 'react'
-import type { Recipe, LanguageCode } from '../lib/types'
+import type { Recipe, LanguageCode, Ingredient, Step, Difficulty, MealType } from '../lib/types'
 import {
   extractFromUrl,
   extractFromPhoto,
@@ -19,6 +19,81 @@ import {
   ApiRequestError,
 } from '../lib/api'
 import { useApp } from '../context/AppContext'
+
+/**
+ * Transform backend recipe data to frontend format.
+ * Backend returns:
+ *   - ingredients: string[] (e.g., ["500g chicken", "2 tbsp oil"])
+ *   - steps: {instruction: string, ingredients: string[]}[]
+ * Frontend expects:
+ *   - ingredients: {text: string, amount?: string, unit?: string}[]
+ *   - steps: {text: string, ingredients?: string[]}[]
+ */
+function transformRecipe(backendRecipe: unknown): Recipe {
+  const recipe = backendRecipe as Record<string, unknown>
+
+  // Transform ingredients - handle both string[] and {text: string}[] formats
+  const ingredients: Ingredient[] = Array.isArray(recipe.ingredients)
+    ? recipe.ingredients.map((ing: unknown) => {
+        if (typeof ing === 'string') {
+          return { text: ing }
+        }
+        // Already in correct format or has instruction field
+        const ingObj = ing as Record<string, unknown>
+        return {
+          text: (ingObj.text as string) || (ingObj.instruction as string) || String(ing),
+          amount: ingObj.amount as string | undefined,
+          unit: ingObj.unit as string | undefined,
+        }
+      })
+    : []
+
+  // Transform steps - handle {instruction, ingredients} and {text, ingredients} formats
+  const steps: Step[] = Array.isArray(recipe.steps)
+    ? recipe.steps.map((step: unknown) => {
+        if (typeof step === 'string') {
+          return { text: step }
+        }
+        const stepObj = step as Record<string, unknown>
+        return {
+          // Backend uses 'instruction', frontend uses 'text'
+          text: (stepObj.text as string) || (stepObj.instruction as string) || String(step),
+          ingredients: Array.isArray(stepObj.ingredients) ? stepObj.ingredients as string[] : undefined,
+        }
+      })
+    : []
+
+  // Validate difficulty
+  const validDifficulties: Difficulty[] = ['easy', 'medium', 'hard']
+  const difficulty = validDifficulties.includes(recipe.difficulty as Difficulty)
+    ? (recipe.difficulty as Difficulty)
+    : undefined
+
+  // Validate mealType
+  const validMealTypes: MealType[] = ['breakfast', 'lunch', 'dinner', 'snack', 'dessert', 'appetizer', 'side', 'drink']
+  const mealType = validMealTypes.includes(recipe.mealType as MealType)
+    ? (recipe.mealType as MealType)
+    : undefined
+
+  return {
+    title: (recipe.title as string) || 'Untitled Recipe',
+    servings: typeof recipe.servings === 'number' ? recipe.servings : parseInt(String(recipe.servings)) || 4,
+    prepTime: recipe.prepTime as string | undefined,
+    cookTime: recipe.cookTime as string | undefined,
+    totalTime: recipe.totalTime as string | undefined,
+    difficulty,
+    cuisine: recipe.cuisine as string | undefined,
+    cuisineTags: Array.isArray(recipe.cuisineTags) ? recipe.cuisineTags as string[] : undefined,
+    dietaryTags: Array.isArray(recipe.dietaryTags) ? recipe.dietaryTags as string[] : undefined,
+    mealType,
+    ingredients,
+    steps,
+    tips: Array.isArray(recipe.tips) ? recipe.tips as string[] : undefined,
+    source: recipe.source as string | undefined,
+    sourceUrl: recipe.sourceUrl as string | undefined,
+    imageUrl: recipe.imageUrl as string | undefined,
+  }
+}
 
 export type ExtractionMode = 'url' | 'photo' | 'youtube'
 
@@ -129,7 +204,7 @@ export function useRecipe(): UseRecipeReturn {
           }
         }
 
-        const extractedRecipe = response.recipe
+        const extractedRecipe = transformRecipe(response.recipe)
         setRecipe(extractedRecipe)
 
         // Update quota after successful extraction
@@ -175,7 +250,7 @@ export function useRecipe(): UseRecipeReturn {
 
       try {
         const response = await translateRecipeApi(recipe, targetLanguage)
-        const translatedRecipe = response.recipe
+        const translatedRecipe = transformRecipe(response.recipe)
         setRecipe(translatedRecipe)
         return translatedRecipe
       } catch (err) {

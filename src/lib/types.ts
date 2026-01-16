@@ -3,11 +3,20 @@
  */
 
 // Recipe types
+export type Difficulty = 'easy' | 'medium' | 'hard'
+export type MealType = 'breakfast' | 'lunch' | 'dinner' | 'snack' | 'dessert' | 'appetizer' | 'side' | 'drink'
+
 export interface Recipe {
   title: string
   servings: number
   prepTime?: string
   cookTime?: string
+  totalTime?: string
+  difficulty?: Difficulty
+  cuisine?: string
+  cuisineTags?: string[]
+  dietaryTags?: string[]
+  mealType?: MealType
   ingredients: Ingredient[]
   steps: Step[]
   tips?: string[]
@@ -46,6 +55,12 @@ export interface SavedRecipe {
   servings: number
   prepTime?: string
   cookTime?: string
+  totalTime?: string
+  difficulty?: Difficulty
+  cuisine?: string
+  cuisineTags?: string[]
+  dietaryTags?: string[]
+  mealType?: MealType
   ingredients: Ingredient[]
   steps: Step[]
   tips?: string[]

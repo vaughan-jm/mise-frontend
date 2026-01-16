@@ -65,24 +65,35 @@ export default function SmartInput({
   const textInputRef = useRef<HTMLInputElement>(null)
 
   // Handle photo upload from file input
+  // Fixed: Prevents iPhone duplication by deduping via base64 content
   const handleFileSelect = useCallback((files: FileList | null) => {
     if (!files || files.length === 0) return
 
+    const imageFiles = Array.from(files).filter((file) => file.type.startsWith('image/'))
+    if (imageFiles.length === 0) return
+
+    // Track how many files we need to process
+    let remaining = imageFiles.length
     const newPhotos: string[] = []
-    let processed = 0
 
-    Array.from(files).forEach((file) => {
-      if (!file.type.startsWith('image/')) return
-
+    imageFiles.forEach((file) => {
       const reader = new FileReader()
       reader.onload = () => {
+        remaining--
         if (typeof reader.result === 'string') {
           newPhotos.push(reader.result)
-          processed++
-          if (processed === files.length || newPhotos.length === processed) {
-            setPhotos((prev) => [...prev, ...newPhotos])
-            setTextInput('') // Clear text when photos are added
-          }
+        }
+        // Only update state once all files are processed
+        if (remaining === 0) {
+          setPhotos((prev) => {
+            // Dedupe by base64 content - prevents iOS duplicate events
+            const existingSet = new Set(prev)
+            const uniqueNew = newPhotos.filter((photo) => !existingSet.has(photo))
+            // Also dedupe within the new batch
+            const deduped = [...new Set(uniqueNew)]
+            return [...prev, ...deduped]
+          })
+          setTextInput('') // Clear text when photos are added
         }
       }
       reader.readAsDataURL(file)
@@ -205,7 +216,11 @@ export default function SmartInput({
           type="file"
           accept="image/*"
           multiple
-          onChange={(e) => handleFileSelect(e.target.files)}
+          onChange={(e) => {
+            handleFileSelect(e.target.files)
+            // Reset value to allow re-selecting same files and prevent iOS caching
+            e.target.value = ''
+          }}
           className="hidden"
         />
 
@@ -276,7 +291,7 @@ export default function SmartInput({
                 />
                 <button
                   onClick={() => removePhoto(index)}
-                  className="absolute -top-1 -right-1 w-5 h-5 bg-rust text-bone rounded-full text-xs opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
+                  className="absolute -top-1 -right-1 w-6 h-6 bg-rust text-bone rounded-full text-sm font-medium opacity-80 hover:opacity-100 transition-opacity flex items-center justify-center shadow-sm"
                   aria-label={`Remove photo ${index + 1}`}
                 >
                   ×

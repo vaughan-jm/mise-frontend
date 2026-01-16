@@ -164,8 +164,28 @@ export default function RecipePage() {
   // Scale ingredient amounts based on servings
   const servingMultiplier = servings / (recipe.servings || 4)
 
+  // Determine if we should show hero image (not for photo sources)
+  const showHeroImage = recipe.imageUrl && recipe.source !== 'photo'
+
   return (
     <PageLayout showFooter={false} maxWidth="lg" className="px-4 pb-8">
+      {/* Hero Image - only for URL/YouTube sources */}
+      {showHeroImage && (
+        <div className="relative w-full h-48 sm:h-64 -mx-4 mb-4 overflow-hidden">
+          <img
+            src={recipe.imageUrl}
+            alt={recipe.title}
+            className="w-full h-full object-cover"
+            onError={(e) => {
+              // Hide image container if image fails to load
+              (e.target as HTMLElement).parentElement!.style.display = 'none'
+            }}
+          />
+          {/* Gradient overlay for text readability */}
+          <div className="absolute inset-0 bg-gradient-to-t from-obsidian/80 to-transparent" />
+        </div>
+      )}
+
       {/* Recipe Header */}
       <div className="py-4 space-y-4">
         {/* Title row */}
@@ -217,7 +237,47 @@ export default function RecipePage() {
           {recipe.cookTime && (
             <span>{t.cookTime}: {recipe.cookTime}</span>
           )}
+          {recipe.totalTime && !recipe.prepTime && !recipe.cookTime && (
+            <span>total: {recipe.totalTime}</span>
+          )}
         </div>
+
+        {/* Metadata badges */}
+        {(recipe.difficulty || recipe.cuisine || recipe.dietaryTags?.length || recipe.mealType) && (
+          <div className="flex flex-wrap gap-2">
+            {/* Difficulty badge with color coding */}
+            {recipe.difficulty && (
+              <span className={`px-2 py-0.5 text-xs rounded-full ${
+                recipe.difficulty === 'easy' ? 'bg-sage/20 text-sage' :
+                recipe.difficulty === 'medium' ? 'bg-amber-500/20 text-amber-400' :
+                'bg-rust/20 text-rust'
+              }`}>
+                {recipe.difficulty}
+              </span>
+            )}
+            {/* Cuisine badge */}
+            {recipe.cuisine && (
+              <span className="px-2 py-0.5 text-xs rounded-full bg-bone/10 text-bone/80">
+                {recipe.cuisine}
+              </span>
+            )}
+            {/* Meal type badge */}
+            {recipe.mealType && (
+              <span className="px-2 py-0.5 text-xs rounded-full bg-ash/20 text-ash">
+                {recipe.mealType}
+              </span>
+            )}
+            {/* Dietary tags */}
+            {recipe.dietaryTags?.map((tag) => (
+              <span
+                key={tag}
+                className="px-2 py-0.5 text-xs rounded-full bg-sage/10 text-sage"
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
+        )}
 
         {/* Source */}
         {(recipe.source || sourceUrl) && (
