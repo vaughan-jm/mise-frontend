@@ -6,7 +6,7 @@
  */
 
 import { useCallback, useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { useApp } from '../context/AppContext'
 import { useRecipe, useQuota } from '../hooks'
@@ -16,9 +16,12 @@ import { loadingMessages } from '../config/content'
 
 export default function HomePage() {
   const navigate = useNavigate()
-  const { language } = useApp()
+  const { language, quota, isSignedIn } = useApp()
   const { extract, isLoading, error, clearError } = useRecipe()
   const { canExtract } = useQuota()
+
+  // Show upgrade nudge when quota exhausted
+  const showUpgradeNudge = !canExtract && quota.remaining === 0
 
   // Loading message rotation
   const [loadingMessageIndex, setLoadingMessageIndex] = useState(0)
@@ -107,6 +110,27 @@ export default function HomePage() {
             >
               {error}
             </motion.p>
+          )}
+
+          {/* Upgrade nudge when quota exhausted */}
+          {showUpgradeNudge && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="text-center mt-6 p-4 rounded-lg bg-sage/10 border border-sage/20"
+            >
+              <p className="text-sm text-bone mb-2">
+                {isSignedIn
+                  ? `You've used all ${quota.limit} recipes this month`
+                  : `You've used all ${quota.limit} free recipes`}
+              </p>
+              <Link
+                to={isSignedIn ? '/pricing' : '/pricing'}
+                className="inline-block px-4 py-2 text-sm font-medium text-obsidian bg-sage rounded-full hover:bg-sage/90 transition-colors"
+              >
+                {isSignedIn ? 'upgrade for more' : 'sign up for $4.99/mo'}
+              </Link>
+            </motion.div>
           )}
         </div>
       </div>

@@ -37,15 +37,15 @@ export const pricingTiers: PricingTier[] = [
   {
     id: 'basic',
     name: 'Basic',
-    monthlyPrice: 1.99,
-    yearlyPrice: 14.99, // 37% savings
-    recipesPerMonth: 20,
+    monthlyPrice: 4.99,
+    yearlyPrice: 49.99, // 2 months free
+    recipesPerMonth: 30,
     features: [
-      '20 recipes per month',
+      '30 recipes per month',
+      'Save up to 50 recipes',
       'URL extraction',
       'Photo extraction',
       'YouTube extraction',
-      'Recipe translation',
     ],
     stripePriceIdMonthly: STRIPE_PRICE_IDS.basicMonthly,
     stripePriceIdYearly: STRIPE_PRICE_IDS.basicYearly,
@@ -53,16 +53,17 @@ export const pricingTiers: PricingTier[] = [
   {
     id: 'pro',
     name: 'Pro',
-    monthlyPrice: 4.99,
-    yearlyPrice: 39.99, // 33% savings
+    monthlyPrice: 9.99,
+    yearlyPrice: 99.99, // 2 months free
     recipesPerMonth: 'unlimited',
     features: [
       'Unlimited recipes',
+      'Unlimited saved recipes',
       'URL extraction',
       'Photo extraction',
       'YouTube extraction',
       'Recipe translation',
-      'Priority support',
+      'Priority processing',
     ],
     stripePriceIdMonthly: STRIPE_PRICE_IDS.proMonthly,
     stripePriceIdYearly: STRIPE_PRICE_IDS.proYearly,
@@ -125,4 +126,21 @@ export function hasTranslation(tierId: SubscriptionTier): boolean {
  */
 export function isPaidTier(tierId: SubscriptionTier): boolean {
   return tierId === 'basic' || tierId === 'pro'
+}
+
+/**
+ * Check if tier can save recipes
+ * Free users cannot save - this is a conversion lever
+ */
+export function canSaveRecipes(tierId: SubscriptionTier): boolean {
+  return tierId === 'basic' || tierId === 'pro'
+}
+
+/**
+ * Get save limit for a tier
+ */
+export function getSaveLimit(tierId: SubscriptionTier): number | 'unlimited' {
+  if (tierId === 'pro') return 'unlimited'
+  if (tierId === 'basic') return 50
+  return 0 // Free users can't save
 }
