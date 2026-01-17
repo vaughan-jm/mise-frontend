@@ -19,3 +19,11 @@ export { useWakeLock } from './useWakeLock'
 
 export { useHaptics } from './useHaptics'
 export type { HapticPattern } from './useHaptics'
+
+export { useFontSize } from './useFontSize'
+export type { FontSize } from './useFontSize'
+
+export { useOnboarding } from './useOnboarding'
+
+export { useIngredientCategories } from './useIngredientCategories'
+export type { IngredientCategory, IngredientGroup, GroupedIngredient } from './useIngredientCategories'

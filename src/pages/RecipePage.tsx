@@ -2,27 +2,34 @@
  * RecipePage
  *
  * Cooking mode with prep/cook phases.
- * Tap to complete ingredients and steps.
+ * Redesigned with pill-shaped swipeable cards,
+ * category grouping, and smooth animations.
  */
 
 import { useEffect, useState, useCallback } from 'react'
 import { useLocation, useNavigate, Link } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useApp } from '../context/AppContext'
-import { useCookingMode, useSavedRecipes, useWakeLock, useHaptics } from '../hooks'
-import { PageLayout, Button, Card, TabSwitcher } from '../components'
+import {
+  useCookingMode,
+  useSavedRecipes,
+  useWakeLock,
+  useHaptics,
+  useFontSize,
+  useOnboarding,
+} from '../hooks'
+import { PageLayout } from '../components'
 import { useToast } from '../components/ui/Toast'
+import PillToggle from '../components/ui/PillToggle'
+import {
+  IngredientList,
+  StepCard,
+  RecipeHeader,
+  UndoButton,
+} from '../components/recipe'
 import type { Recipe } from '../lib/types'
-import type { Tab } from '../components/ui/TabSwitcher'
-import type { CookingPhase } from '../hooks/useCookingMode'
 import { completionMessages } from '../config/content'
 import { canSaveRecipes } from '../config/pricing'
-
-// Phase tabs
-const phaseTabs: Tab<CookingPhase>[] = [
-  { id: 'prep', label: '1. prep' },
-  { id: 'cook', label: '2. cook' },
-]
 
 // Star rating component
 function StarRating({ rating, onRate }: { rating: number; onRate: (n: number) => void }) {
@@ -53,6 +60,10 @@ export default function RecipePage() {
   const { request: requestWakeLock, release: releaseWakeLock } = useWakeLock()
   const { save, isSaving } = useSavedRecipes()
 
+  // New hooks for redesign
+  const { fontSizeClass, fontSizeLabel, cycle: cycleFontSize } = useFontSize()
+  const { hasSeenPeek, markPeekSeen } = useOnboarding()
+
   // Get recipe from navigation state
   const recipe = location.state?.recipe as Recipe | undefined
   const sourceUrl = location.state?.sourceUrl as string | undefined
@@ -61,8 +72,8 @@ export default function RecipePage() {
   const {
     phase,
     setPhase,
+    completedIngredients,
     completeIngredient,
-    isIngredientComplete,
     ingredientProgress,
     allIngredientsComplete,
     completeStep,
@@ -70,7 +81,6 @@ export default function RecipePage() {
     stepProgress,
     canUndo,
     undo,
-    reset,
     isComplete,
   } = useCookingMode(recipe ?? null)
 
@@ -111,20 +121,6 @@ export default function RecipePage() {
     }
   }, [isComplete, showRating])
 
-  // Handle ingredient tap
-  const handleIngredientTap = useCallback((index: number) => {
-    if (isIngredientComplete(index)) return
-    vibrate('light')
-    completeIngredient(index)
-  }, [isIngredientComplete, vibrate, completeIngredient])
-
-  // Handle step tap
-  const handleStepTap = useCallback((index: number) => {
-    if (isStepComplete(index)) return
-    vibrate('light')
-    completeStep(index)
-  }, [isStepComplete, vibrate, completeStep])
-
   // Handle save - only for paid users
   const handleSave = useCallback(async () => {
     if (!recipe || !userCanSave) return
@@ -142,13 +138,6 @@ export default function RecipePage() {
     showToast(t.undo, 'info')
   }, [vibrate, undo, showToast, t])
 
-  // Handle reset
-  const handleReset = useCallback(() => {
-    reset()
-    setShowRating(false)
-    setRating(0)
-  }, [reset])
-
   // Handle rating
   const handleRate = useCallback((n: number) => {
     setRating(n)
@@ -156,23 +145,21 @@ export default function RecipePage() {
     // TODO: Submit rating to API
   }, [vibrate])
 
-  // Handle back
-  const handleBack = useCallback(() => {
-    navigate('/')
-  }, [navigate])
-
   if (!recipe) {
     return null
   }
 
   // Scale ingredient amounts based on servings
-  const servingMultiplier = servings / (recipe.servings || 4)
+  const servingsMultiplier = servings / (recipe.servings || 4)
 
   // Determine if we should show hero image (not for photo sources)
   const showHeroImage = recipe.imageUrl && recipe.source !== 'photo'
 
+  // Should show peek animation (first time only, on prep phase)
+  const shouldShowPeek = !hasSeenPeek && phase === 'prep'
+
   return (
-    <PageLayout showFooter={false} maxWidth="lg" className="px-4 pb-8">
+    <PageLayout showFooter={false} maxWidth="lg" className="px-4 pb-24">
       {/* Hero Image - only for URL/YouTube sources */}
       {showHeroImage && (
         <div className="relative w-full h-48 sm:h-64 -mx-4 mb-4 overflow-hidden">
@@ -181,152 +168,53 @@ export default function RecipePage() {
             alt={recipe.title}
             className="w-full h-full object-cover"
             onError={(e) => {
-              // Hide image container if image fails to load
               (e.target as HTMLElement).parentElement!.style.display = 'none'
             }}
           />
-          {/* Gradient overlay for text readability */}
           <div className="absolute inset-0 bg-gradient-to-t from-obsidian/80 to-transparent" />
         </div>
       )}
 
       {/* Recipe Header */}
-      <div className="py-4 space-y-4">
-        {/* Title row */}
-        <div className="flex items-start justify-between gap-4">
-          <h1 className="text-2xl font-bold text-bone lowercase flex-1">
-            {recipe.title}
-          </h1>
-          <div className="flex gap-2">
-            {/* Save button - only for paid users */}
-            {userCanSave && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleSave}
-                disabled={isSaved || isSaving}
-                isLoading={isSaving}
-              >
-                {isSaved ? t.saved : t.saveRecipe}
-              </Button>
-            )}
-            {/* Upgrade prompt for free signed-in users */}
-            {isSignedIn && !userCanSave && (
-              <Link
-                to="/pricing"
-                className="px-3 py-1.5 text-sm text-sage border border-sage/30 rounded-full hover:bg-sage/10 transition-colors"
-              >
-                upgrade to save
-              </Link>
-            )}
-            <Button variant="ghost" size="sm" onClick={handleBack}>
-              {t.back}
-            </Button>
-          </div>
-        </div>
-
-        {/* Meta row */}
-        <div className="flex flex-wrap items-center gap-4 text-sm text-ash">
-          {/* Servings adjuster */}
-          <div className="flex items-center gap-2">
-            <span>{t.servings}:</span>
-            <button
-              onClick={() => setServings((s) => Math.max(1, s - 1))}
-              className="w-6 h-6 rounded bg-gunmetal hover:bg-ash/20 transition-colors"
-            >
-              -
-            </button>
-            <span className="w-6 text-center text-bone">{servings}</span>
-            <button
-              onClick={() => setServings((s) => s + 1)}
-              className="w-6 h-6 rounded bg-gunmetal hover:bg-ash/20 transition-colors"
-            >
-              +
-            </button>
-          </div>
-
-          {recipe.prepTime && (
-            <span>{t.prepTime}: {recipe.prepTime}</span>
-          )}
-          {recipe.cookTime && (
-            <span>{t.cookTime}: {recipe.cookTime}</span>
-          )}
-          {recipe.totalTime && !recipe.prepTime && !recipe.cookTime && (
-            <span>total: {recipe.totalTime}</span>
-          )}
-        </div>
-
-        {/* Metadata badges */}
-        {(recipe.difficulty || recipe.cuisine || recipe.dietaryTags?.length || recipe.mealType) && (
-          <div className="flex flex-wrap gap-2">
-            {/* Difficulty badge with color coding */}
-            {recipe.difficulty && (
-              <span className={`px-2 py-0.5 text-xs rounded-full ${
-                recipe.difficulty === 'easy' ? 'bg-sage/20 text-sage' :
-                recipe.difficulty === 'medium' ? 'bg-amber-500/20 text-amber-400' :
-                'bg-rust/20 text-rust'
-              }`}>
-                {recipe.difficulty}
-              </span>
-            )}
-            {/* Cuisine badge */}
-            {recipe.cuisine && (
-              <span className="px-2 py-0.5 text-xs rounded-full bg-bone/10 text-bone/80">
-                {recipe.cuisine}
-              </span>
-            )}
-            {/* Meal type badge */}
-            {recipe.mealType && (
-              <span className="px-2 py-0.5 text-xs rounded-full bg-ash/20 text-ash">
-                {recipe.mealType}
-              </span>
-            )}
-            {/* Dietary tags */}
-            {recipe.dietaryTags?.map((tag) => (
-              <span
-                key={tag}
-                className="px-2 py-0.5 text-xs rounded-full bg-sage/10 text-sage"
-              >
-                {tag}
-              </span>
-            ))}
-          </div>
-        )}
-
-        {/* Source */}
-        {(recipe.source || sourceUrl) && (
-          <p className="text-xs text-ash/60">
-            {t.source}: {sourceUrl ? (
-              <a href={sourceUrl} target="_blank" rel="noopener noreferrer" className="hover:text-sage">
-                {recipe.source || sourceUrl}
-              </a>
-            ) : recipe.source}
-          </p>
-        )}
+      <div className="py-4">
+        <RecipeHeader
+          recipe={recipe}
+          servings={servings}
+          onServingsChange={setServings}
+          fontSizeLabel={fontSizeLabel}
+          onFontSizeToggle={cycleFontSize}
+          canSave={userCanSave}
+          isSaved={isSaved}
+          isSaving={isSaving}
+          onSave={handleSave}
+          showUpgradeLink={isSignedIn && !userCanSave}
+        />
       </div>
 
-      {/* Phase Tabs */}
+      {/* Phase Toggle */}
       <div className="flex justify-center mb-6">
-        <TabSwitcher
-          tabs={phaseTabs}
-          activeTab={phase}
-          onChange={setPhase}
-          size="md"
+        <PillToggle
+          options={[
+            { value: 'prep', label: '1. prep' },
+            { value: 'cook', label: '2. cook' },
+          ]}
+          value={phase}
+          onChange={(value) => setPhase(value as 'prep' | 'cook')}
         />
       </div>
 
       {/* Progress */}
-      <div className="text-center text-sm text-ash mb-4">
+      <div className="text-center text-sm text-ash mb-4 lowercase">
         {phase === 'prep' ? (
-          <span>{ingredientProgress.completed} {t.ofGathered.replace('{total}', String(ingredientProgress.total))}</span>
+          <span>{ingredientProgress.completed} of {ingredientProgress.total} gathered</span>
         ) : (
-          <span>{stepProgress.completed} {t.ofCompleted.replace('{total}', String(stepProgress.total))}</span>
+          <span>{stepProgress.completed} of {stepProgress.total} completed</span>
         )}
       </div>
 
       {/* Content */}
       <AnimatePresence mode="wait">
-        {/* Prep Phase - Ingredients */}
+        {/* Prep Phase - Grouped Ingredients */}
         {phase === 'prep' && (
           <motion.div
             key="prep"
@@ -334,206 +222,183 @@ export default function RecipePage() {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: 20 }}
             transition={{ duration: 0.2 }}
-            className="space-y-3"
           >
-            {recipe.ingredients.map((ingredient, index) => {
-              const isComplete = isIngredientComplete(index)
-              if (isComplete) return null
-
-              // Scale amount if present
-              let displayText = ingredient.text
-              if (ingredient.amount && servingMultiplier !== 1) {
-                const originalAmount = parseFloat(ingredient.amount)
-                if (!isNaN(originalAmount)) {
-                  const scaledAmount = (originalAmount * servingMultiplier).toFixed(1).replace(/\.0$/, '')
-                  displayText = displayText.replace(ingredient.amount, scaledAmount)
-                }
-              }
-
-              return (
-                <Card
-                  key={index}
-                  variant="interactive"
-                  animate
-                  onClick={() => handleIngredientTap(index)}
-                  className="cursor-pointer"
-                >
-                  <div className="flex items-center gap-3">
-                    <span className="w-6 h-6 rounded-full bg-sage/20 text-sage text-sm flex items-center justify-center flex-shrink-0">
-                      {index + 1}
-                    </span>
-                    <span className="text-bone">{displayText}</span>
-                  </div>
-                </Card>
-              )
-            })}
-
-            {allIngredientsComplete && (
-              <div className="text-center py-8 text-sage">
-                <p className="text-lg">{t.allDone}</p>
-                <p className="text-sm text-ash mt-2">tap "2. cook" to continue</p>
-              </div>
-            )}
+            <IngredientList
+              ingredients={recipe.ingredients}
+              completedIndices={completedIngredients}
+              onComplete={completeIngredient}
+              servingsMultiplier={servingsMultiplier}
+              showPeek={shouldShowPeek}
+              onPeekComplete={markPeekSeen}
+              fontSizeClass={fontSizeClass}
+            />
           </motion.div>
         )}
 
         {/* Cook Phase - Steps */}
-        {phase === 'cook' && (
+        {phase === 'cook' && !showRating && (
           <motion.div
             key="cook"
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
             transition={{ duration: 0.2 }}
-            className="space-y-4"
+            className="space-y-3"
           >
-            {recipe.steps.map((step, index) => {
-              const isComplete = isStepComplete(index)
-              if (isComplete) return null
+            <AnimatePresence mode="popLayout">
+              {recipe.steps.map((step, index) => {
+                if (isStepComplete(index)) return null
 
-              return (
-                <Card
-                  key={index}
-                  variant="interactive"
-                  animate
-                  onClick={() => handleStepTap(index)}
-                  className="cursor-pointer"
-                >
-                  <div className="space-y-2">
-                    {/* Step number */}
-                    <div className="flex items-start gap-3">
-                      <span className="w-6 h-6 rounded-full bg-sage/20 text-sage text-sm flex items-center justify-center flex-shrink-0 mt-0.5">
-                        {index + 1}
-                      </span>
-                      <p className="text-bone leading-relaxed">{step.text}</p>
-                    </div>
+                // First incomplete step gets peek if we haven't shown it
+                const isFirstIncomplete = !recipe.steps.slice(0, index).some((_, i) => !isStepComplete(i))
+                const showStepPeek = shouldShowPeek && isFirstIncomplete
 
-                    {/* Related ingredients chips */}
-                    {step.ingredients && step.ingredients.length > 0 && (
-                      <div className="pl-9">
-                        <p className="text-xs text-ash mb-1">{t.youllNeed}:</p>
-                        <div className="flex flex-wrap gap-1">
-                          {step.ingredients.map((ing, i) => (
-                            <span
-                              key={i}
-                              className="px-2 py-0.5 bg-sage/10 text-sage text-xs rounded"
-                            >
-                              {ing}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </Card>
-              )
-            })}
-
-            {/* Completion */}
-            {showRating && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="text-center py-8 space-y-6"
-              >
-                <p className="text-2xl text-sage font-bold">
-                  {completionMessages[Math.floor(Math.random() * completionMessages.length)]}
-                </p>
-
-                {/* Rating */}
-                <div className="space-y-2">
-                  <p className="text-ash">{t.rateRecipe}</p>
-                  <StarRating rating={rating} onRate={handleRate} />
-                </div>
-
-                {/* Action buttons */}
-                <div className="flex flex-col items-center gap-3 pt-4">
-                  {/* Save button or upgrade nudge */}
-                  {!isSaved && (
-                    userCanSave ? (
-                      <Button
-                        variant="primary"
-                        size="md"
-                        onClick={handleSave}
-                        disabled={isSaving}
-                        isLoading={isSaving}
-                      >
-                        {t.saveRecipe}
-                      </Button>
-                    ) : (
-                      <Link
-                        to="/pricing"
-                        className="px-6 py-2 text-sm font-medium text-obsidian bg-sage rounded-full hover:bg-sage/90 transition-colors"
-                      >
-                        {isSignedIn ? 'upgrade to save recipes' : 'sign up to save'}
-                      </Link>
-                    )
-                  )}
-
-                  {/* Already saved indicator */}
-                  {isSaved && (
-                    <p className="text-sage text-sm">✓ {t.saved}</p>
-                  )}
-
-                  {/* Clean another recipe */}
-                  <Link
-                    to="/"
-                    className="text-sm text-ash hover:text-bone transition-colors"
+                return (
+                  <motion.div
+                    key={index}
+                    layout
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    exit={{
+                      opacity: 0,
+                      height: 0,
+                      marginBottom: 0,
+                      transition: { duration: 0.2 }
+                    }}
+                    transition={{
+                      layout: { duration: 0.25, ease: 'easeOut' },
+                      opacity: { duration: 0.15 }
+                    }}
                   >
-                    clean another recipe →
-                  </Link>
+                    <StepCard
+                      number={index + 1}
+                      step={step}
+                      onComplete={() => completeStep(index)}
+                      showPeek={showStepPeek}
+                      onPeekComplete={markPeekSeen}
+                      fontSizeClass={fontSizeClass}
+                      servingsMultiplier={servingsMultiplier}
+                    />
+                  </motion.div>
+                )
+              })}
+            </AnimatePresence>
 
-                  {/* Quota nudge for free users */}
-                  {quota.tier === 'free' && quota.remaining <= 2 && quota.remaining > 0 && (
-                    <p className="text-xs text-ash/60 mt-2">
-                      {quota.remaining} recipe{quota.remaining !== 1 ? 's' : ''} left this month
-                    </p>
-                  )}
-
-                  {/* Email capture for non-signed-in users who rated */}
-                  {!isSignedIn && rating > 0 && !emailSubmitted && (
-                    <div className="mt-4 p-4 rounded-lg bg-gunmetal border border-ash/20 max-w-xs">
-                      <p className="text-sm text-bone mb-3">get recipe tips & updates</p>
-                      <form
-                        onSubmit={(e) => {
-                          e.preventDefault()
-                          if (email) {
-                            // TODO: Submit to backend
-                            setEmailSubmitted(true)
-                            showToast('thanks! we\'ll be in touch', 'success')
-                          }
-                        }}
-                        className="flex gap-2"
-                      >
-                        <input
-                          type="email"
-                          value={email}
-                          onChange={(e) => setEmail(e.target.value)}
-                          placeholder="your@email.com"
-                          className="flex-1 px-3 py-2 text-sm bg-obsidian border border-ash/30 rounded-full text-bone placeholder:text-ash/50 focus:outline-none focus:border-sage"
-                        />
-                        <button
-                          type="submit"
-                          disabled={!email}
-                          className="px-4 py-2 text-sm bg-sage text-obsidian rounded-full hover:bg-sage/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                        >
-                          →
-                        </button>
-                      </form>
-                    </div>
-                  )}
-                  {emailSubmitted && (
-                    <p className="text-xs text-sage mt-2">✓ you're on the list!</p>
-                  )}
-                </div>
+            {/* All steps complete but rating not shown yet */}
+            {isComplete && !showRating && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="text-center py-8 text-sage"
+              >
+                <p className="text-lg lowercase">all steps completed!</p>
               </motion.div>
             )}
+          </motion.div>
+        )}
+
+        {/* Completion Screen */}
+        {showRating && (
+          <motion.div
+            key="completion"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="text-center py-8 space-y-6"
+          >
+            <p className="text-2xl text-sage font-bold lowercase">
+              {completionMessages[Math.floor(Math.random() * completionMessages.length)]}
+            </p>
+
+            {/* Rating */}
+            <div className="space-y-2">
+              <p className="text-ash lowercase">{t.rateRecipe}</p>
+              <StarRating rating={rating} onRate={handleRate} />
+            </div>
+
+            {/* Action buttons */}
+            <div className="flex flex-col items-center gap-3 pt-4">
+              {/* Save button or upgrade nudge */}
+              {!isSaved && (
+                userCanSave ? (
+                  <button
+                    onClick={handleSave}
+                    disabled={isSaving}
+                    className="px-6 py-2 text-sm font-medium text-obsidian bg-sage rounded-full hover:bg-sage/90 disabled:opacity-50 transition-colors lowercase"
+                  >
+                    {isSaving ? 'saving...' : t.saveRecipe}
+                  </button>
+                ) : (
+                  <Link
+                    to="/pricing"
+                    className="px-6 py-2 text-sm font-medium text-obsidian bg-sage rounded-full hover:bg-sage/90 transition-colors lowercase"
+                  >
+                    {isSignedIn ? 'upgrade to save recipes' : 'sign up to save'}
+                  </Link>
+                )
+              )}
+
+              {/* Already saved indicator */}
+              {isSaved && (
+                <p className="text-sage text-sm lowercase">✓ {t.saved}</p>
+              )}
+
+              {/* Clean another recipe */}
+              <Link
+                to="/"
+                className="text-sm text-ash hover:text-bone transition-colors lowercase"
+              >
+                clean another recipe →
+              </Link>
+
+              {/* Quota nudge for free users */}
+              {quota.tier === 'free' && quota.remaining <= 2 && quota.remaining > 0 && (
+                <p className="text-xs text-ash/60 mt-2 lowercase">
+                  {quota.remaining} recipe{quota.remaining !== 1 ? 's' : ''} left this month
+                </p>
+              )}
+
+              {/* Email capture for non-signed-in users who rated */}
+              {!isSignedIn && rating > 0 && !emailSubmitted && (
+                <div className="mt-4 p-4 rounded-2xl bg-gunmetal border border-ash/20 max-w-xs">
+                  <p className="text-sm text-bone mb-3 lowercase">get recipe tips & updates</p>
+                  <form
+                    onSubmit={(e) => {
+                      e.preventDefault()
+                      if (email) {
+                        // TODO: Submit to backend
+                        setEmailSubmitted(true)
+                        showToast('thanks! we\'ll be in touch', 'success')
+                      }
+                    }}
+                    className="flex gap-2"
+                  >
+                    <input
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="your@email.com"
+                      className="flex-1 px-3 py-2 text-sm bg-obsidian border border-ash/30 rounded-full text-bone placeholder:text-ash/50 focus:outline-none focus:border-sage"
+                    />
+                    <button
+                      type="submit"
+                      disabled={!email}
+                      className="px-4 py-2 text-sm bg-sage text-obsidian rounded-full hover:bg-sage/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    >
+                      →
+                    </button>
+                  </form>
+                </div>
+              )}
+              {emailSubmitted && (
+                <p className="text-xs text-sage mt-2 lowercase">✓ you're on the list!</p>
+              )}
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
 
       {/* Tips */}
-      {recipe.tips && recipe.tips.length > 0 && (
+      {recipe.tips && recipe.tips.length > 0 && !showRating && (
         <div className="mt-8 pt-6 border-t border-gunmetal">
           <h3 className="text-sm font-bold text-ash lowercase mb-3">{t.tips}</h3>
           <ul className="space-y-2">
@@ -546,19 +411,12 @@ export default function RecipePage() {
         </div>
       )}
 
-      {/* Bottom Actions */}
-      <div className="fixed bottom-4 left-4 right-4 flex justify-center gap-3">
-        {canUndo && (
-          <Button variant="secondary" size="sm" onClick={handleUndo}>
-            {t.undo}
-          </Button>
-        )}
-        {(ingredientProgress.completed > 0 || stepProgress.completed > 0) && (
-          <Button variant="ghost" size="sm" onClick={handleReset}>
-            {t.reset}
-          </Button>
-        )}
-      </div>
+      {/* Undo Button */}
+      <UndoButton
+        canUndo={canUndo}
+        onUndo={handleUndo}
+        label={t.undo}
+      />
     </PageLayout>
   )
 }
