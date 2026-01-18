@@ -19,7 +19,6 @@ import {
 } from '../hooks'
 import { PageLayout } from '../components'
 import { useToast } from '../components/ui/Toast'
-import PillToggle from '../components/ui/PillToggle'
 import {
   IngredientList,
   StepCard,
@@ -149,18 +148,8 @@ export default function RecipePage() {
           recipe={recipe}
           servings={servings}
           onServingsChange={setServings}
-        />
-      </div>
-
-      {/* Phase Toggle */}
-      <div className="flex justify-center mb-6">
-        <PillToggle
-          options={[
-            { value: 'prep', label: 'prep' },
-            { value: 'cook', label: 'cook' },
-          ]}
-          value={phase}
-          onChange={(value) => setPhase(value as 'prep' | 'cook')}
+          phase={phase}
+          onPhaseChange={(value) => setPhase(value as 'prep' | 'cook')}
         />
       </div>
 
