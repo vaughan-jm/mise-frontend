@@ -74,26 +74,26 @@ export default function RecipeHeader({
 
       {/* Controls row: servings left, toggle right */}
       <div className="flex items-center justify-between">
-        {/* Servings: −  servings 4  + */}
+        {/* Servings: pill-style container matching phase toggle */}
         <div className="flex items-center gap-2">
-          <button
-            onClick={() => onServingsChange(Math.max(1, servings - 1))}
-            className="w-6 h-6 flex items-center justify-center rounded-full text-ash/50 hover:text-ash hover:bg-gunmetal transition-colors"
-            aria-label="Decrease servings"
-          >
-            <MinusIcon />
-          </button>
-          <span className="text-sm">
-            <span className="text-ash">servings </span>
-            <span className="text-bone font-medium">{servings}</span>
-          </span>
-          <button
-            onClick={() => onServingsChange(servings + 1)}
-            className="w-6 h-6 flex items-center justify-center rounded-full text-ash/50 hover:text-ash hover:bg-gunmetal transition-colors"
-            aria-label="Increase servings"
-          >
-            <PlusIcon />
-          </button>
+          <span className="text-sm text-ash lowercase">serves</span>
+          <div className="inline-flex items-center rounded-full bg-obsidian border border-ash/20 px-1 py-0.5">
+            <button
+              onClick={() => onServingsChange(Math.max(1, servings - 1))}
+              className="w-7 h-7 flex items-center justify-center rounded-full text-ash hover:bg-gunmetal transition-colors"
+              aria-label="Decrease servings"
+            >
+              <MinusIcon />
+            </button>
+            <span className="px-2 text-sm text-bone font-medium">{servings}</span>
+            <button
+              onClick={() => onServingsChange(servings + 1)}
+              className="w-7 h-7 flex items-center justify-center rounded-full text-ash hover:bg-gunmetal transition-colors"
+              aria-label="Increase servings"
+            >
+              <PlusIcon />
+            </button>
+          </div>
         </div>
 
         {/* Phase toggle */}

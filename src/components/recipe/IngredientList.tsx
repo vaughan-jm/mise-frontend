@@ -268,11 +268,11 @@ export default function IngredientList({
       <div className="space-y-6">
         {groupedSections.map((group, groupIndex) => (
           <div key={groupIndex}>
-            {/* Section header - only show if section exists */}
+            {/* Section header - small, muted, uppercase */}
             {group.section && (
-              <h3 className="text-sm font-medium text-ash lowercase mb-3">
-                {group.section.toLowerCase()}
-              </h3>
+              <h4 className="text-xs font-medium text-ash/50 uppercase tracking-wide mb-2">
+                {group.section}
+              </h4>
             )}
 
             <ul className="space-y-1">
@@ -295,22 +295,31 @@ export default function IngredientList({
   // Fall back to legacy format with category grouping
 
   return (
-    <ul className="space-y-1">
-      {groupedIngredients.flatMap((group) =>
-        group.items.map(({ ingredient, originalIndex }) => {
-          const scaledText = scaleIngredientText(ingredient.text, servingsMultiplier)
+    <div className="space-y-6">
+      {groupedIngredients.map((group) => (
+        <div key={group.category}>
+          {/* Category label - small, muted, uppercase */}
+          <h4 className="text-xs font-medium text-ash/50 uppercase tracking-wide mb-2">
+            {group.label}
+          </h4>
 
-          return (
-            <li
-              key={originalIndex}
-              className="flex items-start gap-2 text-lg text-bone leading-relaxed"
-            >
-              <span className="text-sage mt-0.5">•</span>
-              <span>{scaledText}</span>
-            </li>
-          )
-        })
-      )}
-    </ul>
+          <ul className="space-y-1">
+            {group.items.map(({ ingredient, originalIndex }) => {
+              const scaledText = scaleIngredientText(ingredient.text, servingsMultiplier)
+
+              return (
+                <li
+                  key={originalIndex}
+                  className="flex items-start gap-2 text-lg text-bone leading-relaxed"
+                >
+                  <span className="text-sage mt-0.5">•</span>
+                  <span>{scaledText}</span>
+                </li>
+              )
+            })}
+          </ul>
+        </div>
+      ))}
+    </div>
   )
 }

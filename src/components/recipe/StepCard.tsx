@@ -1,30 +1,27 @@
 /**
  * StepCard Component
  *
- * Pill-shaped step card for the cook phase.
- * Shows step instruction with indented ingredient block below.
+ * Card for the cook phase displaying step instruction with ingredient block.
  *
  * Features:
- * - Pill shape with step number
- * - Step instruction text
- * - Indented ingredient list with quantities (scaled)
- * - Supports tap and swipe to complete
+ * - Step instruction text (no step numbers)
+ * - Dark inset ingredient block for visual contrast
+ * - Tap to complete with ripple effect
+ * - Haptic feedback on tap
  */
 
-import SwipeableItem from '../ui/SwipeableItem'
+import { useState, useRef, useCallback, type MouseEvent } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { useHaptics } from '../../hooks/useHaptics'
 import type { Step } from '../../lib/types'
 
 interface StepCardProps {
-  /** Display number (1-based index) */
-  number: number
   /** Step data */
   step: Step
   /** Called when step is marked complete */
   onComplete: () => void
-  /** Whether to show peek animation */
-  showPeek?: boolean
-  /** Called when peek animation completes */
-  onPeekComplete?: () => void
+  /** Whether this is the first incomplete step (for hint) */
+  isFirstStep?: boolean
   /** Servings multiplier for scaling ingredient quantities */
   servingsMultiplier?: number
   /** Disabled state */
@@ -96,77 +93,106 @@ function scaleIngredientText(text: string, multiplier: number): string {
   )
 }
 
+// Ripple effect component
+function Ripple({ x, y, onComplete }: { x: number; y: number; onComplete: () => void }) {
+  return (
+    <motion.div
+      className="absolute pointer-events-none rounded-full bg-sage/30"
+      style={{ left: x, top: y, transform: 'translate(-50%, -50%)' }}
+      initial={{ width: 0, height: 0, opacity: 0.6 }}
+      animate={{ width: 150, height: 150, opacity: 0 }}
+      transition={{ duration: 0.4, ease: 'easeOut' }}
+      onAnimationComplete={onComplete}
+    />
+  )
+}
+
 export default function StepCard({
-  number,
   step,
   onComplete,
-  showPeek = false,
-  onPeekComplete,
+  isFirstStep = false,
   servingsMultiplier = 1,
   disabled = false,
 }: StepCardProps) {
+  const { vibrate } = useHaptics()
+  const containerRef = useRef<HTMLDivElement>(null)
+  const [ripple, setRipple] = useState<{ x: number; y: number } | null>(null)
+
   const hasIngredients = step.ingredients && step.ingredients.length > 0
 
+  // Handle tap completion
+  const handleTap = useCallback((e: MouseEvent<HTMLDivElement>) => {
+    if (disabled) return
+
+    // Get tap position relative to container
+    const rect = containerRef.current?.getBoundingClientRect()
+    if (rect) {
+      const tapX = e.clientX - rect.left
+      const tapY = e.clientY - rect.top
+      setRipple({ x: tapX, y: tapY })
+    }
+
+    vibrate('light')
+
+    // Delay completion slightly for ripple effect
+    setTimeout(() => {
+      onComplete()
+    }, 100)
+  }, [disabled, onComplete, vibrate])
+
+  const clearRipple = useCallback(() => {
+    setRipple(null)
+  }, [])
+
   return (
-    <SwipeableItem
-      onComplete={onComplete}
-      showPeek={showPeek}
-      onPeekComplete={onPeekComplete}
-      disabled={disabled}
-      className="rounded-2xl"
+    <motion.div
+      ref={containerRef}
+      onClick={handleTap}
+      whileTap={{ scale: 0.98 }}
+      className={`
+        relative
+        overflow-hidden
+        rounded-2xl
+        border border-ash/20
+        bg-gunmetal
+        p-4
+        cursor-pointer
+        transition-colors
+        hover:border-sage/50
+        ${disabled ? 'opacity-50 cursor-not-allowed' : ''}
+      `}
     >
-      <div
-        className={`
-          rounded-2xl
-          border border-ash/30
-          bg-gunmetal
-          px-4 py-3
-          transition-colors
-          hover:border-sage/50
-          ${disabled ? 'opacity-50' : ''}
-        `}
-      >
-        {/* Step number + instruction */}
-        <div className="flex items-start gap-3">
-          {/* Number badge */}
-          <span
-            className="
-              flex-shrink-0
-              w-6 h-6
-              rounded-full
-              bg-sage/20
-              text-sage
-              text-sm font-medium
-              flex items-center justify-center
-              mt-0.5
-            "
-          >
-            {number}
-          </span>
+      {/* Instruction text - no step number */}
+      <p className="text-bone leading-relaxed text-lg">
+        {step.text}
+      </p>
 
-          {/* Instruction text */}
-          <p className="text-bone leading-relaxed text-lg">
-            {step.text}
-          </p>
-        </div>
-
-        {/* Indented ingredient list - with visual separation from instruction */}
-        {hasIngredients && (
-          <div className="mt-4 ml-9 pt-3 border-t border-ash/20 space-y-2">
-            <p className="text-xs lowercase text-ash/50 mb-2">
-              ingredients for this step:
-            </p>
+      {/* Ingredients in contrasting dark background block */}
+      {hasIngredients && (
+        <div className="mt-4 p-3 bg-obsidian rounded-xl">
+          <ul className="space-y-1">
             {step.ingredients!.map((ingredient, idx) => (
-              <p
-                key={idx}
-                className="text-sm text-ash leading-relaxed"
-              >
+              <li key={idx} className="text-sm text-ash">
                 • {scaleIngredientText(ingredient, servingsMultiplier)}
-              </p>
+              </li>
             ))}
-          </div>
+          </ul>
+        </div>
+      )}
+
+      {/* Tap hint for first step only */}
+      {isFirstStep && (
+        <span className="block mt-3 text-xs text-ash/40 lowercase">
+          tap when done
+        </span>
+      )}
+
+      {/* Tap ripple effect */}
+      <AnimatePresence>
+        {ripple && (
+          <Ripple x={ripple.x} y={ripple.y} onComplete={clearRipple} />
         )}
-      </div>
-    </SwipeableItem>
+      </AnimatePresence>
+    </motion.div>
   )
 }

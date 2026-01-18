@@ -15,7 +15,6 @@ import {
   useSavedRecipes,
   useWakeLock,
   useHaptics,
-  useOnboarding,
 } from '../hooks'
 import { PageLayout } from '../components'
 import { useToast } from '../components/ui/Toast'
@@ -58,8 +57,6 @@ export default function RecipePage() {
   const { request: requestWakeLock, release: releaseWakeLock } = useWakeLock()
   const { save, isSaving } = useSavedRecipes()
 
-  // New hooks for redesign
-  const { hasSeenPeek, markPeekSeen } = useOnboarding()
 
   // Get recipe from navigation state
   const recipe = location.state?.recipe as Recipe | undefined
@@ -137,9 +134,6 @@ export default function RecipePage() {
   // Scale ingredient amounts based on servings
   const servingsMultiplier = servings / (recipe.servings || 4)
 
-  // Should show peek animation (first time only, for cook phase)
-  const shouldShowPeek = !hasSeenPeek && phase === 'cook'
-
   return (
     <PageLayout showFooter={false} maxWidth="lg" className="px-4 pb-24">
       {/* Recipe Header */}
@@ -168,14 +162,13 @@ export default function RecipePage() {
 
       {/* Cook Phase - Steps */}
       {phase === 'cook' && !showRating && (
-        <div className="space-y-3">
+        <div className="space-y-4">
           <AnimatePresence mode="popLayout">
             {recipe.steps.map((step, index) => {
               if (isStepComplete(index)) return null
 
-              // First incomplete step gets peek if we haven't shown it
+              // Check if this is the first incomplete step (for tap hint)
               const isFirstIncomplete = !recipe.steps.slice(0, index).some((_, i) => !isStepComplete(i))
-              const showStepPeek = shouldShowPeek && isFirstIncomplete
 
               return (
                 <motion.div
@@ -188,11 +181,9 @@ export default function RecipePage() {
                   }}
                 >
                   <StepCard
-                    number={index + 1}
                     step={step}
                     onComplete={() => completeStep(index)}
-                    showPeek={showStepPeek}
-                    onPeekComplete={markPeekSeen}
+                    isFirstStep={isFirstIncomplete}
                     servingsMultiplier={servingsMultiplier}
                   />
                 </motion.div>
