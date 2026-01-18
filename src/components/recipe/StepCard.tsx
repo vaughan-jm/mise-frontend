@@ -25,7 +25,7 @@ interface StepCardProps {
   showPeek?: boolean
   /** Called when peek animation completes */
   onPeekComplete?: () => void
-  /** Font size class (from useFontSize hook) */
+  /** Font size class */
   fontSizeClass?: string
   /** Servings multiplier for scaling ingredient quantities */
   servingsMultiplier?: number

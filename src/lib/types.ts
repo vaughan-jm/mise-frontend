@@ -18,6 +18,7 @@ export interface Recipe {
   dietaryTags?: string[]
   mealType?: MealType
   ingredients: Ingredient[]
+  ingredientsStructured?: StructuredIngredient[]
   steps: Step[]
   tips?: string[]
   source?: string
@@ -29,6 +30,19 @@ export interface Ingredient {
   text: string
   amount?: string
   unit?: string
+}
+
+export interface StructuredIngredient {
+  text: string           // "chicken breast"
+  metric: {
+    value: number
+    unit: string         // "g", "ml", "kg", "l"
+  } | null
+  imperial: {
+    value: number
+    unit: string         // "lb", "oz", "cup", "tbsp", "tsp"
+  } | null
+  category: string       // "proteins", "vegetables", "dairy", "pantry", "spices", "other"
 }
 
 export interface Step {

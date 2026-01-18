@@ -15,7 +15,6 @@ import {
   useSavedRecipes,
   useWakeLock,
   useHaptics,
-  useFontSize,
   useOnboarding,
 } from '../hooks'
 import { PageLayout } from '../components'
@@ -61,7 +60,6 @@ export default function RecipePage() {
   const { save, isSaving } = useSavedRecipes()
 
   // New hooks for redesign
-  const { fontSizeClass, fontSizeLabel, cycle: cycleFontSize } = useFontSize()
   const { hasSeenPeek, markPeekSeen } = useOnboarding()
 
   // Get recipe from navigation state
@@ -140,42 +138,17 @@ export default function RecipePage() {
   // Scale ingredient amounts based on servings
   const servingsMultiplier = servings / (recipe.servings || 4)
 
-  // Determine if we should show hero image (not for photo sources)
-  const showHeroImage = recipe.imageUrl && recipe.source !== 'photo'
-
   // Should show peek animation (first time only, for cook phase)
   const shouldShowPeek = !hasSeenPeek && phase === 'cook'
 
   return (
     <PageLayout showFooter={false} maxWidth="lg" className="px-4 pb-24">
-      {/* Hero Image - only for URL/YouTube sources */}
-      {showHeroImage && (
-        <div className="relative w-full max-h-48 sm:max-h-56 mb-4 rounded-2xl overflow-hidden">
-          <img
-            src={recipe.imageUrl}
-            alt={recipe.title}
-            className="w-full h-auto max-h-48 sm:max-h-56 object-cover"
-            onError={(e) => {
-              (e.target as HTMLElement).parentElement!.style.display = 'none'
-            }}
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-obsidian/80 to-transparent rounded-2xl" />
-        </div>
-      )}
-
       {/* Recipe Header */}
       <div className="py-4">
         <RecipeHeader
           recipe={recipe}
           servings={servings}
           onServingsChange={setServings}
-          fontSizeLabel={fontSizeLabel}
-          onFontSizeToggle={cycleFontSize}
-          canSave={userCanSave}
-          isSaved={isSaved}
-          isSaving={isSaving}
-          onSave={handleSave}
-          showUpgradeLink={isSignedIn && !userCanSave}
         />
       </div>
 
@@ -205,6 +178,7 @@ export default function RecipePage() {
           >
             <IngredientList
               ingredients={recipe.ingredients}
+              ingredientsStructured={recipe.ingredientsStructured}
               servingsMultiplier={servingsMultiplier}
             />
           </motion.div>
@@ -251,7 +225,6 @@ export default function RecipePage() {
                       onComplete={() => completeStep(index)}
                       showPeek={showStepPeek}
                       onPeekComplete={markPeekSeen}
-                      fontSizeClass={fontSizeClass}
                       servingsMultiplier={servingsMultiplier}
                     />
                   </motion.div>
