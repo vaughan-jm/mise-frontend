@@ -59,7 +59,7 @@ export default function PricingPage() {
     <PageLayout maxWidth="xl" className="px-4 py-8">
       {/* Header */}
       <div className="text-center space-y-4 mb-8">
-        <h1 className="text-3xl font-bold text-bone lowercase">{t.pricing}</h1>
+        <h1 className="text-2xl font-bold text-bone lowercase">{t.pricing}</h1>
         <p className="text-ash">choose a plan that works for you</p>
 
         {/* Billing toggle */}

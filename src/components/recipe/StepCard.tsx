@@ -153,7 +153,7 @@ export default function StepCard({
         {/* Indented ingredient list - with visual separation from instruction */}
         {hasIngredients && (
           <div className="mt-4 ml-9 pt-3 border-t border-ash/20 space-y-2">
-            <p className="text-xs uppercase tracking-wide text-ash/50 mb-2">
+            <p className="text-xs lowercase text-ash/50 mb-2">
               ingredients for this step:
             </p>
             {step.ingredients!.map((ingredient, idx) => (
