@@ -47,16 +47,11 @@ export default function PillToggle({
             key={option.value}
             onClick={() => !disabled && onChange(option.value)}
             disabled={disabled}
-            className={`
-              px-4 py-1.5
-              rounded-full
-              text-sm font-medium
-              lowercase
-              transition-all duration-200
-              ${isSelected
-                ? 'bg-bone text-obsidian'
-                : 'bg-transparent text-ash hover:text-bone'}
-            `}
+            className="px-4 py-1.5 rounded-full text-sm font-medium lowercase transition-all duration-200"
+            style={{
+              backgroundColor: isSelected ? 'var(--color-bone)' : 'transparent',
+              color: isSelected ? 'var(--color-obsidian)' : 'var(--color-ash)',
+            }}
           >
             {option.label}
           </button>
