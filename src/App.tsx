@@ -16,6 +16,7 @@ import {
   TermsPage,
   RefundPage,
   ContactPage,
+  SharedRecipePage,
 } from './pages'
 
 // 404 Page
@@ -40,6 +41,7 @@ export default function App() {
       {/* Public routes */}
       <Route path="/" element={<HomePage />} />
       <Route path="/recipe" element={<RecipePage />} />
+      <Route path="/r/:id" element={<SharedRecipePage />} />
       <Route path="/pricing" element={<PricingPage />} />
       <Route path="/privacy" element={<PrivacyPage />} />
       <Route path="/terms" element={<TermsPage />} />

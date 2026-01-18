@@ -352,18 +352,73 @@ export async function submitFeedback(
 }
 
 export interface RatingRequest {
-  recipeIdentifier: string
-  rating: number
+  stars: number
 }
 
-export async function submitRating(
-  recipeIdentifier: string,
-  rating: number
-): Promise<void> {
-  await request<{ success: boolean }>('/api/rating', {
+export async function submitRating(stars: number): Promise<void> {
+  await request<{ message: string }>('/api/feedback/rating', {
     method: 'POST',
-    body: JSON.stringify({ recipeIdentifier, rating }),
+    body: JSON.stringify({ stars }),
   })
+}
+
+// ============================================================================
+// Email Capture Endpoint
+// ============================================================================
+
+export interface EmailCaptureRequest {
+  email: string
+  source?: string
+}
+
+export async function submitEmailCapture(
+  email: string,
+  source = 'unknown'
+): Promise<void> {
+  await request<{ message: string }>('/api/feedback', {
+    method: 'POST',
+    body: JSON.stringify({
+      message: `Email capture (${source}): ${email}`,
+      type: 'other',
+      email,
+    }),
+  })
+}
+
+// ============================================================================
+// Shared Recipe Endpoint
+// ============================================================================
+
+export interface SharedRecipeResponse {
+  recipe: {
+    id: string
+    title: string
+    servings?: string
+    prepTime?: string
+    cookTime?: string
+    totalTime?: string
+    difficulty?: string
+    imageUrl?: string
+    cuisine?: string
+    cuisineTags?: string[]
+    dietaryTags?: string[]
+    mealType?: string
+    ingredients: string[]
+    steps: Array<string | { instruction: string; ingredients?: string[] }>
+    tips?: string[]
+    source?: string
+    sourceUrl?: string
+    author?: string
+  }
+}
+
+export async function getSharedRecipe(
+  id: string,
+  ref?: string
+): Promise<SharedRecipeResponse['recipe']> {
+  const params = ref ? `?ref=${encodeURIComponent(ref)}` : ''
+  const response = await request<SharedRecipeResponse>(`/api/recipes/shared/${id}${params}`)
+  return response.recipe
 }
 
 // ============================================================================
@@ -385,6 +440,55 @@ export async function submitContact(
     method: 'POST',
     body: JSON.stringify({ name, email, message }),
   })
+}
+
+// ============================================================================
+// Referral Endpoints
+// ============================================================================
+
+export interface ReferralCodeResponse {
+  code: string
+  shareUrl: string
+}
+
+export interface ReferralStats {
+  code: string
+  totalReferrals: number
+  pendingReferrals: number
+  convertedReferrals: number
+  creditsEarned: number
+  creditsRemaining: number
+}
+
+export async function getReferralCode(): Promise<ReferralCodeResponse> {
+  return request<ReferralCodeResponse>('/api/referral/code')
+}
+
+export async function getReferralStats(): Promise<ReferralStats> {
+  return request<ReferralStats>('/api/referral/stats')
+}
+
+export async function trackReferralClick(code: string): Promise<{ success: boolean; valid: boolean }> {
+  return request<{ success: boolean; valid: boolean }>('/api/referral/track', {
+    method: 'POST',
+    body: JSON.stringify({ code, event: 'click' }),
+  })
+}
+
+export async function applyReferralCode(
+  code: string
+): Promise<{ success: boolean; message?: string; creditsAwarded?: number }> {
+  return request<{ success: boolean; message?: string; creditsAwarded?: number }>(
+    '/api/referral/apply',
+    {
+      method: 'POST',
+      body: JSON.stringify({ code }),
+    }
+  )
+}
+
+export async function validateReferralCode(code: string): Promise<{ valid: boolean }> {
+  return request<{ valid: boolean }>(`/api/referral/validate/${code}`)
 }
 
 // ============================================================================

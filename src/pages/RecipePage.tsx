@@ -7,8 +7,9 @@
  */
 
 import { useEffect, useState, useCallback } from 'react'
-import { useLocation, useNavigate, Link } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
+import posthog from 'posthog-js'
 import { useApp } from '../context/AppContext'
 import {
   useCookingMode,
@@ -25,27 +26,9 @@ import {
   UndoButton,
 } from '../components/recipe'
 import type { Recipe } from '../lib/types'
-import { completionMessages } from '../config/content'
 import { canSaveRecipes } from '../config/pricing'
-
-// Star rating component
-function StarRating({ rating, onRate }: { rating: number; onRate: (n: number) => void }) {
-  return (
-    <div className="flex gap-1">
-      {[1, 2, 3, 4, 5].map((n) => (
-        <button
-          key={n}
-          onClick={() => onRate(n)}
-          className={`text-2xl transition-colors ${
-            n <= rating ? 'text-sage' : 'text-ash/30 hover:text-ash'
-          }`}
-        >
-          ★
-        </button>
-      ))}
-    </div>
-  )
-}
+import * as api from '../lib/api'
+import { CompletionScreen } from '../components/completion'
 
 export default function RecipePage() {
   const location = useLocation()
@@ -100,18 +83,39 @@ export default function RecipePage() {
   useEffect(() => {
     if (isComplete && !showRating) {
       setShowRating(true)
+
+      // Track completion event
+      posthog.capture('recipe_completed', {
+        recipe_title: recipe?.title,
+        source_type: recipe?.source,
+        user_tier: quota.tier,
+        is_signed_in: isSignedIn,
+      })
     }
-  }, [isComplete, showRating])
+  }, [isComplete, showRating, recipe?.title, recipe?.source, quota.tier, isSignedIn])
 
   // Handle save - only for paid users
   const handleSave = useCallback(async () => {
     if (!recipe || !userCanSave) return
+
+    // Track save initiated
+    posthog.capture('save_initiated', {
+      recipe_title: recipe.title,
+      user_tier: quota.tier,
+    })
+
     const saved = await save(recipe, recipe.source, sourceUrl ?? undefined)
     if (saved) {
       setIsSaved(true)
       showToast(t.saved, 'success')
+
+      // Track save success
+      posthog.capture('save_completed', {
+        recipe_title: recipe.title,
+        user_tier: quota.tier,
+      })
     }
-  }, [recipe, userCanSave, save, sourceUrl, showToast, t])
+  }, [recipe, userCanSave, save, sourceUrl, showToast, t, quota.tier])
 
   // Handle undo
   const handleUndo = useCallback(() => {
@@ -121,11 +125,26 @@ export default function RecipePage() {
   }, [vibrate, undo, showToast, t])
 
   // Handle rating
-  const handleRate = useCallback((n: number) => {
+  const handleRate = useCallback(async (n: number) => {
     setRating(n)
     vibrate('success')
-    // TODO: Submit rating to API
-  }, [vibrate])
+
+    // Track rating event
+    posthog.capture('recipe_rated', {
+      rating: n,
+      recipe_title: recipe?.title,
+      user_tier: quota.tier,
+      is_signed_in: isSignedIn,
+    })
+
+    // Submit rating to API
+    try {
+      await api.submitRating(n)
+    } catch (error) {
+      // Silently fail - rating is not critical
+      console.error('Failed to submit rating:', error)
+    }
+  }, [vibrate, recipe?.title, quota.tier, isSignedIn])
 
   if (!recipe) {
     return null
@@ -202,96 +221,35 @@ export default function RecipePage() {
 
       {/* Completion Screen */}
       {showRating && (
-        <div className="text-center py-8 space-y-6">
-            <p className="text-2xl text-sage font-bold lowercase">
-              {completionMessages[Math.floor(Math.random() * completionMessages.length)]}
-            </p>
-
-            {/* Rating */}
-            <div className="space-y-2">
-              <p className="text-ash lowercase">{t.rateRecipe}</p>
-              <StarRating rating={rating} onRate={handleRate} />
-            </div>
-
-            {/* Action buttons */}
-            <div className="flex flex-col items-center gap-3 pt-4">
-              {/* Save button or upgrade nudge */}
-              {!isSaved && (
-                userCanSave ? (
-                  <button
-                    onClick={handleSave}
-                    disabled={isSaving}
-                    className="px-6 py-2 text-sm font-medium text-obsidian bg-sage rounded-full hover:bg-sage/90 disabled:opacity-50 transition-colors lowercase"
-                  >
-                    {isSaving ? 'saving...' : t.saveRecipe}
-                  </button>
-                ) : (
-                  <Link
-                    to="/pricing"
-                    className="px-6 py-2 text-sm font-medium text-obsidian bg-sage rounded-full hover:bg-sage/90 transition-colors lowercase"
-                  >
-                    {isSignedIn ? 'upgrade to save recipes' : 'sign up to save'}
-                  </Link>
-                )
-              )}
-
-              {/* Already saved indicator */}
-              {isSaved && (
-                <p className="text-sage text-sm lowercase">✓ {t.saved}</p>
-              )}
-
-              {/* Clean another recipe */}
-              <Link
-                to="/"
-                className="text-sm text-ash hover:text-bone transition-colors lowercase"
-              >
-                clean another recipe →
-              </Link>
-
-              {/* Quota nudge for free users */}
-              {quota.tier === 'free' && quota.remaining <= 2 && quota.remaining > 0 && (
-                <p className="text-xs text-ash/60 mt-2 lowercase">
-                  {quota.remaining} recipe{quota.remaining !== 1 ? 's' : ''} left this month
-                </p>
-              )}
-
-              {/* Email capture for non-signed-in users who rated */}
-              {!isSignedIn && rating > 0 && !emailSubmitted && (
-                <div className="mt-4 p-4 rounded-2xl bg-gunmetal border border-ash/20 max-w-xs">
-                  <p className="text-sm text-bone mb-3 lowercase">get recipe tips & updates</p>
-                  <form
-                    onSubmit={(e) => {
-                      e.preventDefault()
-                      if (email) {
-                        // TODO: Submit to backend
-                        setEmailSubmitted(true)
-                        showToast('thanks! we\'ll be in touch', 'success')
-                      }
-                    }}
-                    className="flex gap-2"
-                  >
-                    <input
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      placeholder="your@email.com"
-                      className="flex-1 px-3 py-2 text-sm bg-obsidian border border-ash/30 rounded-full text-bone placeholder:text-ash/50 focus:outline-none focus:border-sage"
-                    />
-                    <button
-                      type="submit"
-                      disabled={!email}
-                      className="px-4 py-2 text-sm bg-sage text-obsidian rounded-full hover:bg-sage/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                    >
-                      →
-                    </button>
-                  </form>
-                </div>
-              )}
-              {emailSubmitted && (
-                <p className="text-xs text-sage mt-2 lowercase">✓ you're on the list!</p>
-              )}
-          </div>
-        </div>
+        <CompletionScreen
+          recipe={recipe}
+          rating={rating}
+          onRate={handleRate}
+          isSaved={isSaved}
+          isSaving={isSaving}
+          onSave={handleSave}
+          userCanSave={userCanSave}
+          isSignedIn={isSignedIn}
+          quota={quota}
+          email={email}
+          onEmailChange={setEmail}
+          emailSubmitted={emailSubmitted}
+          onEmailSubmit={async () => {
+            if (email) {
+              posthog.capture('email_capture_submitted', {
+                source: 'completion_screen',
+              })
+              try {
+                await api.submitEmailCapture(email, 'completion_screen')
+              } catch (error) {
+                console.error('Failed to submit email:', error)
+              }
+              setEmailSubmitted(true)
+              showToast("thanks! we'll be in touch", 'success')
+            }
+          }}
+          t={t}
+        />
       )}
 
       {/* Tips */}
