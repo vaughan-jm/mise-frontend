@@ -11,6 +11,7 @@
  */
 
 import { useIngredientCategories } from '../../hooks/useIngredientCategories'
+import { useStructuredIngredientGroups } from '../../hooks/useStructuredIngredientGroups'
 import type { Ingredient, StructuredIngredient } from '../../lib/types'
 
 interface IngredientListProps {
@@ -257,25 +258,41 @@ export default function IngredientList({
   ingredientsStructured,
   servingsMultiplier = 1,
 }: IngredientListProps) {
+  // Call hooks unconditionally (React rules of hooks)
+  const groupedSections = useStructuredIngredientGroups(ingredientsStructured || [])
+  const { groupedIngredients } = useIngredientCategories(ingredients)
+
   // Use structured ingredients if available
   if (ingredientsStructured && ingredientsStructured.length > 0) {
     return (
-      <ul className="space-y-1">
-        {ingredientsStructured.map((ingredient, index) => (
-          <li
-            key={index}
-            className="flex items-start gap-2 text-base text-bone leading-relaxed"
-          >
-            <span className="text-sage mt-0.5">•</span>
-            <span>{formatStructuredIngredient(ingredient, servingsMultiplier)}</span>
-          </li>
+      <div className="space-y-6">
+        {groupedSections.map((group, groupIndex) => (
+          <div key={groupIndex}>
+            {/* Section header - only show if section exists */}
+            {group.section && (
+              <h3 className="text-sm font-medium text-ash lowercase mb-3">
+                {group.section.toLowerCase()}
+              </h3>
+            )}
+
+            <ul className="space-y-1">
+              {group.ingredients.map((ingredient, index) => (
+                <li
+                  key={index}
+                  className="flex items-start gap-2 text-lg text-bone leading-relaxed"
+                >
+                  <span className="text-sage mt-0.5">•</span>
+                  <span>{formatStructuredIngredient(ingredient, servingsMultiplier)}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
         ))}
-      </ul>
+      </div>
     )
   }
 
   // Fall back to legacy format with category grouping
-  const { groupedIngredients } = useIngredientCategories(ingredients)
 
   return (
     <ul className="space-y-1">
@@ -286,7 +303,7 @@ export default function IngredientList({
           return (
             <li
               key={originalIndex}
-              className="flex items-start gap-2 text-base text-bone leading-relaxed"
+              className="flex items-start gap-2 text-lg text-bone leading-relaxed"
             >
               <span className="text-sage mt-0.5">•</span>
               <span>{scaledText}</span>

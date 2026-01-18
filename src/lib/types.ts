@@ -44,6 +44,7 @@ export interface StructuredIngredient {
   } | null
   originalSystem?: 'metric' | 'imperial'  // Which system was in the original recipe
   category: string       // "proteins", "vegetables", "dairy", "pantry", "spices", "other"
+  section?: string | null  // "For the marinade", "For the sauce", etc.
 }
 
 export interface Step {
