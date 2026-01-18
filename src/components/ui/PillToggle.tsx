@@ -2,15 +2,13 @@
  * PillToggle Component
  *
  * Pill-shaped two-option toggle (prep/cook).
- * Selected option highlighted with animated sliding indicator.
+ * Selected option highlighted with CSS transition for cross-browser reliability.
  *
  * Features:
  * - Pill shape matching homepage aesthetic
- * - Animated sliding background on selection
- * - Sage highlight on selected, dark on unselected
+ * - Background transition on selection
+ * - Bone highlight on selected, dark on unselected
  */
-
-import { motion } from 'framer-motion'
 
 interface PillToggleOption {
   value: string
@@ -50,31 +48,17 @@ export default function PillToggle({
             onClick={() => !disabled && onChange(option.value)}
             disabled={disabled}
             className={`
-              relative
               px-4 py-1.5
               rounded-full
               text-sm font-medium
               lowercase
-              transition-colors duration-200
-              ${isSelected ? 'text-obsidian' : 'text-ash hover:text-bone'}
+              transition-all duration-200
+              ${isSelected
+                ? 'bg-bone text-obsidian'
+                : 'bg-transparent text-ash hover:text-bone'}
             `}
           >
-            {/* Animated background indicator */}
-            {isSelected && (
-              <motion.div
-                layoutId="pill-toggle-indicator"
-                className="absolute inset-0 z-0 bg-bone rounded-full"
-                initial={false}
-                transition={{
-                  type: 'spring',
-                  stiffness: 500,
-                  damping: 30
-                }}
-              />
-            )}
-
-            {/* Label */}
-            <span className="relative z-10">{option.label}</span>
+            {option.label}
           </button>
         )
       })}

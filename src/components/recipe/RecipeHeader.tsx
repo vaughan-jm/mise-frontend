@@ -55,7 +55,7 @@ export default function RecipeHeader({
         )}
 
         {/* Title - linked for URL sources, plain text for photos */}
-        <div className="flex-1 min-w-0">
+        <div className="flex-1 min-w-0 flex flex-col">
           {recipe.sourceUrl && recipe.source !== 'photo' ? (
             <a
               href={recipe.sourceUrl}

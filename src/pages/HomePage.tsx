@@ -16,23 +16,23 @@ import { loadingMessages } from '../config/content'
 
 export default function HomePage() {
   const navigate = useNavigate()
-  const { language, quota, isSignedIn } = useApp()
-  const { extract, isLoading, error, clearError } = useRecipe()
+  const { language, quota, isSignedIn, isLoading: isAuthLoading } = useApp()
+  const { extract, isLoading: isExtractLoading, error, clearError } = useRecipe()
   const { canExtract } = useQuota()
 
-  // Show upgrade nudge when quota exhausted (not during loading)
-  const showUpgradeNudge = !isLoading && !canExtract && quota.remaining === 0
+  // Show upgrade nudge only when auth is fully loaded and quota exhausted
+  const showUpgradeNudge = !isAuthLoading && !isExtractLoading && !canExtract && quota.remaining === 0
 
   // Loading message rotation
   const [loadingMessageIndex, setLoadingMessageIndex] = useState(0)
 
   useEffect(() => {
-    if (!isLoading) return
+    if (!isExtractLoading) return
     const interval = setInterval(() => {
       setLoadingMessageIndex((prev) => (prev + 1) % loadingMessages.length)
     }, 2000)
     return () => clearInterval(interval)
-  }, [isLoading])
+  }, [isExtractLoading])
 
   // Handle extraction from SmartInput
   const handleSubmit = useCallback(
@@ -84,13 +84,13 @@ export default function HomePage() {
         <div className="w-full max-w-[400px] mt-8">
           <SmartInput
             onSubmit={handleSubmit}
-            isLoading={isLoading}
+            isLoading={isExtractLoading}
             disabled={!canExtract}
             placeholder="recipe or YouTube URL"
           />
 
           {/* Loading message */}
-          {isLoading && (
+          {isExtractLoading && (
             <motion.p
               key={loadingMessageIndex}
               initial={{ opacity: 0 }}
