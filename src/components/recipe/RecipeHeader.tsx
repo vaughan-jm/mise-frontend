@@ -6,15 +6,11 @@
  * Features:
  * - Recipe title
  * - Servings adjuster (± buttons)
- * - Prep/cook times
- * - Metadata badges (difficulty, cuisine, dietary)
  * - Font size toggle (A/A+)
  * - Save button or upgrade link
- * - Back navigation
  */
 
-import { useNavigate } from 'react-router-dom'
-import type { Recipe, Difficulty } from '../../lib/types'
+import type { Recipe } from '../../lib/types'
 
 // Icons
 const MinusIcon = () => (
@@ -26,12 +22,6 @@ const MinusIcon = () => (
 const PlusIcon = () => (
   <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-  </svg>
-)
-
-const BackIcon = () => (
-  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
   </svg>
 )
 
@@ -48,13 +38,6 @@ interface RecipeHeaderProps {
   showUpgradeLink?: boolean
 }
 
-// Difficulty badge colors
-const difficultyColors: Record<Difficulty, string> = {
-  easy: 'bg-green-900/30 text-green-400',
-  medium: 'bg-yellow-900/30 text-yellow-400',
-  hard: 'bg-red-900/30 text-red-400'
-}
-
 export default function RecipeHeader({
   recipe,
   servings,
@@ -67,8 +50,6 @@ export default function RecipeHeader({
   onSave,
   showUpgradeLink = false,
 }: RecipeHeaderProps) {
-  const navigate = useNavigate()
-
   return (
     <div className="space-y-3">
       {/* Row 1: Title + Actions */}
@@ -131,18 +112,6 @@ export default function RecipeHeader({
             </button>
           ) : null}
 
-          {/* Back button */}
-          <button
-            onClick={() => navigate('/')}
-            className="
-              p-2
-              text-ash hover:text-bone
-              transition-colors
-            "
-            aria-label="Back to home"
-          >
-            <BackIcon />
-          </button>
         </div>
       </div>
 
@@ -150,7 +119,6 @@ export default function RecipeHeader({
       <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-ash">
         {/* Servings adjuster */}
         <div className="flex items-center gap-2">
-          <span className="text-ash/60">servings:</span>
           <button
             onClick={() => onServingsChange(Math.max(1, servings - 1))}
             className="w-6 h-6 flex items-center justify-center rounded-full border border-ash/30 text-ash hover:text-bone hover:border-ash/50 transition-colors"
@@ -168,50 +136,6 @@ export default function RecipeHeader({
           </button>
         </div>
 
-        {/* Times */}
-        {recipe.prepTime && (
-          <span>prep: {recipe.prepTime}</span>
-        )}
-        {recipe.cookTime && (
-          <span>cook: {recipe.cookTime}</span>
-        )}
-        {recipe.totalTime && !recipe.prepTime && !recipe.cookTime && (
-          <span>total: {recipe.totalTime}</span>
-        )}
-      </div>
-
-      {/* Row 3: Badges */}
-      <div className="flex flex-wrap gap-2">
-        {/* Difficulty */}
-        {recipe.difficulty && (
-          <span className={`px-2 py-0.5 text-xs rounded-full lowercase ${difficultyColors[recipe.difficulty]}`}>
-            {recipe.difficulty}
-          </span>
-        )}
-
-        {/* Cuisine */}
-        {recipe.cuisine && (
-          <span className="px-2 py-0.5 text-xs rounded-full bg-ash/10 text-ash lowercase">
-            {recipe.cuisine}
-          </span>
-        )}
-
-        {/* Meal type */}
-        {recipe.mealType && (
-          <span className="px-2 py-0.5 text-xs rounded-full bg-ash/10 text-ash lowercase">
-            {recipe.mealType}
-          </span>
-        )}
-
-        {/* Dietary tags */}
-        {recipe.dietaryTags?.map((tag) => (
-          <span
-            key={tag}
-            className="px-2 py-0.5 text-xs rounded-full bg-sage/10 text-sage lowercase"
-          >
-            {tag}
-          </span>
-        ))}
       </div>
 
       {/* Source link */}

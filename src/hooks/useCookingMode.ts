@@ -158,7 +158,7 @@ export function useCookingMode(recipe: Recipe | null): UseCookingModeReturn {
     return completedSteps.size >= recipe.steps.length
   }, [recipe, completedSteps])
 
-  const isComplete = allIngredientsComplete && allStepsComplete
+  const isComplete = allStepsComplete
 
   // Undo last action
   const canUndo = undoHistory.length > 0

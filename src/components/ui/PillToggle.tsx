@@ -63,7 +63,7 @@ export default function PillToggle({
             {isSelected && (
               <motion.div
                 layoutId="pill-toggle-indicator"
-                className="absolute inset-0 bg-sage rounded-full"
+                className="absolute inset-0 z-0 bg-bone rounded-full"
                 initial={false}
                 transition={{
                   type: 'spring',

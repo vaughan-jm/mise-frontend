@@ -148,11 +148,9 @@ export default function SwipeableItem({
     >
       {/* Background action bar (revealed on swipe) */}
       <motion.div
-        className="absolute inset-0 rounded-full bg-sage flex items-center justify-center"
+        className="absolute inset-0 rounded-full bg-sage"
         style={{ opacity: actionBarOpacity, scale: actionBarScale }}
-      >
-        <span className="text-obsidian font-medium text-sm lowercase">done</span>
-      </motion.div>
+      />
 
       {/* Foreground content (draggable) */}
       <motion.div

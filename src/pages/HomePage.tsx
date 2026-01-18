@@ -20,8 +20,8 @@ export default function HomePage() {
   const { extract, isLoading, error, clearError } = useRecipe()
   const { canExtract } = useQuota()
 
-  // Show upgrade nudge when quota exhausted
-  const showUpgradeNudge = !canExtract && quota.remaining === 0
+  // Show upgrade nudge when quota exhausted (not during loading)
+  const showUpgradeNudge = !isLoading && !canExtract && quota.remaining === 0
 
   // Loading message rotation
   const [loadingMessageIndex, setLoadingMessageIndex] = useState(0)

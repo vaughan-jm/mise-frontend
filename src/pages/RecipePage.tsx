@@ -74,11 +74,9 @@ export default function RecipePage() {
     setPhase,
     completedIngredients,
     completeIngredient,
-    ingredientProgress,
     allIngredientsComplete,
     completeStep,
     isStepComplete,
-    stepProgress,
     canUndo,
     undo,
     isComplete,
@@ -162,16 +160,16 @@ export default function RecipePage() {
     <PageLayout showFooter={false} maxWidth="lg" className="px-4 pb-24">
       {/* Hero Image - only for URL/YouTube sources */}
       {showHeroImage && (
-        <div className="relative w-full h-48 sm:h-64 -mx-4 mb-4 overflow-hidden">
+        <div className="relative w-full max-h-48 sm:max-h-56 mb-4 rounded-2xl overflow-hidden">
           <img
             src={recipe.imageUrl}
             alt={recipe.title}
-            className="w-full h-full object-cover"
+            className="w-full h-auto max-h-48 sm:max-h-56 object-cover"
             onError={(e) => {
               (e.target as HTMLElement).parentElement!.style.display = 'none'
             }}
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-obsidian/80 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-obsidian/80 to-transparent rounded-2xl" />
         </div>
       )}
 
@@ -203,14 +201,6 @@ export default function RecipePage() {
         />
       </div>
 
-      {/* Progress */}
-      <div className="text-center text-sm text-ash mb-4 lowercase">
-        {phase === 'prep' ? (
-          <span>{ingredientProgress.completed} of {ingredientProgress.total} gathered</span>
-        ) : (
-          <span>{stepProgress.completed} of {stepProgress.total} completed</span>
-        )}
-      </div>
 
       {/* Content */}
       <AnimatePresence mode="wait">
