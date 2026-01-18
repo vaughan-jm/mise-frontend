@@ -78,13 +78,14 @@ function formatNumber(value: number, unit: string): string {
 
 /**
  * Format a structured ingredient for display
- * Returns format: "1 lb chicken breast (450g)"
+ * Shows original system first, converted in parentheses
+ * e.g., "1 lb chicken breast (450g)" or "450g chicken breast (1 lb)"
  */
 function formatStructuredIngredient(
   ingredient: StructuredIngredient,
   multiplier: number = 1
 ): string {
-  const { text, metric, imperial } = ingredient
+  const { text, metric, imperial, originalSystem } = ingredient
 
   // Scale values
   const scaledMetric = metric
@@ -107,8 +108,15 @@ function formatStructuredIngredient(
     return `${formatNumber(scaledMetric.value, scaledMetric.unit)}${scaledMetric.unit} ${text}`
   }
 
-  // Both systems: imperial first, metric in parentheses
-  return `${formatNumber(scaledImperial!.value, scaledImperial!.unit)} ${scaledImperial!.unit} ${text} (${formatNumber(scaledMetric!.value, scaledMetric!.unit)}${scaledMetric!.unit})`
+  // Both systems available - show original first, converted in parentheses
+  // Default to imperial if originalSystem not specified (backward compatibility)
+  const showMetricFirst = originalSystem === 'metric'
+
+  if (showMetricFirst) {
+    return `${formatNumber(scaledMetric!.value, scaledMetric!.unit)}${scaledMetric!.unit} ${text} (${formatNumber(scaledImperial!.value, scaledImperial!.unit)} ${scaledImperial!.unit})`
+  } else {
+    return `${formatNumber(scaledImperial!.value, scaledImperial!.unit)} ${scaledImperial!.unit} ${text} (${formatNumber(scaledMetric!.value, scaledMetric!.unit)}${scaledMetric!.unit})`
+  }
 }
 
 // ============================================================================
@@ -256,7 +264,7 @@ export default function IngredientList({
         {ingredientsStructured.map((ingredient, index) => (
           <li
             key={index}
-            className="flex items-start gap-2 text-sm text-bone leading-relaxed"
+            className="flex items-start gap-2 text-base text-bone leading-relaxed"
           >
             <span className="text-sage mt-0.5">•</span>
             <span>{formatStructuredIngredient(ingredient, servingsMultiplier)}</span>
@@ -278,7 +286,7 @@ export default function IngredientList({
           return (
             <li
               key={originalIndex}
-              className="flex items-start gap-2 text-sm text-bone leading-relaxed"
+              className="flex items-start gap-2 text-base text-bone leading-relaxed"
             >
               <span className="text-sage mt-0.5">•</span>
               <span>{scaledText}</span>

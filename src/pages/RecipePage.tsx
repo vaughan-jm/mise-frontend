@@ -156,8 +156,8 @@ export default function RecipePage() {
       <div className="flex justify-center mb-6">
         <PillToggle
           options={[
-            { value: 'prep', label: '1. prep' },
-            { value: 'cook', label: '2. cook' },
+            { value: 'prep', label: 'prep' },
+            { value: 'cook', label: 'cook' },
           ]}
           value={phase}
           onChange={(value) => setPhase(value as 'prep' | 'cook')}
@@ -166,93 +166,63 @@ export default function RecipePage() {
 
 
       {/* Content */}
-      <AnimatePresence mode="wait">
-        {/* Prep Phase - Grouped Ingredients */}
-        {phase === 'prep' && (
-          <motion.div
-            key="prep"
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: 20 }}
-            transition={{ duration: 0.2 }}
-          >
-            <IngredientList
-              ingredients={recipe.ingredients}
-              ingredientsStructured={recipe.ingredientsStructured}
-              servingsMultiplier={servingsMultiplier}
-            />
-          </motion.div>
-        )}
+      {/* Prep Phase - Grouped Ingredients */}
+      {phase === 'prep' && (
+        <div>
+          <IngredientList
+            ingredients={recipe.ingredients}
+            ingredientsStructured={recipe.ingredientsStructured}
+            servingsMultiplier={servingsMultiplier}
+          />
+        </div>
+      )}
 
-        {/* Cook Phase - Steps */}
-        {phase === 'cook' && !showRating && (
-          <motion.div
-            key="cook"
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            transition={{ duration: 0.2 }}
-            className="space-y-3"
-          >
-            <AnimatePresence mode="popLayout">
-              {recipe.steps.map((step, index) => {
-                if (isStepComplete(index)) return null
+      {/* Cook Phase - Steps */}
+      {phase === 'cook' && !showRating && (
+        <div className="space-y-3">
+          <AnimatePresence mode="popLayout">
+            {recipe.steps.map((step, index) => {
+              if (isStepComplete(index)) return null
 
-                // First incomplete step gets peek if we haven't shown it
-                const isFirstIncomplete = !recipe.steps.slice(0, index).some((_, i) => !isStepComplete(i))
-                const showStepPeek = shouldShowPeek && isFirstIncomplete
+              // First incomplete step gets peek if we haven't shown it
+              const isFirstIncomplete = !recipe.steps.slice(0, index).some((_, i) => !isStepComplete(i))
+              const showStepPeek = shouldShowPeek && isFirstIncomplete
 
-                return (
-                  <motion.div
-                    key={index}
-                    layout
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: 'auto' }}
-                    exit={{
-                      opacity: 0,
-                      height: 0,
-                      marginBottom: 0,
-                      transition: { duration: 0.2 }
-                    }}
-                    transition={{
-                      layout: { duration: 0.25, ease: 'easeOut' },
-                      opacity: { duration: 0.15 }
-                    }}
-                  >
-                    <StepCard
-                      number={index + 1}
-                      step={step}
-                      onComplete={() => completeStep(index)}
-                      showPeek={showStepPeek}
-                      onPeekComplete={markPeekSeen}
-                      servingsMultiplier={servingsMultiplier}
-                    />
-                  </motion.div>
-                )
-              })}
-            </AnimatePresence>
+              return (
+                <motion.div
+                  key={index}
+                  exit={{
+                    opacity: 0,
+                    height: 0,
+                    marginBottom: 0,
+                    transition: { duration: 0.2 }
+                  }}
+                >
+                  <StepCard
+                    number={index + 1}
+                    step={step}
+                    onComplete={() => completeStep(index)}
+                    showPeek={showStepPeek}
+                    onPeekComplete={markPeekSeen}
+                    servingsMultiplier={servingsMultiplier}
+                  />
+                </motion.div>
+              )
+            })}
+          </AnimatePresence>
 
-            {/* All steps complete but rating not shown yet */}
-            {isComplete && !showRating && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="text-center py-8 text-sage"
-              >
-                <p className="text-lg lowercase">all steps completed!</p>
-              </motion.div>
-            )}
-          </motion.div>
-        )}
+          {/* All steps complete but rating not shown yet */}
+          {isComplete && !showRating && (
+            <div className="text-center py-8 text-sage">
+              <p className="text-lg lowercase">all steps completed!</p>
+            </div>
+          )}
+        </div>
+      )}
 
-        {/* Completion Screen */}
-        {showRating && (
-          <motion.div
-            key="completion"
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="text-center py-8 space-y-6"
-          >
+      {/* Completion Screen */}
+      {showRating && (
+        <div className="text-center py-8 space-y-6">
             <p className="text-2xl text-sage font-bold lowercase">
               {completionMessages[Math.floor(Math.random() * completionMessages.length)]}
             </p>
@@ -340,10 +310,9 @@ export default function RecipePage() {
               {emailSubmitted && (
                 <p className="text-xs text-sage mt-2 lowercase">✓ you're on the list!</p>
               )}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+          </div>
+        </div>
+      )}
 
       {/* Tips */}
       {recipe.tips && recipe.tips.length > 0 && !showRating && (

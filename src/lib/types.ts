@@ -42,6 +42,7 @@ export interface StructuredIngredient {
     value: number
     unit: string         // "lb", "oz", "cup", "tbsp", "tsp"
   } | null
+  originalSystem?: 'metric' | 'imperial'  // Which system was in the original recipe
   category: string       // "proteins", "vegetables", "dairy", "pantry", "spices", "other"
 }
 

@@ -72,26 +72,26 @@ export default function RecipeHeader({
               {recipe.title}
             </h1>
           )}
-        </div>
-      </div>
 
-      {/* Row 2: Servings adjuster */}
-      <div className="flex items-center gap-2 text-sm text-ash">
-        <button
-          onClick={() => onServingsChange(Math.max(1, servings - 1))}
-          className="w-6 h-6 flex items-center justify-center rounded-full border border-ash/30 text-ash hover:text-bone hover:border-ash/50 transition-colors"
-          aria-label="Decrease servings"
-        >
-          <MinusIcon />
-        </button>
-        <span className="text-bone font-medium w-4 text-center">{servings}</span>
-        <button
-          onClick={() => onServingsChange(servings + 1)}
-          className="w-6 h-6 flex items-center justify-center rounded-full border border-ash/30 text-ash hover:text-bone hover:border-ash/50 transition-colors"
-          aria-label="Increase servings"
-        >
-          <PlusIcon />
-        </button>
+          {/* Servings adjuster - inside title div for alignment */}
+          <div className="flex items-center gap-2 text-sm text-ash mt-2">
+            <button
+              onClick={() => onServingsChange(Math.max(1, servings - 1))}
+              className="w-6 h-6 flex items-center justify-center rounded-full border border-ash/30 text-ash hover:text-bone hover:border-ash/50 transition-colors"
+              aria-label="Decrease servings"
+            >
+              <MinusIcon />
+            </button>
+            <span className="text-bone font-medium w-4 text-center">{servings}</span>
+            <button
+              onClick={() => onServingsChange(servings + 1)}
+              className="w-6 h-6 flex items-center justify-center rounded-full border border-ash/30 text-ash hover:text-bone hover:border-ash/50 transition-colors"
+              aria-label="Increase servings"
+            >
+              <PlusIcon />
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   )

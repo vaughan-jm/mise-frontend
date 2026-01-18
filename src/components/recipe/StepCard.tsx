@@ -25,8 +25,6 @@ interface StepCardProps {
   showPeek?: boolean
   /** Called when peek animation completes */
   onPeekComplete?: () => void
-  /** Font size class */
-  fontSizeClass?: string
   /** Servings multiplier for scaling ingredient quantities */
   servingsMultiplier?: number
   /** Disabled state */
@@ -104,7 +102,6 @@ export default function StepCard({
   onComplete,
   showPeek = false,
   onPeekComplete,
-  fontSizeClass = 'text-base',
   servingsMultiplier = 1,
   disabled = false,
 }: StepCardProps) {
@@ -148,7 +145,7 @@ export default function StepCard({
           </span>
 
           {/* Instruction text */}
-          <p className={`text-bone leading-relaxed ${fontSizeClass}`}>
+          <p className="text-bone leading-relaxed text-lg">
             {step.text}
           </p>
         </div>
@@ -159,7 +156,7 @@ export default function StepCard({
             {step.ingredients!.map((ingredient, idx) => (
               <p
                 key={idx}
-                className="text-sm text-ash/70 leading-snug"
+                className="text-base text-ash/70 leading-snug"
               >
                 {scaleIngredientText(ingredient, servingsMultiplier)}
               </p>
