@@ -1,36 +1,23 @@
 /**
  * IngredientList Component
  *
- * Displays ingredients grouped by category with smooth removal animations.
- * Uses AnimatePresence with layout animations for seamless transitions.
+ * Displays all ingredients in a single scrollable container,
+ * grouped by category. Static list for reference during prep.
  *
  * Features:
  * - Category grouping (proteins, vegetables, spices, etc.)
- * - Subtle inline category labels
- * - Smooth removal when items complete (no page jump)
- * - First-time peek animation support
+ * - Quantity scaling based on servings multiplier
+ * - Scrollable container with subtle styling
  */
 
-import { motion, AnimatePresence } from 'framer-motion'
 import { useIngredientCategories } from '../../hooks/useIngredientCategories'
-import IngredientCard from './IngredientCard'
 import type { Ingredient } from '../../lib/types'
 
 interface IngredientListProps {
   /** All ingredients from the recipe */
   ingredients: Ingredient[]
-  /** Set of completed ingredient indices */
-  completedIndices: Set<number>
-  /** Called when an ingredient is marked complete */
-  onComplete: (index: number) => void
   /** Servings multiplier for scaling quantities */
   servingsMultiplier?: number
-  /** Whether to show peek animation on first item */
-  showPeek?: boolean
-  /** Called when peek animation completes */
-  onPeekComplete?: () => void
-  /** Font size class from useFontSize hook */
-  fontSizeClass?: string
 }
 
 /**
@@ -46,60 +33,126 @@ interface IngredientListProps {
  */
 function reformatIngredientText(text: string): string {
   // Pattern: "[metric qty+unit] / [imperial qty+unit] [description]"
+  // The separator " / " must have spaces around it to distinguish from fractions like "3/4"
   // Examples:
   //   "450g / 1 lb sweet Italian sausage"
   //   "1 / 1 egg"
-  //   "1 / 1 medium onion, minced"
+  //   "200g / 3/4 cup granulated sugar" (note: 3/4 is a fraction, not separator)
   //   "2 cloves / 2 cloves garlic, crushed"
   //   "2.5ml / 0.5 tsp fennel seeds"
 
-  const slashMatch = text.match(/^([\d.]+\s*\w*)\s*\/\s*([\d.]+\s*\w*)\s+(.+)$/)
-
-  if (!slashMatch || !slashMatch[1] || !slashMatch[2] || !slashMatch[3]) {
-    // No slash format detected, return as-is
+  // Split on " / " (with spaces) to avoid matching fractions
+  const separatorIndex = text.indexOf(' / ')
+  if (separatorIndex === -1) {
     return text
   }
 
-  const metricPart = slashMatch[1]
-  const imperialPart = slashMatch[2]
-  const description = slashMatch[3]
-  const metric = metricPart.trim()
-  const imperial = imperialPart.trim()
+  const metricPart = text.slice(0, separatorIndex).trim()
+  const rest = text.slice(separatorIndex + 3).trim() // Skip " / "
 
-  // If metric and imperial are the same (e.g., "1 / 1"), just show one
-  if (metric === imperial) {
+  // Find where the imperial quantity ends and description begins
+  // Imperial can be: "1 lb", "3/4 cup", "1 1/2 cups", "2 cloves"
+  const imperialMatch = rest.match(/^((?:\d+\s+)?\d+(?:\/\d+)?\s*(?:lb|oz|g|kg|ml|l|cup|cups|tbsp|tsp|tablespoon|teaspoon|clove|cloves)?)\s+(.+)$/i)
+
+  if (!imperialMatch || !imperialMatch[1] || !imperialMatch[2]) {
+    // Couldn't parse imperial, return as-is
+    return text
+  }
+
+  const imperial = imperialMatch[1].trim()
+  const description = imperialMatch[2].trim()
+
+  // If metric and imperial are the same, just show one
+  if (metricPart === imperial) {
     return `${imperial} ${description}`
   }
 
-  // Check if they're numerically equivalent
-  const metricNumMatch = metric.match(/^([\d.]+)\s*(.*)$/)
-  const imperialNumMatch = imperial.match(/^([\d.]+)\s*(.*)$/)
-
-  if (metricNumMatch?.[1] && imperialNumMatch?.[1]) {
-    const metricNum = parseFloat(metricNumMatch[1])
-    const metricUnit = metricNumMatch[2] ?? ''
-    const imperialNum = parseFloat(imperialNumMatch[1])
-    const imperialUnit = imperialNumMatch[2] ?? ''
-
-    // If same number and same unit, just show once
-    if (metricNum === imperialNum && metricUnit === imperialUnit) {
-      return `${imperial} ${description}`
-    }
-
-    // If metric is just a plain number with no unit and equals imperial number,
-    // don't show the parenthetical (e.g., "1 / 1 medium onion" -> "1 medium onion")
-    if (!metricUnit && metricNum === imperialNum) {
-      return `${imperial} ${description}`
-    }
+  // Check if they're numerically equivalent (simple numbers only)
+  const metricNum = parseFloat(metricPart)
+  const imperialNum = parseFloat(imperial)
+  if (!isNaN(metricNum) && !isNaN(imperialNum) && metricNum === imperialNum) {
+    return `${imperial} ${description}`
   }
 
   // Show imperial first, metric in parentheses
-  return `${imperial} ${description} (${metric})`
+  return `${imperial} ${description} (${metricPart})`
+}
+
+/**
+ * Format a scaled number - use fractions for imperial, decimals for metric
+ */
+function formatScaledQuantity(decimal: number, unit: string): string {
+  // Metric units should use clean decimals, not fractions
+  const isMetric = /^(g|kg|ml|l)$/i.test(unit)
+
+  if (isMetric) {
+    // Round to nearest whole number for metric
+    return Math.round(decimal).toString()
+  }
+
+  // For imperial, try to use nice fractions
+  const fractions: [number, string][] = [
+    [0.125, '1/8'],
+    [0.25, '1/4'],
+    [0.333, '1/3'],
+    [0.375, '3/8'],
+    [0.5, '1/2'],
+    [0.625, '5/8'],
+    [0.667, '2/3'],
+    [0.75, '3/4'],
+    [0.875, '7/8'],
+  ]
+
+  const whole = Math.floor(decimal)
+  const remainder = decimal - whole
+
+  // If close to a whole number, return as whole
+  if (remainder < 0.1 || remainder > 0.9) {
+    return Math.round(decimal).toString()
+  }
+
+  // Check if remainder matches a common fraction
+  for (const [value, fraction] of fractions) {
+    if (Math.abs(remainder - value) < 0.08) {
+      return whole > 0 ? `${whole} ${fraction}` : fraction
+    }
+  }
+
+  // Fall back to decimal with 1 decimal place
+  return decimal.toFixed(1).replace(/\.0$/, '')
+}
+
+/**
+ * Parse a quantity that might be a fraction, mixed number, or decimal
+ * Examples: "3/4", "1 1/2", "2.5", "3"
+ */
+function parseQuantity(str: string): number {
+  str = str.trim()
+
+  // Check for mixed number: "1 1/2"
+  const mixedMatch = str.match(/^(\d+)\s+(\d+)\/(\d+)$/)
+  if (mixedMatch && mixedMatch[1] && mixedMatch[2] && mixedMatch[3]) {
+    const whole = parseInt(mixedMatch[1], 10)
+    const num = parseInt(mixedMatch[2], 10)
+    const denom = parseInt(mixedMatch[3], 10)
+    return whole + num / denom
+  }
+
+  // Check for fraction: "3/4"
+  const fractionMatch = str.match(/^(\d+)\/(\d+)$/)
+  if (fractionMatch && fractionMatch[1] && fractionMatch[2]) {
+    const num = parseInt(fractionMatch[1], 10)
+    const denom = parseInt(fractionMatch[2], 10)
+    return num / denom
+  }
+
+  // Otherwise parse as decimal
+  return parseFloat(str) || 0
 }
 
 /**
  * Scale ingredient text based on servings multiplier
- * Handles format: "1 lb sweet Italian sausage (450g)"
+ * Handles formats: "1 lb sausage", "3/4 cup flour", "1 1/2 cups sugar"
  */
 function scaleIngredientText(text: string, multiplier: number): string {
   // First reformat from backend format
@@ -107,112 +160,71 @@ function scaleIngredientText(text: string, multiplier: number): string {
 
   if (multiplier === 1) return reformatted
 
-  // Match numbers (including those in parentheses for metric)
-  return reformatted.replace(
-    /(\d+\.?\d*)\s*(lb|oz|g|kg|ml|l|cup|cups|tbsp|tsp|tablespoon|teaspoon|clove|cloves)?/gi,
-    (_match, num, unit) => {
-      const value = parseFloat(num)
-      const scaled = value * multiplier
+  // Units to match (must come after the quantity)
+  const units = 'lb|oz|g|kg|ml|l|cup|cups|tbsp|tsp|tablespoon|teaspoon|clove|cloves'
 
-      // Format nicely - avoid excessive decimals
-      const formatted = scaled % 1 === 0
-        ? scaled.toString()
-        : scaled.toFixed(1).replace(/\.0$/, '')
-
-      return `${formatted}${unit ? ` ${unit}` : ''}`
-    }
+  // Match: mixed number + unit, fraction + unit, or decimal + unit
+  // Pattern: optional whole number, optional fraction, then unit
+  const pattern = new RegExp(
+    `(\\d+\\s+\\d+\\/\\d+|\\d+\\/\\d+|\\d+\\.?\\d*)\\s*(${units})`,
+    'gi'
   )
+
+  return reformatted.replace(pattern, (_match, qty, unit) => {
+    const value = parseQuantity(qty)
+    const scaled = value * multiplier
+    const formatted = formatScaledQuantity(scaled, unit)
+    return `${formatted} ${unit}`
+  })
 }
 
 export default function IngredientList({
   ingredients,
-  completedIndices,
-  onComplete,
   servingsMultiplier = 1,
-  showPeek = false,
-  onPeekComplete,
-  fontSizeClass = 'text-base',
 }: IngredientListProps) {
   const { groupedIngredients } = useIngredientCategories(ingredients)
 
-  // Track if we've shown peek (only on first incomplete item)
-  let peekShown = false
+  // Count total items
+  const totalItems = ingredients.length
 
   return (
-    <div className="space-y-4">
-      {groupedIngredients.map((group) => {
-        // Filter out completed items from this group
-        const incompleteItems = group.items.filter(
-          ({ originalIndex }) => !completedIndices.has(originalIndex)
-        )
+    <div className="rounded-2xl bg-gunmetal border border-ash/30 max-h-[60vh] overflow-y-auto scrollbar-thin scrollbar-thumb-ash/30">
+      {/* Header */}
+      <div className="sticky top-0 z-10 bg-gunmetal px-4 py-3 flex items-center justify-between border-b border-ash/20">
+        <span className="text-sm text-bone lowercase">prep list</span>
+        <span className="text-xs text-ash bg-ash/10 rounded-full px-2 py-0.5">
+          {totalItems} items
+        </span>
+      </div>
 
-        // Skip empty groups
-        if (incompleteItems.length === 0) return null
-
-        return (
+      {/* Ingredient groups */}
+      <div className="px-4 pb-4">
+        {groupedIngredients.map((group) => (
           <div key={group.category}>
             {/* Category label */}
-            <div className="text-xs text-ash/60 uppercase tracking-wider pl-4 py-2">
+            <div className="text-xs text-sage uppercase tracking-wider mt-4 mb-2">
               {group.label}
             </div>
 
-            {/* Items with AnimatePresence for smooth removal */}
-            <AnimatePresence mode="popLayout">
-              {incompleteItems.map(({ ingredient, originalIndex }) => {
-                // Determine if this item should show peek
-                const shouldShowPeek = showPeek && !peekShown
-                if (shouldShowPeek) peekShown = true
-
-                // Scale the ingredient text
+            {/* Ingredient items */}
+            <ul className="space-y-1">
+              {group.items.map(({ ingredient, originalIndex }) => {
                 const scaledText = scaleIngredientText(ingredient.text, servingsMultiplier)
 
                 return (
-                  <motion.div
+                  <li
                     key={originalIndex}
-                    layout
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: 'auto' }}
-                    exit={{
-                      opacity: 0,
-                      height: 0,
-                      marginBottom: 0,
-                      transition: { duration: 0.2 }
-                    }}
-                    transition={{
-                      layout: { duration: 0.25, ease: 'easeOut' },
-                      opacity: { duration: 0.15 }
-                    }}
-                    className="mb-2"
+                    className="flex items-start gap-2 text-sm text-bone leading-relaxed"
                   >
-                    <IngredientCard
-                      number={originalIndex + 1}
-                      text={scaledText}
-                      onComplete={() => onComplete(originalIndex)}
-                      showPeek={shouldShowPeek}
-                      onPeekComplete={onPeekComplete}
-                      fontSizeClass={fontSizeClass}
-                    />
-                  </motion.div>
+                    <span className="text-sage mt-0.5">•</span>
+                    <span>{scaledText}</span>
+                  </li>
                 )
               })}
-            </AnimatePresence>
+            </ul>
           </div>
-        )
-      })}
-
-      {/* Empty state when all ingredients are complete */}
-      {groupedIngredients.every(g =>
-        g.items.every(({ originalIndex }) => completedIndices.has(originalIndex))
-      ) && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="text-center py-8 text-sage"
-        >
-          <p className="text-lg lowercase">all ingredients gathered</p>
-          <p className="text-sm text-ash mt-1">ready to cook</p>
-        </motion.div>
-      )}
+        ))}
+      </div>
     </div>
   )
 }

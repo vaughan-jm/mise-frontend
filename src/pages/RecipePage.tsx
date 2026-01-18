@@ -72,9 +72,6 @@ export default function RecipePage() {
   const {
     phase,
     setPhase,
-    completedIngredients,
-    completeIngredient,
-    allIngredientsComplete,
     completeStep,
     isStepComplete,
     canUndo,
@@ -104,13 +101,6 @@ export default function RecipePage() {
       navigate('/')
     }
   }, [recipe, navigate])
-
-  // Auto-switch to cook phase when prep is complete
-  useEffect(() => {
-    if (allIngredientsComplete && phase === 'prep') {
-      setPhase('cook')
-    }
-  }, [allIngredientsComplete, phase, setPhase])
 
   // Show completion when done
   useEffect(() => {
@@ -153,8 +143,8 @@ export default function RecipePage() {
   // Determine if we should show hero image (not for photo sources)
   const showHeroImage = recipe.imageUrl && recipe.source !== 'photo'
 
-  // Should show peek animation (first time only, on prep phase)
-  const shouldShowPeek = !hasSeenPeek && phase === 'prep'
+  // Should show peek animation (first time only, for cook phase)
+  const shouldShowPeek = !hasSeenPeek && phase === 'cook'
 
   return (
     <PageLayout showFooter={false} maxWidth="lg" className="px-4 pb-24">
@@ -215,12 +205,7 @@ export default function RecipePage() {
           >
             <IngredientList
               ingredients={recipe.ingredients}
-              completedIndices={completedIngredients}
-              onComplete={completeIngredient}
               servingsMultiplier={servingsMultiplier}
-              showPeek={shouldShowPeek}
-              onPeekComplete={markPeekSeen}
-              fontSizeClass={fontSizeClass}
             />
           </motion.div>
         )}
